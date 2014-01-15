@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<definitions>
+	<define var="nombre_news" value="5" />
+	<define var="nombre_caracteres" value="200" />
+	<define var="nombre_cours" value="4" />
+	<define var="login" value="admin" />
+	<define var="pass" value="admin" />
+	<define var="db_host" value="localhost" />
+	<define var="db_name" value="mylearn" />
+	<define var="db_user" value="mylearn" />
+	<define var="db_user_pass" value="mylearn" />
+</definitions>

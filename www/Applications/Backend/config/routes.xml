@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<routes>
+	<route url="/admin(/?)" module="Dashboard" action="index" />
+	<route url="/admin/cours(/?)" module="Cours" action="index" />
+	<route url="/admin/logout" module="Connexion" action="logout" />
+	<route url="/admin/cours/supprimer" module="Cours" action="delete" />
+	<route url="/admin/cours/ajouter" module="Cours" action="add" />
+	<route url="/admin/cours/modifier-([0-9]+)" module="Cours" action="update" vars="id"/>
+</routes>

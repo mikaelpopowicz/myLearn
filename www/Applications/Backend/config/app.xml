@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<definitions>
+	<define var="login" value="miko" />
+	<define var="pass" value="bbc1a65d97d8cbfc719d7e3a28ba8df244f60123" />
+</definitions>
