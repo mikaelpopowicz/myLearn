@@ -24,7 +24,7 @@
 				} else {
 				?>
 				<div class="alert alert-info">
-					Connectez-vous à l'aide de votre login et mot de passe
+					<span class="text-center">Connectez-vous à l'aide de votre login et mot de passe</span>
 				</div>	
 				<?php
 				}
