@@ -37,7 +37,7 @@ class ByteManager_PDO extends ByteManager
 	public function getByName($name)
 	{
 		$requete = $this->dao->prepare('SELECT id_u AS id, salt
-			FROM byte
+			FROM user
 			WHERE username = :username');
 		$requete->bindValue(':username', $name);
 		$requete->execute();
@@ -51,7 +51,7 @@ class ByteManager_PDO extends ByteManager
 	public function getByNamePass($name, $pass)
 	{
 		$requete = $this->dao->prepare('SELECT id_u AS id, username, nom, prenom, email, password, salt, token, active, dateByte
-			FROM byte
+			FROM user
 			WHERE username = :username
 			AND password = :password');
 		$requete->bindValue(':username', $name);

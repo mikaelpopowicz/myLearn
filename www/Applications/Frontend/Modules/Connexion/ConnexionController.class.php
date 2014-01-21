@@ -48,9 +48,11 @@ class ConnexionController extends \Library\BackController
 						}
 					} else {
 						$this->page->addVar('erreurs', '<p class="text-error text-center">Vous avec commis une erreur sur votre identifiant/mot de passe</p>');
+						echo "<script>alert('NOOOOO');</script>";
 					}
 				} else {
 					$this->page->addVar('erreurs', '<p class="text-error text-center">Vous avec commis une erreur sur votre identifiant/mot de passe</p>');
+					echo "<script>alert('NOOOOO');</script>";
 				}
 	 		}
 	 	}
