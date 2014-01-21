@@ -11,7 +11,7 @@ class User extends \Library\Entity
 	$salt,
 	$token,
 	$active,
-	$dateByte;
+	$dateUser;
 	
 	const USER_INVALIDE = 1;
 	const NOM_INVALIDE = 2;
@@ -114,9 +114,9 @@ class User extends \Library\Entity
 		$this->active = $active;
 	}
 	
-	public function setDateByte(\DateTime $date)
+	public function setDateUser(\DateTime $date)
 	{
-		$this->dateByte = $date;
+		$this->dateUser = $date;
 	}
 	
 	
@@ -130,6 +130,6 @@ class User extends \Library\Entity
 	public function salt() { return $this->salt; }
 	public function token() { return $this->token; }
 	public function active() { return $this->active; }
-	public function dateByte() { return $this->dateByte; }
+	public function dateUser() { return $this->dateByte; }
 }
 ?>

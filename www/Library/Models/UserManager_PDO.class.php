@@ -3,7 +3,7 @@ namespace Library\Models;
  
 use \Library\Entities\User;
  
-class ByteManager_PDO extends ByteManager
+class UserManager_PDO extends UserManager
 {
 	public function getList()
 	{
@@ -13,7 +13,7 @@ class ByteManager_PDO extends ByteManager
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\User');
 		$listeByte = $requete->fetchAll();
 		foreach ($listeByte as $byte) {
-			$byte->setDateByte(new \DateTime($byte['dateUser']));
+			$byte->setDateUser(new \DateTime($byte['dateUser']));
 		}
 		$requete->closeCursor();
 		return $listeByte;
@@ -28,7 +28,7 @@ class ByteManager_PDO extends ByteManager
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\User');
 		if ($user = $requete->fetch()) {
-			$user->setDateByte(new \DateTime($user['dateUser']));
+			$user->setDateUser(new \DateTime($user['dateUser']));
 			return $user;
 		}
 		return null;
@@ -59,7 +59,7 @@ class ByteManager_PDO extends ByteManager
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\User');
 		if ($user = $requete->fetch()) {
-			$user->setDateByte(new \DateTime($user['dateUser']));
+			$user->setDateUser(new \DateTime($user['dateUser']));
 			return $user;
 		}
 		return null;
@@ -113,7 +113,7 @@ class ByteManager_PDO extends ByteManager
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\User');
 		if ($user = $requete->fetch()) {
-			$user->setDateByte(new \DateTime($user['dateUser']));
+			$user->setDateUser(new \DateTime($user['dateUser']));
 			return $user;
 		}
 		return null;
@@ -128,7 +128,7 @@ class ByteManager_PDO extends ByteManager
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\User');
 		if ($user = $requete->fetch()) {
-			$user->setDateByte(new \DateTime($user['dateUser']));
+			$user->setDateUser(new \DateTime($user['dateUser']));
 			return $user;
 		}
 		return null;
