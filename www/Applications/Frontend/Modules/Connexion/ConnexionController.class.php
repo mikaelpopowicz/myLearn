@@ -60,7 +60,7 @@ class ConnexionController extends \Library\BackController
 	{
 		if($this->app->user()->isAuthenticated()) {
 			$this->app->user()->delUser();
-			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "information", layout: "topCenter", text: "Vous êtes déconnecté"});</script>');
+			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "information", layout: "bottom", text: "Vous êtes déconnecté"});</script>');
 			if($request->getExists('request')) {
 				$this->app->httpResponse()->redirect($request->getData('request'));
 			} else {
