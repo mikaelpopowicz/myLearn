@@ -1,7 +1,7 @@
 <?php
 namespace Library\Entities;
  
-class Byte extends \Library\Entity
+class User extends \Library\Entity
 {
 	protected $username,
 	$nom,

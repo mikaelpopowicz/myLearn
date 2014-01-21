@@ -1,20 +1,20 @@
 <?php
 namespace Library\Models;
 
-use \Library\Entities\Byte;
+use \Library\Entities\User;
  
-abstract class ByteManager extends \Library\Manager
+abstract class UserManager extends \Library\Manager
 {
 	/**
 	* Méthode retournant une liste des utilisateurs
-	* @return array La liste des utilisateurs. Chaque entrée est une instance de Byte.
+	* @return array La liste des utilisateurs. Chaque entrée est une instance de User.
 	*/
 	abstract public function getList();
 	
 	/**
 	* Méthode retournant un utilisateur par son ID
 	* @param $id int L'identifiant de l'utilisateur à récupérer
-	* @return Byte L'utilisateur demandée
+	* @return User L'utilisateur demandée
 	*/
 	abstract public function getUnique($id);
 	
@@ -22,7 +22,7 @@ abstract class ByteManager extends \Library\Manager
 	* Méthode servant à l'identification
 	* @param $name string Username de l'utilisateur
 	* @param $pass string Mot de passe déjà hashé pour vérifier en BDD
-	* @return Byte L'utilisateur si il existe et le pass est correct
+	* @return User L'utilisateur si il existe et le pass est correct
 	*/
 	abstract public function getByNamePass($name, $pass);
 	
@@ -34,33 +34,33 @@ abstract class ByteManager extends \Library\Manager
 	
 	/**
 	* Méthode permettant d'ajouter un utilisateur.
-	* @param $user Byte L'utilisateur à ajouter
+	* @param $user User L'utilisateur à ajouter
 	* @return void
 	*/
-	abstract protected function add(Byte $user);
+	abstract protected function add(User $user);
 	
 	/**
 	* Méthode permettant de modifier un utilisateur
 	* @param $user Byte L'utilisateur à modifier
 	* @return void
 	*/
-	abstract protected function modify(Byte $user);
+	abstract protected function modify(User $user);
 	
 	/**
 	* Méthode permettant de supprimer un utilisateur
-	* @param $user Byte L'utilisateur à supprimer
+	* @param $user User L'utilisateur à supprimer
 	* @return void
 	*/
-	abstract public function delete(Byte $user);
+	abstract public function delete(User $user);
 	
 	/**
 	* Méthode permettant d'enregistrer un utilisateur.
-	* @param $user Byte L'utilisateur à enregistrer
+	* @param $user User L'utilisateur à enregistrer
 	* @see self::add()
 	* @see self::modify()
 	* @return void
 	*/
-	public function save(Byte $user)
+	public function save(User $user)
 	{
 		if ($user->isValid())
 		{

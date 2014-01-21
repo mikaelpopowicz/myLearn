@@ -17,13 +17,14 @@ class ConnexionController extends \Library\BackController
 				$pass = $request->postData('password');
 				
 				// Vérification du login
-				$exists = $this->managers->getManagerOf('Byte')->getByName($login);
+				$exists = $this->managers->getManagerOf('User')->getByName($login);
+				echo '<script>alter("coucou");</script>';
 				
 				// Si un utilisateur a ce login
 				if($exists != NULL) {
 					
 					// On vérifie qu'il a le bon mot de passe
-					$match = $this->managers->getManagerOf('Byte')->getByNamePass($login, sha1(md5(sha1(md5($exists['salt'])).sha1(md5($pass)).sha1(md5($exists['salt'])))));
+					$match = $this->managers->getManagerOf('User')->getByNamePass($login, sha1(md5(sha1(md5($exists['salt'])).sha1(md5($pass)).sha1(md5($exists['salt'])))));
 					
 					// Si cela nous retourne l'utilisateur
 					if($match != NULL) {
@@ -48,11 +49,9 @@ class ConnexionController extends \Library\BackController
 						}
 					} else {
 						$this->page->addVar('erreurs', '<p class="text-error text-center">Vous avec commis une erreur sur votre identifiant/mot de passe</p>');
-						echo "<script>alert('NOOOOO');</script>";
 					}
 				} else {
 					$this->page->addVar('erreurs', '<p class="text-error text-center">Vous avec commis une erreur sur votre identifiant/mot de passe</p>');
-					echo "<script>alert('NOOOOO');</script>";
 				}
 	 		}
 	 	}

@@ -21,7 +21,7 @@ USE mylearn;
 CREATE TABLE IF NOT EXISTS devoir
  (
    id_d INTEGER(2) NOT NULL  ,
-   id_p INTEGER(2) NOT NULL  ,
+   id_u INTEGER(2) NOT NULL  ,
    id_classe INTEGER(2) NOT NULL  ,
    dateDevoir DATE NULL  ,
    enonce VARCHAR(128) NULL  ,
@@ -44,7 +44,8 @@ CREATE TABLE IF NOT EXISTS user
    password VARCHAR(128) NULL  ,
    active BOOL NULL  ,
    salt VARCHAR(40) NULL  ,
-   token VARCHAR(40) NULL  
+   token VARCHAR(40) NULL ,
+   dateUser DATE
    , PRIMARY KEY (id_u) 
  ) 
  comment = "";
@@ -55,7 +56,7 @@ CREATE TABLE IF NOT EXISTS user
 
 CREATE TABLE IF NOT EXISTS administrateur
  (
-   id_u INTEGER(2) NOT NULL  ,
+   id_u INTEGER(2) NOT NULL
    , PRIMARY KEY (id_u) 
  ) 
  comment = "";
@@ -79,18 +80,9 @@ CREATE TABLE IF NOT EXISTS matiere
 
 CREATE TABLE IF NOT EXISTS professeur
  (
-   id_p INTEGER(2) NOT NULL  ,
-   id_m INTEGER(2) NOT NULL  ,
    id_u INTEGER(2) NOT NULL  ,
-   nom VARCHAR(128) NOT NULL  ,
-   prenom VARCHAR(128) NULL  ,
-   username VARCHAR(128) NULL  ,
-   email VARCHAR(128) NULL  ,
-   password VARCHAR(128) NULL  ,
-   active BOOL NULL  ,
-   salt VARCHAR(40) NULL  ,
-   token VARCHAR(40) NULL  
-   , PRIMARY KEY (id_p) 
+   id_m INTEGER(2) NOT NULL
+   , PRIMARY KEY (id_u) 
  ) 
  comment = "";
 
@@ -102,15 +94,7 @@ CREATE TABLE IF NOT EXISTS eleve
  (
    id_u INTEGER(2) NOT NULL  ,
    id_classe INTEGER(2) NOT NULL  ,
-   dateNaissance DATE NOT NULL  ,
-   username VARCHAR(128) NULL  ,
-   nom VARCHAR(128) NULL  ,
-   prenom VARCHAR(128) NULL  ,
-   email VARCHAR(128) NULL  ,
-   password VARCHAR(128) NULL  ,
-   active BOOL NULL  ,
-   salt VARCHAR(40) NULL  ,
-   token VARCHAR(40) NULL  
+   dateNaissance DATE NOT NULL
    , PRIMARY KEY (id_u) 
  ) 
  comment = "";
@@ -145,16 +129,7 @@ CREATE TABLE IF NOT EXISTS section
 
 CREATE TABLE IF NOT EXISTS gestionnaire
  (
-   id_u INTEGER(2) NOT NULL  ,
-   id_classe INTEGER(2) NOT NULL  ,
-   username VARCHAR(128) NULL  ,
-   nom VARCHAR(128) NULL  ,
-   prenom VARCHAR(128) NULL  ,
-   email VARCHAR(128) NULL  ,
-   password VARCHAR(128) NULL  ,
-   active BOOL NULL  ,
-   salt VARCHAR(40) NULL  ,
-   token VARCHAR(40) NULL  
+   id_u INTEGER(2) NOT NULL
    , PRIMARY KEY (id_u) 
  ) 
  comment = "";
@@ -239,8 +214,8 @@ CREATE TABLE IF NOT EXISTS avoir
 
 
 ALTER TABLE devoir 
-  ADD FOREIGN KEY FK_devoir_professeur (id_p)
-      REFERENCES professeur (id_p) ;
+  ADD FOREIGN KEY FK_devoir_professeur (id_u)
+      REFERENCES professeur (id_u) ;
 
 
 ALTER TABLE devoir 
@@ -276,11 +251,6 @@ ALTER TABLE eleve
 ALTER TABLE section 
   ADD FOREIGN KEY FK_section_administrateur (id_u)
       REFERENCES administrateur (id_u) ;
-
-
-ALTER TABLE gestionnaire 
-  ADD FOREIGN KEY FK_gestionnaire_classe (id_classe)
-      REFERENCES classe (id_classe) ;
 
 
 ALTER TABLE gestionnaire 
