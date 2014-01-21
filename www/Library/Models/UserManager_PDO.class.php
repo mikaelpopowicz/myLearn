@@ -70,7 +70,7 @@ class UserManager_PDO extends UserManager
 		return $this->dao->query('SELECT COUNT(*) FROM byte')->fetchColumn();
 	}
 	
-	protected function add(Byte $user)
+	protected function add(User $user)
 	{
 	    $requete = $this->dao->prepare('INSERT INTO user SET username = :username, nom = :nom, prenom = :prenom, email = :email, password = :password, salt =:salt, token = :token, dateUser = now()');
 	    $requete->bindValue(':username', $user['username']);
@@ -83,7 +83,7 @@ class UserManager_PDO extends UserManager
 	    $requete->execute();
 	}
 	
-	protected function modify(Byte $user)
+	protected function modify(User $user)
 	  {
 	    $requete = $this->dao->prepare('UPDATE user SET username = :username, nom = :nom, prenom = :prenom, email = :email, password = :password, salt =:salt, token = :token, active = :active, dateUser = :dateUser WHERE id_u = :id');
 	    $requete->bindValue(':username', $user['username']);
@@ -99,7 +99,7 @@ class UserManager_PDO extends UserManager
 	    $requete->execute();
 	  }
 
-  	public function delete(Byte $user)
+  	public function delete(User $user)
   	{
   		$this->dao->exec('DELETE FROM user WHERE id_u = '.$user['id']);
   	}

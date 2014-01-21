@@ -18,7 +18,6 @@ class ConnexionController extends \Library\BackController
 				
 				// Vérification du login
 				$exists = $this->managers->getManagerOf('User')->getByName($login);
-				echo '<script>alter("coucou");</script>';
 				
 				// Si un utilisateur a ce login
 				if($exists != NULL) {
