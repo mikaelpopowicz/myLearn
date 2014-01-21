@@ -44,13 +44,13 @@ class ConnexionController extends \Library\BackController
 							
 						// Si le compte n'est pas activé
 						} else {
-							$this->page->addVar('erreurs', '<p class="text-warning text-center">Votre compte n\'est pas encore activé, cliquer <a href="/connexion/activer"><strong>ICI</strong></a> si vous n\'avez pas reçu le mail d\'activation</p>');
+							$this->page->addVar('erreurs', 'Votre compte n\'est pas encore activé, cliquer <a href="/connexion/activer"><strong>ICI</strong></a> si vous n\'avez pas reçu le mail d\'activation');
 						}
 					} else {
-						$this->page->addVar('erreurs', '<p class="text-danger text-center">Vous avec commis une erreur sur votre identifiant/mot de passe</p>');
+						$this->page->addVar('erreurs', 'Vous avec commis une erreur sur votre identifiant/mot de passe');
 					}
 				} else {
-					$this->page->addVar('erreurs', '<p class="text-danger text-center">Vous avec commis une erreur sur votre identifiant/mot de passe</p>');
+					$this->page->addVar('erreurs', 'Vous avec commis une erreur sur votre identifiant/mot de passe');
 				}
 	 		}
 	 	}

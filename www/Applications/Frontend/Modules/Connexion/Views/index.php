@@ -10,16 +10,26 @@
 <div class="container">
 	<div class="row">
 		<div class="col-md-6 text-center">
+			<br><br>
 			<h3>Connexion à la plateforme de cours en ligne</h3>
 			<p>Description écrite par l'établissement</p>
 		</div>
 		<div class="col-md-6">
 			<div class="well">
+				<?php
+				if(isset($erreurs)) {
+					echo '<div class="alert alert-danger">';
+					echo $erreurs;
+					echo '</div>';
+				} else {
+				?>
+				<div class="alert alert-info">
+					Connectez-vous à l'aide de votre login et mot de passe
+				</div>	
+				<?php
+				}
+				?>
 				<form class="form-signin" role="form" method="post">
-					<h2 class="form-signin-heading text-info text-center">Identifiez-vous</h2>
-					<?php
-					echo isset($erreurs) ? $erreurs : "";
-					?>
 					<input type="text" class="form-control" placeholder="Utilisateur" name="login" required autofocus>
 					<input type="password" class="form-control" placeholder="Password" name="password" required>
 					<button class="btn btn-lg btn-primary btn-block" name="go" type="submit">Connexion</button>
