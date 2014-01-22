@@ -15,7 +15,6 @@ class InstallationController extends \Library\BackController
 		$php = explode('.', $php);
 		$php = ($php[0] >= 5 && $php[1] >= 2) ? '<span class="label label-success"><i class="fa fa-check"></i> </span>' : "<span class='badge badge-danger'>X</span>";
 		$test =  "../".__DIR__;
-		echo $_SERVER['DOCUMENT_ROOT'];
 		fopen ('../../test.php', 'r');
 		$conf = is_writable('../../../Frontend/Config') ? '<span class="label label-success"><i class="fa fa-check"></i> </span>' : "<span class='label label-danger'><i class='fa fa-times'></i> </span>";
 		
