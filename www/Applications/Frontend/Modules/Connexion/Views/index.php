@@ -17,9 +17,9 @@
 		<div class="col-md-6">
 			<div class="well">
 				<?php
-				if(isset($erreurs)) {
-					echo '<div class="alert alert-danger">';
-					echo $erreurs;
+				if(isset($erreurs) && is_array($erreurs)) {
+					echo '<div class="alert alert-'.$erreurs[0].'">';
+					echo $erreurs[1];
 					echo '</div>';
 				} else {
 				?>

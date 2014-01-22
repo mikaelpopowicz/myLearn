@@ -14,9 +14,9 @@
 		<meta charset="UTF-8"/>
 		<meta content="Fill this in with your information" name="description"/>
 		
-		<!--- highly suggested that you un-comment this on a live site 
+		<!--- highly suggested that you un-comment this on a live site -->
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		-->
+
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta content="yes" name="apple-mobile-web-app-capable"/>
@@ -36,22 +36,6 @@
 		<!--http://mathiasbynens.be/notes/touch-icons-->
 		<link rel="shortcut icon" href="/images/favicon.png">
 
-		<!-- Open Graph for facebook http://graph.facebook.com/[UserName] replace [UserName] with yours and get your fb:admis content information where the XXXX goes.
-		================================================== -->
-
-		<meta content="" property="og:title"/>
-		<meta content="" property="og:type"/>
-		<meta content="" property="og:url"/>
-		<meta content="" property="og:image"/>
-		<meta content="" property="og:site_name"/>
-		<meta content="XXXXX" property="fb:admins"/>
-		<meta content="en_us" property="og:locale"/>
-		<meta content=" " property="og:description"/>
-		
-		<!-- JS JQuery in the head you can use ajax if you want ================ -->
-		<!--
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-			-->
 		<script>window.jQuery || document.write('<script src="/assets/js/jquery-1.9.1.min.js"><\/script>')</script>
 
 		<!-- Add to HEAD after style sheet http://modernizr.com/docs/#installing  ================ -->
@@ -121,26 +105,6 @@
 								} else {
 								?>
 								<li><a href="/inscription">Devenir membre <i class="e-icon-pencil"></i></a></li>
-										
-								<!--begin .dropdown .parent -->
-								<li class="dropdown parent"> <a class="dropdown-toggle" href="#" data-toggle="dropdown">Connexion <i class="e-icon-login"></i></a>
-									<ul class="dropdown-menu signin"><!--begin .dropdown-menu .signin -->			
-										<li><!--begin list item / everything goes inside the list item-->
-											<form action="/connexion" method="post"><!--begin form add your stuff -->
-												<input type="text" name="login" placeholder="Pseudo" required= />
-												<input type="password" name="password" placeholder="Mot de passe" required />
-												<label class="checkbox">
-													<input type="checkbox" name="cookie">
-													Se souvenir de moi
-												</label>
-												<input type="hidden" name="request" value="<?php echo $_SERVER['REQUEST_URI'];?>">
-												<button type="submit" class="btn custom-btn btn-primary" name="go">Connexion</button>
-											</form>
-										</li><!--end list item-->
-										<li class="divider"></li><!--divider -->		
-										<li><a href="/connexion/mot-de-passe-perdu">Mot de passe oublié ?</a></li>			
-									</ul><!--close .dropdown-menu .signin -->
-								</li><!--close .dropdown .parent -->
 								<?php
 								}
 								?>
@@ -217,60 +181,15 @@
 		?>
 		<!--== FIN DU CONTENU DE LA PAGE ==-->	
 		
-		<!--begin footer -->
-		<footer class="footer clearfix">
-			<div class="container">
-				<!--footer container-->
-				<div class="row-fluid">
-					<div class="span3">
-						<section>
-							<h4>Nous contacter</h4>
-							<p>Mika-p.fr<br>
-							Paris<br>
-							<span class="overflow"><strong>email:</strong> <a href="mailto:webmaster@iris-bde.fr">webmaster@iris-bde.fr</a></span> </p>
-						</section>
-						<!--close section-->
-					</div>
-					<!-- close .span3 --> 
-					<!--section containing newsletter signup and recent images-->
-					<div class="span5">
-						<section>
-							<h4>Restez informé</h4>
-							<p>Incscrivez-vous à notre newsletter. Nous ne divulguons pas les adresses email.</p>
-							<form action="yourscript.php" method="post">
-								<div class="input-append append-fix custom-append row-fluid">
-									<input type="email" class="span8" placeholder="Adresse email" name="email" readonly/>
-									<button class="btn btn-primary disabled" disabled="disabled" readonly>S'inscrire</button>
-								</div>
-								<!--close input-append--> 
-							</form>
-						</section>
-						<!--close section-->
-					</div>
-					<!-- close .span5 --> 
-					<!--section containing blog posts-->
-					<div class="span4">
-						<section>
-							<h4>A propos</h4>
-							<p>Ce site vous est proposé par le <a class="primary-color" href="http://www.iris-bde.fr">BDE ESCAPE</a>.</br>
-								Un site par les élèves pour les élèves.</p>
-						</section>
-					</div>
-					<!-- close .span4 -->
-				</div>
-				<!-- close .row-fluid-->
-			</div>
-			<!-- close footer .container--> 
-		</footer>
-		<!--/close footer--> 
 
 		<!--change this to your stuff-->
 		<section class="footer-credits">
 			<div class="container">
 				<ul class="clearfix">
-					<li>© 2013 Mika-p. All rights reserved.</li>
+					<li>© 2013 myLearn. All rights reserved.</li>
 					<li><a href="#">Conditions d'utilisation</a></li>
 					<li><a href="#">Politique de confidentialité</a></li>
+					<li><a href="#">Plus d'informations</a></li>
 				</ul>
 			</div>
 			<!--close footer-credits container--> 

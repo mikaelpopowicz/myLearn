@@ -16,23 +16,7 @@
 
 	<!-- Bootstrap core CSS -->
 	<link href="/css/bootstrap.css" rel="stylesheet">
-
-	<!-- Custom styles for this template -->
-	<link href="/css/doc.css" rel="stylesheet">
-	<link href="/css/navbar.css" rel="stylesheet">
-	<link href="/assets/css/datatables.css" rel="stylesheet">
-	
-	<script type="text/javascript" src="/js/tinymce/tinymce.min.js"></script>
-	<script>
-	tinymce.init({
-		selector: "textarea#contenu",
-	    theme: "modern",
-	    height: 500,
-		content_css: "/assets/css/style.css",
-		plugins: "code",
-		extended_valid_elements: "hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style],img[href|src|name|title|onclick|align|alt|title|width|height|vspace|hspace],iframe[id|class|width|size|noshade|src|height|frameborder|border|marginwidth|marginheight|target|scrolling|allowtransparency],style[type]"
-	 }); 
-	</script>
+	<link href="/css/font-awesome.min.css" rel="stylesheet">
 
 	<!-- Just for debugging purposes. Don't actually copy this line! -->
 	<!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -43,43 +27,20 @@
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
 		<![endif]-->
 </head>
-<body>
-	<div class="container">
-
-		<!-- Static navbar -->
-		<div class="navbar navbar-default" role="navigation">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="/admin">Mika-p | Admin</a>
-			</div>
-			<div class="navbar-collapse collapse">
-				<ul class="nav navbar-nav">
-					<li class="<?php echo $class_accueil;?>"><a href="/admin">Tableau de bord</a></li>
-					<li class="<?php echo $class_cours;?>"><a href="/admin/cours">Cours</a></li>
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Utilisateurs <b class="caret"></b></a>
-						<ul class="dropdown-menu">
-							<li><a href="/admin/user/listing">Listing</a></li>
-							<li><a href="/admin/user/acl">Gérer les droits</a></li>
-						</ul>
-					</li>
-				</ul>
-				<ul class="nav navbar-nav navbar-right">
-					<li class=""><a href="/admin/logout">Déconnexion</a></li>
-				</ul>
-			</div><!--/.nav-collapse -->
+<body>		
+	<div class="jumbotron">
+		<div class="container">
+			<h1>Installation de <span class="text-info">myLearn</span></h1>
+			<p>Un problème ? Consulter notre <a href="http://mylearn.cpm-web.fr/faq">FAQ</a></p>
 		</div>
-		
+	</div>
+	<div class="container">
+		<!--=== Content ===-->
 		<?php
 		echo $content;
 		?>
-
-	</div> <!-- /container -->
+		<!--=== End Content ===-->
+	</div> <!-- div.container -->
 	
 	<!--=== Includes modal ===-->
 	<?php

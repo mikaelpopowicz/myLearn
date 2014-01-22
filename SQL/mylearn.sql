@@ -312,4 +312,4 @@ ALTER TABLE avoir
   ADD FOREIGN KEY FK_avoir_eleve (id_u)
       REFERENCES eleve (id_u) ;
 
-INSERT INTO user (id_u, username, salt, password, active) VALUES(1, 'admin', '8262216f0c53cd1ebc83e1bb6b84ddce84fe7738', '7a53be99a2d39e90884249a0260f753e24033947', 1);
+INSERT INTO user (id_u, username, salt, password, active, dateUser) VALUES(1, 'admin', '8262216f0c53cd1ebc83e1bb6b84ddce84fe7738', '7a53be99a2d39e90884249a0260f753e24033947', 1, CURDATE());

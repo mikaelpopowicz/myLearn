@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<routes>
+	<route url="/" module="Installation" action="index" />
+	<route url="/install-1" module="Installation" action="init1" />
+	<route url="/install-2" module="Installation" action="init2" />
+	<route url="/install-3" module="Installation" action="init3" />
+</routes>

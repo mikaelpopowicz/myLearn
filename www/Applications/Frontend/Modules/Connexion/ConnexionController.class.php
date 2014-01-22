@@ -35,22 +35,17 @@ class ConnexionController extends \Library\BackController
 							$this->app->user()->setAttribute('email', $match['email']);
 							$this->app->user()->setAttribute('id', $match['id']);
 							
-							// Si request existe (url de la page précédente)
-							if($request->postExists('request')) {
-								$this->app->httpResponse()->redirect($request->postData('request'));
-							} else {
-								$this->app->httpResponse()->redirect('/');
-							}
+							$this->app->httpResponse()->redirect('/');
 							
 						// Si le compte n'est pas activé
 						} else {
-							$this->page->addVar('erreurs', 'Votre compte n\'est pas encore activé, cliquer <a href="/connexion/activer"><strong>ICI</strong></a> si vous n\'avez pas reçu le mail d\'activation');
+							$this->page->addVar('erreurs', array('warning', 'Votre compte n\'est pas encore activé, cliquer <a href="/connexion/activer"><strong>ICI</strong></a> si vous n\'avez pas reçu le mail d\'activation'));
 						}
 					} else {
-						$this->page->addVar('erreurs', 'Vous avec commis une erreur sur votre identifiant/mot de passe');
+						$this->page->addVar('erreurs', array('danger', 'Vous avec commis une erreur sur votre identifiant/mot de passe'));
 					}
 				} else {
-					$this->page->addVar('erreurs', 'Vous avec commis une erreur sur votre identifiant/mot de passe');
+					$this->page->addVar('erreurs', array('danger', 'Vous avec commis une erreur sur votre identifiant/mot de passe'));
 				}
 	 		}
 	 	}
