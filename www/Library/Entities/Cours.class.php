@@ -10,7 +10,7 @@ class Cours extends \Library\Entity {
 	$dateAjout,
 	$dateModif,
 	$matiere,
-	$count_c;
+	$count_c; // NOMBRE DE VUES (le cours)
 	
 	const AUTEUR_INVALIDE = 1;
 	const TITRE_INVALIDE = 2;
