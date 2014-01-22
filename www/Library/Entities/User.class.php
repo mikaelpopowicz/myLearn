@@ -130,6 +130,6 @@ class User extends \Library\Entity
 	public function salt() { return $this->salt; }
 	public function token() { return $this->token; }
 	public function active() { return $this->active; }
-	public function dateUser() { return $this->dateByte; }
+	public function dateUser() { return $this->dateUser; }
 }
 ?>

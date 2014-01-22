@@ -4,4 +4,6 @@
 	<route url="/install-1" module="Installation" action="init1" />
 	<route url="/install-2" module="Installation" action="init2" />
 	<route url="/install-3" module="Installation" action="init3" />
+	<route url="/install-4" module="Installation" action="init4" />
+	<route url="/(.*)" module="Installation" action="index" vars="lost"/>
 </routes>

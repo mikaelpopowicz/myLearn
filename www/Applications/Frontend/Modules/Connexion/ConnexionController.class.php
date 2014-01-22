@@ -7,6 +7,8 @@ class ConnexionController extends \Library\BackController
 	{
 		$this->page->addVar('no_layout', true);
 		$this->page->addVar('title', 'myLearn - Connexion');
+		$this->page->addVar('nom', $this->app->config()->get('conf_nom'));
+		$this->page->addVar('desc', $this->app->config()->get('conf_description'));
 		
 	 	if($this->app->user()->isAuthenticated()) {
 			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "Vous êtes déjà connecté"});</script>');

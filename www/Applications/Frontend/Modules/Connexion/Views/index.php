@@ -3,7 +3,7 @@
 		<h1>Bienvenue sur <span class="text-info">myLearn</span></h1>
 		<p>Une plateforme éducative, pensée par des élèves pour des élèves. N'hésitez pas à nous soumettre vos demandes sur la plateforme sur notre site.</p>
 		<p>
-			<a href="http://mylearn.cpm-web.fr"class="btn btn-primary btn-lg" role="button">En savoir plus »</a>
+			<a href="http://mylearn.cpm-web.fr"class="btn btn-primary" role="button">En savoir plus »</a>
 		</p>
 	</div>
 </div>
@@ -12,7 +12,8 @@
 		<div class="col-md-6 text-center">
 			<br><br>
 			<h3>Connexion à la plateforme de cours en ligne</h3>
-			<p>Description écrite par l'établissement</p>
+			<h3><?php echo isset($nom) ? $nom : "";?></h3>
+			<p><?php echo isset($desc) ? $desc : "";?></p>
 		</div>
 		<div class="col-md-6">
 			<div class="well">
