@@ -297,5 +297,22 @@ ALTER TABLE avoir
   ADD FOREIGN KEY FK_avoir_eleve (id_u)
       REFERENCES eleve (id_u) ;
 
+# -----------------------------------------------------------------------------
+#       CREATION TRIGGERS ET PROCEDURES
+# -----------------------------------------------------------------------------
+
+DELIMITER @@
+
+CREATE PROCEDURE newEleve(IN username VARCHAR(128), nom VARCHAR(128), prenom VARCHAR(128), email VARCHAR(128), password VARCHAR(128), active BOOLEAN, salt VARCHAR(40), token VARCHAR(40), dateUser DATE)
+BEGIN
+
+END @@
+
+DELIMITER ;
+
+# -----------------------------------------------------------------------------
+#       CREATION COMPTE ADMIN
+# -----------------------------------------------------------------------------
 INSERT INTO user (id_u, username, salt, password, active, dateUser, token) VALUES(1, 'admin', '8262216f0c53cd1ebc83e1bb6b84ddce84fe7738', '7a53be99a2d39e90884249a0260f753e24033947', 1, CURDATE(), sha1(md5('tokenadministrateur')));
-INSERT INTO administrateur VALUES(1);
+INSERT INTO administrateur VALUES(1, "Responsable informatique");
+

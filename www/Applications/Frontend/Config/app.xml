@@ -5,7 +5,7 @@
 	<define var="db_user" value="root" />
 	<define var="db_user_pass" value="toor" />
 	<define var="conf_nom" value="Jules Ferry" />
-	<define var="conf_description" value="Ecole d'art de Paris" />
+	<define var="conf_description" value="Ecole d'art de paris" />
 	<define var="conf_date" value="23/01/2014" />
 	<define var="installed" value="true" />
 </definitions>

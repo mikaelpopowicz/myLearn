@@ -1,7 +1,7 @@
 <?php
 namespace Library\Entities;
 
-class Eleve extends \Library\Entitie\User
+class Eleve extends \Library\Entities\User
 {
 	private $classe,					// Identifiant de la classe dans laquelle se trouve l'élève
 	$dateNaissance;						// Date de naissance de l'élève

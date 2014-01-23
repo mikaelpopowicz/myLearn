@@ -23,8 +23,9 @@ class AdministrateurManager_PDO extends AdministrateurManager
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Administrateur');
 		if ($user = $requete->fetch()) {
 			return $user;
+		} else {
+			return NULL;
 		}
-		return null;
 	}
 	
 	public function count()
