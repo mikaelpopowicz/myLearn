@@ -3,14 +3,15 @@ namespace Library\Entities;
 
 class Cours extends \Library\Entity {
 	
-	protected $auteur,
-	$titre,
-	$description,
-	$contenu,
-	$dateAjout,
-	$dateModif,
-	$matiere,
-	$count_c; // NOMBRE DE VUES (le cours)
+	protected $auteur,						// Identifiant de l'utilisateur qui a ecrit le cours (clé étrangère)
+	$titre,									// Titre du cours
+	$description,							// Description du cours
+	$contenu,								// Contenu du cours
+	$dateAjout,								// Date de création du cours
+	$dateModif,								// Date de la dernière modification du cours
+	$matiere,								// Matière à laquelle le cours fait référence (clé étrangère)
+	$classe,								// Classe dans laquelle le cours a été donné (clé étrangère)
+	$count_c;								// Nombre de fois que le cours a été vue par des élèves
 	
 	const AUTEUR_INVALIDE = 1;
 	const TITRE_INVALIDE = 2;
