@@ -4,8 +4,13 @@
 \t<define var="db_name" value="mylearn" />
 \t<define var="db_user" value="root" />
 \t<define var="db_user_pass" value="root" />
+<<<<<<< HEAD
 \t<define var="conf_nom" value="Iris" />
 \t<define var="conf_description" value="va te faire mettre" />
+=======
+\t<define var="conf_nom" value="IRIS" />
+\t<define var="conf_description" value="bonjour banane" />
+>>>>>>> 8e6da2f72f2e1306d3e6a85ebf554263f14c5376
 \t<define var="conf_date" value="22/01/2014" />
 \t<define var="installed" value="true" />
 </definitions>

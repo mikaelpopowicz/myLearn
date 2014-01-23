@@ -7,8 +7,6 @@ abstract class DevoirManager extends \Library\Manager
 {
 	/**
 	* Méthode retournant une liste de devoirs demandée
-	* @param $debut int La première devoirs à sélectionner
-	* @param $limite int Le nombre de devoirs à sélectionner
 	* @return array La liste des devoirs. Chaque entrée est une instance de Devoir.
 	*/
 	abstract public function getList();
