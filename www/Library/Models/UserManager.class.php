@@ -21,6 +21,13 @@ abstract class UserManager extends \Library\Manager
 	/**
 	* Méthode servant à l'identification
 	* @param $name string Username de l'utilisateur
+	* @return User L'utilisateur si le username est correct
+	*/
+	abstract public function getByName($name);
+	
+	/**
+	* Méthode servant à l'identification
+	* @param $name string Username de l'utilisateur
 	* @param $pass string Mot de passe déjà hashé pour vérifier en BDD
 	* @return User L'utilisateur si il existe et le pass est correct
 	*/

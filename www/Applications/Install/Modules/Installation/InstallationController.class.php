@@ -172,7 +172,6 @@ class InstallationController extends \Library\BackController
 			if($this->app->user()->getAttribute('step2') == 'ok') {
 				if($this->app->user()->getAttribute('step3') == 'ok') {
 					if($request->postExists('finish')) {
-						$this->app->user()->SetAttribute('step4', 'ok');
 						$this->app->user()->delUser();
 						$this->app->user()->setFlash('<script>noty({type: "success", layout: "top", text: "<strong>Installation terminée !</strong>"});</script>');
 						$this->app->httpresponse()->redirect('/');
@@ -186,14 +185,14 @@ class InstallationController extends \Library\BackController
 					$app = fopen('../Applications/Frontend/Config/app.xml', 'w+');
 					$str = '<?xml version="1.0" encoding="utf-8" ?>
 <definitions>
-\t<define var="db_host" value="'.$bdd['hote'].'" />
-\t<define var="db_name" value="'.$bdd['base'].'" />
-\t<define var="db_user" value="'.$bdd['user'].'" />
-\t<define var="db_user_pass" value="'.$bdd['password'].'" />
-\t<define var="conf_nom" value="'.$infos['nom'].'" />
-\t<define var="conf_description" value="'.$infos['description'].'" />
-\t<define var="conf_date" value="'.$date->format('d/m/Y').'" />
-\t<define var="installed" value="true" />
+	<define var="db_host" value="'.$bdd['hote'].'" />
+	<define var="db_name" value="'.$bdd['base'].'" />
+	<define var="db_user" value="'.$bdd['user'].'" />
+	<define var="db_user_pass" value="'.$bdd['password'].'" />
+	<define var="conf_nom" value="'.$infos['nom'].'" />
+	<define var="conf_description" value="'.$infos['description'].'" />
+	<define var="conf_date" value="'.$date->format('d/m/Y').'" />
+	<define var="installed" value="true" />
 </definitions>';
 					$put = fwrite($app, "$str");
 					if ($put) {

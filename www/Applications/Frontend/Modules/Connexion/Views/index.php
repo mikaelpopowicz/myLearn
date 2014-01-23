@@ -12,7 +12,7 @@
 		<div class="col-md-6 text-center">
 			<br><br>
 			<h3>Connexion à la plateforme de cours en ligne</h3>
-			<h3><?php echo isset($nom) ? $nom : "";?></h3>
+			<h3 class="text-primary"><?php echo isset($nom) ? $nom : "";?></h3>
 			<p><?php echo isset($desc) ? $desc : "";?></p>
 		</div>
 		<div class="col-md-6">
