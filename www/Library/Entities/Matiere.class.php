@@ -2,9 +2,9 @@
 namespace Library\Entities;
 
 class Matiere extends \Library\Entity {
-	
-	protected $libelle,
-	$icon;
+
+	protected $libelle,							// Nom de la matière
+	$icon;										// Icone choisie pour la matière
 
 	const LIBELLE_INVALIDE = 1;
 	const ICON_INVALIDE = 2;
@@ -37,13 +37,6 @@ class Matiere extends \Library\Entity {
 	
 	// GETTERS //
    
-	public function libelle()
-	{
-		return $this->libelle;
-	}
-	
-	public function icon()
-	{
-		return $this->icon;
-	}
+	public function libelle() { return $this->libelle; }
+	public function icon() { return $this->icon; }
 }
