@@ -34,8 +34,17 @@ class ConnexionController extends \Library\BackController
 						if($match['active'] == 1) {
 							$this->app->user()->setAuthenticated(true);
 							$this->app->user()->setAttribute('username', $match['username']);
-							$this->app->user()->setAttribute('email', $match['email']);
 							$this->app->user()->setAttribute('id', $match['id']);
+							
+							if($this->managers->getManagerOf('Eleve')->getUnique($match['id']) != NULL) {
+								$this->app->user()->setAttribute('status', 'Eleve');
+							} else if($this->managers->getManagerOf('Administrateur')->getUnique($match['id']) != NULL) {
+								$this->app->user()->setAttribute('status', 'Admin');
+							} else if($this->managers->getManagerOf('Professeur')->getUnique($match['id']) != NULL) {
+								$this->app->user()->setAttribute('status', 'Professeur');
+							} else if($this->managers->getManagerOf('Gestionnaire')->getUnique($match['id']) != NULL) {
+								$this->app->user()->setAttribute('status', 'Gestionnaire');
+							}
 							
 							$this->app->httpResponse()->redirect('/');
 							

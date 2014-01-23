@@ -1,9 +1,9 @@
 <?php
 namespace Library\Models;
 
-use \Library\Entities\Eleve;
+use \Library\Entities\Professeur;
  
-abstract class EleveManager extends \Library\Manager
+abstract class ProfesseurManager extends \Library\Manager
 {
 	/**
 	* Méthode retournant une liste des utilisateurs
@@ -29,21 +29,21 @@ abstract class EleveManager extends \Library\Manager
 	* @param $user User L'utilisateur à ajouter
 	* @return void
 	*/
-	abstract protected function add(Eleve $eleve);
+	abstract protected function add(Professeur $professeur);
 	
 	/**
 	* Méthode permettant de modifier un utilisateur
 	* @param $user Byte L'utilisateur à modifier
 	* @return void
 	*/
-	abstract protected function modify(Eleve $eleve);
+	abstract protected function modify(Professeur $professeur);
 	
 	/**
 	* Méthode permettant de supprimer un utilisateur
 	* @param $user User L'utilisateur à supprimer
 	* @return void
 	*/
-	abstract public function delete(Eleve $eleve);
+	abstract public function delete(Professeur $professeur);
 	
 	/**
 	* Méthode permettant d'enregistrer un utilisateur.
@@ -52,8 +52,8 @@ abstract class EleveManager extends \Library\Manager
 	* @see self::modify()
 	* @return void
 	*/
-	public function save(Eleve $eleve)
+	public function save(Professeur $professeur)
 	{
-		$eleve->isNew() ? $this->add($eleve) : $this->modify($eleve);
+		$professeur->isNew() ? $this->add($professeur) : $this->modify($professeur);
 	}
 }
