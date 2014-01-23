@@ -16,6 +16,7 @@ class Eleve extends \Library\Entitie\User
 		$this->dateNaissance = $date;
 	}
 	
+	public function classe() { return $this->classe; }
 	public function dateNaissance() { return $this->dateNaissance; }
 }
 ?>
