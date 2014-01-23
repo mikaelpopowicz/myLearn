@@ -16,6 +16,24 @@
 						</span>
 					</li>
 					<li>
+						/Applications/Admin/ est accessible en éciture
+						<span class="pull-right">
+							<?php echo $dir['admin'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Frontend/ est accessible en éciture
+						<span class="pull-right">
+							<?php echo $dir['frontend'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Prof/ est accessible en éciture
+						<span class="pull-right">
+							<?php echo $dir['prof'];?>
+						</span>
+					</li>
+					<li>
 						/Applications/Admin/AdminApplication.back.class.php est accessible en éciture
 						<span class="pull-right">
 							<?php echo $app['admin'];?>

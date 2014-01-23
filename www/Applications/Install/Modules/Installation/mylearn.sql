@@ -301,14 +301,6 @@ ALTER TABLE avoir
 #       CREATION TRIGGERS ET PROCEDURES
 # -----------------------------------------------------------------------------
 
-DELIMITER @@
-
-CREATE PROCEDURE newEleve(IN username VARCHAR(128), nom VARCHAR(128), prenom VARCHAR(128), email VARCHAR(128), password VARCHAR(128), active BOOLEAN, salt VARCHAR(40), token VARCHAR(40), dateUser DATE)
-BEGIN
-
-END @@
-
-DELIMITER ;
 
 # -----------------------------------------------------------------------------
 #       CREATION COMPTE ADMIN

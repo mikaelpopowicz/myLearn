@@ -74,6 +74,29 @@ class InstallationController extends \Library\BackController
 			$erreur[] = "prof";
 		}
 		
+		$dir = array();
+		$dir['admin'] = is_writable("../Applications/Admin/");
+		if ($dir['admin']) {
+			$dir['admin'] = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		} else {
+			$dir['admin'] = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "admin";
+		}
+		$dir['frontend'] = is_writable("../Applications/Frontend/");
+		if ($dir['frontend']) {
+			$dir['frontend'] = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		} else {
+			$dir['frontend'] = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "frontend";
+		}
+		$dir['prof'] = is_writable("../Applications/Prof/");
+		if ($dir['prof']) {
+			$dir['prof'] = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		} else {
+			$dir['prof'] = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "prof";
+		}
+		
 		if (empty($erreur)) {
 			$this->page->addVar('next', '');
 			if($request->postExists('next')) {
@@ -92,6 +115,7 @@ class InstallationController extends \Library\BackController
 		$this->page->addVar('php', $php);
 		$this->page->addVar('conf', $conf);
 		$this->page->addVar('app', $app);
+		$this->page->addVar('dir', $dir);
 		$this->page->addVar('message', $message);
 	}
 	

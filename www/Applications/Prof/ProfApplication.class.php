@@ -12,13 +12,13 @@ class ProfApplication extends \Library\Application
    
 	public function run()
 	{
-		if ($this->user->isAuthenticated())
+		if ($this->user->isAuthenticated() && $this->user()->getAttribute('status') == 'Prof')
 		{
 			$controller = $this->getController();
 		}
 		else
 		{
-			$controller = new Modules\Connexion\ConnexionController($this, 'Connexion', 'index');
+			$this->httpResponse->redirect('/');
 		}
      
 		$controller->execute();

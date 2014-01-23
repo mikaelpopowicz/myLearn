@@ -12,14 +12,13 @@ class AdminApplication extends \Library\Application
    
 	public function run()
 	{
-		if ($this->user->isAuthenticated())
+		if ($this->user->isAuthenticated() && $this->user->getAttribute('satus') == 'Admin')
 		{
 			$controller = $this->getController();
 		}
 		else
 		{
-			//$this->httpResponse->redirect('/admin');
-			$controller = new Modules\Connexion\ConnexionController($this, 'Connexion', 'index');
+			$this->httpResponse->redirect('/');
 		}
      
 		$controller->execute();
