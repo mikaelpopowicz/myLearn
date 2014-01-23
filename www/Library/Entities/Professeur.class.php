@@ -3,13 +3,13 @@ namespace Library\Entities;
 
 class Professeur extends \Library\Entities\User
 {
-	private $anciennete;
+	private $matiere;
 	
-	public function setAnciennete($ancien)
+	public function setMatiere($matiere)
 	{
-		$this->anciennete = $ancien;
+		$this->matiere = $matiere;
 	}
 	
-	public function anciennete() { return $this->anciennete; }
+	public function matiere() { return $this->matiere; }
 }
 ?>

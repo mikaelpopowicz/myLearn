@@ -40,7 +40,8 @@ CREATE TABLE IF NOT EXISTS user
 
 CREATE TABLE IF NOT EXISTS administrateur
  (
-   id_u INTEGER(2) NOT NULL
+   id_u INTEGER(2) NOT NULL  ,
+   poste VARCHAR(80)
    , PRIMARY KEY (id_u) 
  ) 
  comment = "";
