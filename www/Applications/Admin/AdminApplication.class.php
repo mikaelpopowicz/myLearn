@@ -1,20 +1,19 @@
 <?php
-namespace Applications\Backend;
+namespace Applications\Admin;
  
-class BackendApplication extends \Library\Application
+class AdminApplication extends \Library\Application
 {
 	public function __construct()
 	{
 		parent::__construct();
      
-		$this->name = 'Backend';
+		$this->name = 'Admin';
 	}
    
 	public function run()
 	{
 		if ($this->user->isAuthenticated())
 		{
-			$_SESSION['username'] = "Admin";
 			$controller = $this->getController();
 		}
 		else

@@ -1,5 +1,5 @@
 <?php
-namespace Applications\Admin\Modules\Dashboard;
+namespace Applications\Prof\Modules\Dashboard;
 
 class DashboardController extends \Library\BackController
 {
