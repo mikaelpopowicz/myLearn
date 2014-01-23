@@ -3,9 +3,9 @@
 \t<define var="db_host" value="localhost" />
 \t<define var="db_name" value="mylearn" />
 \t<define var="db_user" value="root" />
-\t<define var="db_user_pass" value="toor" />
-\t<define var="conf_nom" value="Iris" />
-\t<define var="conf_description" value="Description pour la page de connexion" />
+\t<define var="db_user_pass" value="root" />
+\t<define var="conf_nom" value="IRIS" />
+\t<define var="conf_description" value="bonjour banane" />
 \t<define var="conf_date" value="22/01/2014" />
 \t<define var="installed" value="true" />
 </definitions>
