@@ -1,7 +1,7 @@
 <?php
 namespace Library\Entities;
 
-class Gestionnaire extends \Library\Entity;
+class Gestionnaire extends \Library\Entities\User
 {
 	
 }
