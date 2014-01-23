@@ -1,7 +1,7 @@
 <?php
 namespace Library\Entities;
 
-class Administrateur extends \Library\entities\User
+class Administrateur extends \Library\Entity
 {
 	private $poste;
 	
