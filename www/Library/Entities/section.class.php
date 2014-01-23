@@ -4,7 +4,7 @@ namespace Library\Entities\NEW;
 class Cours extends \Library\Entity {
 	
 	protected  $libelle,						// Nom de la section
-	$id_u;										// Identifiant de l'administrateur de la section (clé étrangère)
+	$admin;										// Identifiant de l'administrateur de la section (clé étrangère)
 	
 	const LIBELLE_INVALIDE = 1;
 	
@@ -28,15 +28,15 @@ class Cours extends \Library\Entity {
 		}
 	}
    
-	public function setId_u($id_u)
+	public function setAdmin(admin)
 	{
-		$this->id_u = $id_u;
+		$this->admin = admin;
 	}
 
 		// GETTERS //
    
 	public function libelle() { return $this->libelle; }
-	public function id_u() { return $this->id_u; }
+	public function admin() { return $this->admin; }
 }
 
 ?>
