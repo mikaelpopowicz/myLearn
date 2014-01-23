@@ -28,12 +28,50 @@ class InstallationController extends \Library\BackController
 				$erreur[] = "php";
 		}
 		
-		$conf = is_writable("../Applications/Frontend/Config/");
-		if ($conf) {
-			$conf = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		$conf = array();
+		$conf['admin'] = is_writable("../Applications/Admin/Config/");
+		if ($conf['admin']) {
+			$conf['admin'] = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
 		} else {
-			$conf = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
-			$erreur[] = "conf";
+			$conf['admin'] = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "admin";
+		}
+		$conf['frontend'] = is_writable("../Applications/Frontend/Config/");
+		if ($conf['frontend']) {
+			$conf['frontend'] = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		} else {
+			$conf['frontend'] = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "frontend";
+		}
+		$conf['prof'] = is_writable("../Applications/Prof/Config/");
+		if ($conf['prof']) {
+			$conf['prof'] = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		} else {
+			$conf['prof'] = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "prof";
+		}
+		
+		$app = array();
+		$app['admin'] = is_writable("../Applications/Admin/AdminApplication.back.class.php");
+		if ($app['admin']) {
+			$app['admin'] = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		} else {
+			$app['admin'] = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "admin";
+		}
+		$app['frontend'] = is_writable("../Applications/Frontend/FrontendApplication.back.class.php");
+		if ($app['frontend']) {
+			$app['frontend'] = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		} else {
+			$app['frontend'] = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "frontend";
+		}
+		$app['prof'] = is_writable("../Applications/Prof/ProfApplication.back.class.php");
+		if ($app['prof']) {
+			$app['prof'] = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		} else {
+			$app['prof'] = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "prof";
 		}
 		
 		if (empty($erreur)) {
@@ -53,6 +91,7 @@ class InstallationController extends \Library\BackController
 		
 		$this->page->addVar('php', $php);
 		$this->page->addVar('conf', $conf);
+		$this->page->addVar('app', $app);
 		$this->page->addVar('message', $message);
 	}
 	
@@ -182,7 +221,10 @@ class InstallationController extends \Library\BackController
 					$date = new \DateTime(date('Y-m-d'));					
 					$bdd = unserialize(base64_decode($this->app->user()->getAttribute('bdd')));
 					$infos = unserialize(base64_decode($this->app->user()->getAttribute('infos')));
-					$app = fopen('../Applications/Frontend/Config/app.xml', 'w+');
+					$app = array();
+					$app[] = fopen('../Applications/Frontend/Config/app.xml', 'w+');
+					$app[] = fopen('../Applications/Admin/Config/app.xml', 'w+');
+					$app[] = fopen('../Applications/Prof/Config/app.xml', 'w+');
 					$str = '<?xml version="1.0" encoding="utf-8" ?>
 <definitions>
 	<define var="db_host" value="'.$bdd['hote'].'" />
@@ -194,13 +236,18 @@ class InstallationController extends \Library\BackController
 	<define var="conf_date" value="'.$date->format('d/m/Y').'" />
 	<define var="installed" value="true" />
 </definitions>';
-					$put = fwrite($app, "$str");
-					if ($put) {
-					    @chmod("../Applications/Frontend/Config/app.xml", 0755);
-					} else {
-						$erreur[] = "infos";
+					$put = array();
+					$dir = array('Frontend', 'Admin', 'Prof');
+					for($i = 0; $i < 3; $i++) {
+						$put[$i] = fwrite($app[$i], "$str");
+						if ($put[$i]) {
+						    @chmod("../Applications/".$dir[$i]."/Config/app.xml", 0755);
+						} else {
+							$erreur[] = "infos";
+						}
+						fclose($app[$i]);
+						rename("../Applications/".$dir[$i]."/".$dir[$i]."Application.back.class.php", "../Applications/".$dir[$i]."/".$dir[$i]."Application.class.php");
 					}
-					fclose($app);
 					$str = "";
 					$pdo = fopen('../Applications/Install/Modules/Installation/mylearn.sql', 'r');
 					while (!feof($pdo)) {
@@ -209,7 +256,6 @@ class InstallationController extends \Library\BackController
 					fclose($pdo);
 					$dbh = new \PDO('mysql:host='.$bdd['hote'].';dbname='.$bdd['base'], $bdd['user'], $bdd['password']);
 					$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING);
-					//$test = include __DIR__.'/mylearn.sql';
 					$sql = $dbh->query($str);
 					if(!$sql) {
 						$erreur[] = "bdd";

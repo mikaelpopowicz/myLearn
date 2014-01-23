@@ -16,9 +16,39 @@
 						</span>
 					</li>
 					<li>
+						/Applications/Admin/AdminApplication.back.class.php est accessible en éciture
+						<span class="pull-right">
+							<?php echo $app['admin'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Frontend/FrontendApplication.back.class.php est accessible en éciture
+						<span class="pull-right">
+							<?php echo $app['frontend'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Prof/ProfApplication.back.class.php est accessible en éciture
+						<span class="pull-right">
+							<?php echo $app['prof'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Admin/Config est accessible en éciture
+						<span class="pull-right">
+							<?php echo $conf['admin'];?>
+						</span>
+					</li>
+					<li>
 						/Applications/Frontend/Config est accessible en éciture
 						<span class="pull-right">
-							<?php echo $conf;?>
+							<?php echo $conf['frontend'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Prof/Config est accessible en éciture
+						<span class="pull-right">
+							<?php echo $conf['prof'];?>
 						</span>
 					</li>
 				</ul>
