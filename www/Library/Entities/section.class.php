@@ -28,12 +28,6 @@ class Cours extends \Library\Entity {
 	}
    
 	public function setId_u($id_u)
-	{
-		if (!is_string($id_u) || empty($id_u))
-		{
-			$this->erreurs[] = self::ID_u_INVALIDE;
-		}
-		else
 		{
 			$this->id_u = $id_u;
 		}
