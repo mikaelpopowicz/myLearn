@@ -3,7 +3,7 @@ namespace Library\Entities;
 
 class Eleve extends \Library\Entities\User
 {
-	private $dateNaissance;
+	private $dateNaissance;						// Date de naissance de l'élève
 	
 	public function setDateNaissance(\DateTime $date)
 	{
