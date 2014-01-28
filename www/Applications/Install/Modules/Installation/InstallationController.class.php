@@ -25,7 +25,14 @@ class InstallationController extends \Library\BackController
 			$php = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
 		} else {
 			$php = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
-				$erreur[] = "php";
+			$erreur[] = "php";
+		}
+		
+		if (in_array ("mod_rewrite", apache_get_modules())) {
+			$mod = '<span class="label label-success"><i class="fa fa-check"></i> </span>';
+		} else {
+			$mod = '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
+			$erreur[] = "rewrite";
 		}
 		
 		$conf = array();

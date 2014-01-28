@@ -16,6 +16,12 @@
 						</span>
 					</li>
 					<li>
+						Apache mod_rewrite
+						<span class="pull-right">
+							<?php echo $mod;?>
+						</span>
+					</li>
+					<li>
 						/Applications/Admin/ est accessible en éciture
 						<span class="pull-right">
 							<?php echo $dir['admin'];?>
