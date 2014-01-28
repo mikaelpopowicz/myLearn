@@ -55,7 +55,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="/admin">Mika-p | Admin</a>
+				<a class="navbar-brand" href="/admin">myLearn | Admin</a>
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
@@ -70,7 +70,7 @@
 					</li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li class=""><a href="/admin/logout">Déconnexion</a></li>
+					<li class=""><a href="/connexion/logout//">Déconnexion</a></li>
 				</ul>
 			</div><!--/.nav-collapse -->
 		</div>

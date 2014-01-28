@@ -42,7 +42,7 @@ class ConnexionController extends \Library\BackController
 								$this->app->user()->setAttribute('status', 'Admin');
 								$this->app->httpResponse()->redirect('/admin');
 							} else if($this->managers->getManagerOf('Professeur')->getUnique($match['id']) != NULL) {
-								$this->app->user()->setAttribute('status', 'Professeur');
+								$this->app->user()->setAttribute('status', 'Prof');
 								$this->app->httpResponse()->redirect('/professeur');
 							} else if($this->managers->getManagerOf('Gestionnaire')->getUnique($match['id']) != NULL) {
 								$this->app->user()->setAttribute('status', 'Gestionnaire');

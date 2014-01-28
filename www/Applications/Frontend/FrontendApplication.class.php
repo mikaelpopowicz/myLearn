@@ -13,6 +13,14 @@ class FrontendApplication extends \Library\Application {
 		if ($this->user->isAuthenticated())
 		{
 			$controller = $this->getController();
+			if($controller->action() != 'logout') {
+				if($this->user->getAttribute('status') == 'Prof') {
+					$this->httpResponse->redirect('/professeur');
+				} else if($this->user->getAttribute('status') == 'Admin') {
+					$this->httpResponse->redirect('/admin');
+				}
+				
+			}
 		}
 		else
 		{

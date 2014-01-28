@@ -21,6 +21,7 @@
 	<link href="/css/doc.css" rel="stylesheet">
 	<link href="/css/navbar.css" rel="stylesheet">
 	<link href="/assets/css/datatables.css" rel="stylesheet">
+	<link href="/assets/css/font-awesome.css" rel="stylesheet">
 	
 	<script type="text/javascript" src="/js/tinymce/tinymce.min.js"></script>
 	<script>
@@ -42,37 +43,60 @@
 		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
 		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
 		<![endif]-->
+		
+	<style>
+		body { padding-top: 70px; }
+	</style>	
 </head>
 <body>
 	<div class="container">
 
 		<!-- Static navbar -->
-		<div class="navbar navbar-default" role="navigation">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="/admin">Mika-p | Admin</a>
+		<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="/admin">myLearn | Admin</a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li class="<?php echo $class_accueil;?>"><a href="/admin">Tableau de bord</a></li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle <?php echo $class_cours;?>" data-toggle="dropdown">Gestion <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li><a href="/admin/section">Section</a></li>
+								<li><a href="/admin/session">Session</a></li>
+								<li><a href="/admin/classe">Classe</a></li>
+							</ul>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle <?php echo $class_cours;?>" data-toggle="dropdown">Cours <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li><a href="/admin/matiere">Matières</a></li>
+								<li><a href="/admin/cours">Cours</a></li>
+								<li><a href="/admin/devoirs">Devoirs</a></li>
+							</ul>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Utilisateurs <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li><a href="/admin/administrateur">Administrateurs</a></li>
+								<li><a href="/admin/professeurs">Professeurs</a></li>
+								<li><a href="/admin/eleves">Elèves</a></li>
+							</ul>
+						</li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li class=""><a href="/admin/parametres">Paramètres</a></li>
+						<li class=""><a href="/connexion/logout//">Déconnexion</a></li>
+					</ul>
+				</div><!--/.nav-collapse -->
 			</div>
-			<div class="navbar-collapse collapse">
-				<ul class="nav navbar-nav">
-					<li class="<?php echo $class_accueil;?>"><a href="/admin">Tableau de bord</a></li>
-					<li class="<?php echo $class_cours;?>"><a href="/admin/cours">Cours</a></li>
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Utilisateurs <b class="caret"></b></a>
-						<ul class="dropdown-menu">
-							<li><a href="/admin/user/listing">Listing</a></li>
-							<li><a href="/admin/user/acl">Gérer les droits</a></li>
-						</ul>
-					</li>
-				</ul>
-				<ul class="nav navbar-nav navbar-right">
-					<li class=""><a href="/admin/logout">Déconnexion</a></li>
-				</ul>
-			</div><!--/.nav-collapse -->
 		</div>
 		
 		<?php

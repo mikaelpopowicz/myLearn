@@ -4336,6 +4336,36 @@ a.badge:focus {
   text-decoration: none;
   cursor: pointer;
 }
+.badge-danger {
+  background-color: #d9534f;
+}
+.badge-danger:hover {
+  background-color: #d2322d;
+}
+.badge-warning {
+  background-color: #f0ad4e;
+}
+.badge-warning:hover {
+  background-color: #ed9c28;
+}
+.badge-success {
+  background-color: #5cb85c;
+}
+.badge-success:hover {
+  background-color: #47a447;
+}
+.badge-info {
+  background-color: #5bc0de;
+}
+.badge-info:hover {
+  background-color: #39b3d7;
+}
+.badge-primary {
+  background-color: #428bca;
+}
+.badge-primary:hover {
+  background-color: #3276b1;
+}
 a.list-group-item.active > .badge,
 .nav-pills > .active > a > .badge {
   color: #428bca;

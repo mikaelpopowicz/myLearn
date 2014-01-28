@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <routes>
 	<route url="/admin(/?)" module="Dashboard" action="index" />
-	<route url="/admin/cours(/?)" module="Cours" action="index" />
-	<route url="/admin/logout" module="Connexion" action="logout" />
+	<route url="/admin/section(/?)" module="Gestion" action="indexSection" />
+	<route url="/admin/session(/?)" module="Gestion" action="indexSession" />
+	<route url="/admin/classe(/?)" module="Gestion" action="indexClasse" />
+	<route url="/admin/cours(/?)" module="Cours" action="indexCours" />
+	<route url="/admin/matiere(/?)" module="Cours" action="indexMatiere" />
+	<route url="/admin/devoirs(/?)" module="Cours" action="indexDevoirs" />
+	<route url="/admin/administrateur(/?)" module="User" action="indexAdministrateur" />
+	<route url="/admin/professeurs(/?)" module="User" action="indexProfesseurs" />
+	<route url="/admin/eleves(/?)" module="User" action="indexEleves" />
+	<route url="/admin/parametres(/?)" module="Param" action="index" />
 	<route url="/admin/cours/supprimer" module="Cours" action="delete" />
 	<route url="/admin/cours/ajouter" module="Cours" action="add" />
 	<route url="/admin/cours/modifier-([0-9]+)" module="Cours" action="update" vars="id"/>

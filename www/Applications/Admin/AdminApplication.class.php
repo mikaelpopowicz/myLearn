@@ -12,7 +12,7 @@ class AdminApplication extends \Library\Application
    
 	public function run()
 	{
-		if ($this->user->isAuthenticated() && $this->user->getAttribute('satus') == 'Admin')
+		if ($this->user->isAuthenticated() && $this->user->getAttribute('status') == 'Admin')
 		{
 			$controller = $this->getController();
 		}

@@ -303,8 +303,13 @@ ALTER TABLE avoir
 
 
 # -----------------------------------------------------------------------------
-#       CREATION COMPTE ADMIN
+#       CREATION COMPTE ADMIN, PROF, ELEVE
 # -----------------------------------------------------------------------------
 INSERT INTO user (id_u, username, salt, password, active, dateUser, token) VALUES(1, 'admin', '8262216f0c53cd1ebc83e1bb6b84ddce84fe7738', '7a53be99a2d39e90884249a0260f753e24033947', 1, CURDATE(), sha1(md5('tokenadministrateur')));
 INSERT INTO administrateur VALUES(1, "Responsable informatique");
+INSERT INTO matiere SET id_m = 0;
+INSERT INTO user (id_u, username, salt, password, active, dateUser, token) VALUES(2, 'prof', '8262216f0c53cd1ebc83e1bb6b84ddce84fe7738', '0a9f3ec3809e9162ba1219bfe03970b6a0e10068', 1, CURDATE(), sha1(md5('tokenadministrateur')));
+INSERT INTO professeur VALUES(2, 0);
+INSERT INTO user (id_u, username, salt, password, active, dateUser, token) VALUES(3, 'eleve', '8262216f0c53cd1ebc83e1bb6b84ddce84fe7738', '59cee2a6f0ff147433684a69020158e115a40f41', 1, CURDATE(), sha1(md5('tokenadministrateur')));
+INSERT INTO eleve VALUES(3, "");
 

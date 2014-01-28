@@ -1,3 +1,14 @@
+<pre>
+	
+	
+	
+	
+	
+	
+	
+	
+	<?php print_r($_SESSION);?>
+</pre>
 <div class="container">
 	<div class="hero-unit text-center">
 		<div class="headline">
