@@ -10,9 +10,9 @@ class FrontendApplication extends \Library\Application {
 	}
 	
 	public function run() {
+		$controller = $this->getController();
 		if ($this->user->isAuthenticated())
 		{
-			$controller = $this->getController();
 			if($controller->action() != 'logout') {
 				if($this->user->getAttribute('status') == 'Prof') {
 					$this->httpResponse->redirect('/professeur');
@@ -24,7 +24,9 @@ class FrontendApplication extends \Library\Application {
 		}
 		else
 		{
-			$controller = new Modules\Connexion\ConnexionController($this, 'Connexion', 'index');
+			if($controller->action() != 'activate' && $controller->action() != 'newPass' && $controller->action() != 'passReload') {
+				$controller = new Modules\Connexion\ConnexionController($this, 'Connexion', 'index');
+			}			
 		}
 		$controller->execute();
 		$this->httpResponse->setPage($controller->page());

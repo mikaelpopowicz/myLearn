@@ -35,6 +35,9 @@
 					<input type="password" class="form-control" placeholder="Password" name="password" required>
 					<button class="btn btn-lg btn-primary btn-block" name="go" type="submit">Connexion</button>
 				</form>
+				<p class="text-center">
+					<a href="/connexion/mot-de-passe-perdu">Mot de passe oublié ?</a>
+				</p>
 			</div>
 		</div>
 	</div>

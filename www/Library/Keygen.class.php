@@ -12,8 +12,8 @@ class Keygen extends ApplicationComponent
 	
 	public function getNewSalt($length = 12)
 	{
-		$managers = new \Library\Managers('PDO', \Library\PDOFactory::getMysqlConnexion());
-		$manager = $managers->getManagerOf('Byte');
+		$managers = new \Library\Managers('PDO', \Library\PDOFactory::getMysqlConnexion($this->app->config()));
+		$manager = $managers->getManagerOf('User');
 		$tokens = $manager->getTokens();
 	    // initialiser la variable $mdp
 	    $salt = "";

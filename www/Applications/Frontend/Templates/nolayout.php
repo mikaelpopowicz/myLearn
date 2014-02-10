@@ -26,7 +26,7 @@
 	  
   	<!-- Bootstrap core JavaScript ================ -->
   	<!-- Placed at the end of the document so the pages load faster -->
-  	<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  	<script src="/js/jquery-1.7.2.min.js"></script>
   	<script src="/js/bootstrap.min.js"></script>
   	<!-- Noty ================ -->
   	<script src='/assets/js/noty/packaged/jquery.noty.packaged.min.js'></script>

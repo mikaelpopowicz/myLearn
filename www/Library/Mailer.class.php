@@ -1,7 +1,7 @@
 <?php
 namespace Library;
 
-class Mailer
+class Mailer extends \Library\ApplicationComponent
 {
 	private $mail;
 	private $sujet;
@@ -11,7 +11,9 @@ class Mailer
 	private $ligne;
 	private $boundary;
 	
-	public function __construct($mail, $sujet, $message, $headers) {
+	/*
+	public function __construct($app, $mail, $sujet, $message, $headers) {
+		parrent::__construct($app);
 		$this->boundary = "-----=".md5(rand());
 		if (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $mail)) {
 			$this->setLigne("\r\n");
@@ -24,9 +26,16 @@ class Mailer
 		$this->setHeaders($headers);
 		$this->send();
 	}
+	*/
 	
 	public function setMail($mail) {
 		$this->mail = $mail;
+		$this->boundary = "-----=".md5(rand());
+		if (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $mail)) {
+			$this->setLigne("\r\n");
+		} else {
+			$this->setLigne("\n");
+		}
 	}
 	
 	public function setSujet($sujet) {
@@ -34,8 +43,8 @@ class Mailer
 	}
 	
 	public function setHeaders($sender) {
-		$this->headers = "From: \"Mika-p.fr\"<".$sender.">".$this->ligne;
-		$this->headers.= "Reply-to: \"Mika-p.fr\" <".$sender.">".$this->ligne;
+		$this->headers = "From: \"myLearn\"<".$sender.">".$this->ligne;
+		$this->headers.= "Reply-to: \"myLearn\" <".$sender.">".$this->ligne;
 		$this->headers.= "MIME-Version: 1.0".$this->ligne;
 		$this->headers.= "Content-Type: multipart/alternative;".$this->ligne." boundary=\"$this->boundary\"".$this->ligne;
 	}
@@ -322,7 +331,7 @@ class Mailer
 									<tr>
 										<td>
 											<div id="logo" class="text-logo">
-												<h2><a href="http://poo/"><span>Mika</span>-p<span>.Fr</span></a></h2>
+												<h2><a href="http://ppe/"><span>my</span>Learn</a></h2>
 											</div>
 											</td>
 										<td align="right"><h6 class="collapse">'.$titre.'</h6></td>

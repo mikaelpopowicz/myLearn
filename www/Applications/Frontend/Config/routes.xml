@@ -15,8 +15,8 @@
 	<route url="/connexion/mot-de-passe-perdu" module="Connexion" action="passReload" />
 	<route url="/connexion/mot-de-passe-perdu/(.+)" module="Connexion" action="newPass" vars="token" />
 	<route url="/connexion/logout/(.*)" module="Connexion" action="logout" vars="request" />
-	<route url="/inscription" module="Connexion" action="subscribe" />
 	<route url="/connexion/(.+)" module="Connexion" action="activate" vars="token" />
+	<route url="/inscription" module="Connexion" action="subscribe" />
 	<route url="/membre/mon-profil" module="Membre" action="index" />
 	<route url="/membre/mon-profil/modifier-profil" module="Membre" action="modifierProfil" />
 	<route url="/membre/mon-profil/modifier-mot-de-passe" module="Membre" action="modifierPass" />

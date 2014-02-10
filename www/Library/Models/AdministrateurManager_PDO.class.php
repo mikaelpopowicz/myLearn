@@ -35,8 +35,15 @@ class AdministrateurManager_PDO extends AdministrateurManager
 	
 	protected function add(Administrateur $administrateur)
 	{
-	    $requete = $this->dao->prepare('PROCEDURE SQL');
-	    $requete->bindValue(':id', $administrateur['id']);
+	    $requete = $this->dao->prepare('CALL ajouter_admin(:user, :nom, :prenom, :email, :pass, :salt, :token, :poste)');
+	    $requete->bindValue(':user', $administrateur['username']);
+		$requete->bindValue(':nom', $administrateur['nom']);
+		$requete->bindValue(':prenom', $administrateur['prenom']);
+		$requete->bindValue(':email', $administrateur['email']);
+		$requete->bindValue(':pass', $administrateur['password']);
+		$requete->bindValue(':salt', $administrateur['salt']);
+		$requete->bindValue(':token', $administrateur['token']);
+		$requete->bindValue(':poste', $administrateur['poste']);
 	    $requete->execute();
 	}
 	
