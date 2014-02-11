@@ -10,31 +10,25 @@ class Mailer extends \Library\ApplicationComponent
 	private $headers;
 	private $ligne;
 	private $boundary;
+	private $team;
+	private $contact;
 	
-	/*
-	public function __construct($app, $mail, $sujet, $message, $headers) {
-		parrent::__construct($app);
+	
+	public function __construct($app) {
+		parent::__construct($app);
+		$this->setLigne("\n");
 		$this->boundary = "-----=".md5(rand());
-		if (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $mail)) {
-			$this->setLigne("\r\n");
-		} else {
-			$this->setLigne("\n");
-		}
-		$this->setMail($mail);
-		$this->setSujet($sujet);
-		$this->setMessage($sujet, $message);
-		$this->setHeaders($headers);
-		$this->send();
+		$this->setHeaders($this->app->config()->get('conf_email'));
+		$this->setTeam($app->config()->get('conf_nom'));
+		$this->setContact($app->config()->get('conf_contact'));
+		//echo $app->config()->get('conf_email');
 	}
-	*/
 	
 	public function setMail($mail) {
 		$this->mail = $mail;
-		$this->boundary = "-----=".md5(rand());
+		
 		if (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $mail)) {
 			$this->setLigne("\r\n");
-		} else {
-			$this->setLigne("\n");
 		}
 	}
 	
@@ -52,13 +46,21 @@ class Mailer extends \Library\ApplicationComponent
 	public function setLigne($ligne) {
 		$this->ligne = $ligne;
 	}
+
+	public function setTeam($team) {
+		$this->team = $team;
+	}
+
+	public function setContact($contact) {
+		$this->contact = $contact;
+	}
 	
 	public function send() {
 		mail($this->mail, $this->sujet, $this->message, $this->headers);
 	}
 	
 	public function setMessage($titre, $message) {
-		$dir = '../'.__DIR__;
+		//$dir = '../'.__DIR__;
 		
 		$this->message = $this->ligne."--".$this->boundary.$this->ligne;
 		
@@ -380,7 +382,7 @@ class Mailer extends \Library\ApplicationComponent
 															<td>				
 																			
 																<h5 class="">Contacts:</h5>												
-																<p>Email: <strong><a href="mailto:webmaster@mika-p.fr">webmaster@mika-p.fr</a></strong></p>
+																<p>Email: <strong><a href="mailto:'.$this->contact.'">'.$this->contact.'</a></strong></p>
                 
 															</td>
 														</tr>
@@ -414,7 +416,7 @@ class Mailer extends \Library\ApplicationComponent
 								<tr>
 									<td align="center">
 										<p>
-											L\'équipe Mika-p.fr
+											L\'équipe '.$this->team.'
 										</p>
 									</td>
 								</tr>

@@ -9,6 +9,7 @@ class ConnexionController extends \Library\BackController
 		$this->page->addVar('title', 'myLearn - Connexion');
 		$this->page->addVar('nom', $this->app->config()->get('conf_nom'));
 		$this->page->addVar('desc', $this->app->config()->get('conf_description'));
+		$this->page->addVar('mail', $this->app->config()->get('conf_email'));
 		
 	 	if($this->app->user()->isAuthenticated()) {
 			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "Vous êtes déjà connecté"});</script>');
@@ -158,7 +159,7 @@ class ConnexionController extends \Library\BackController
 					$test->setToken($this->app->key()->getNewSalt(40));
 					$manU->save($test);
 					$this->app->user()->setFlash('<script>noty({type: "success", layout: "top", text: "<strong>Activation réussie !</strong> Vous pouvez maintenant vous connecter"});</script>');
-					$this->app->httpResponse()->redirect('/connexion');
+					$this->app->httpResponse()->redirect('/');
 					
 				// Sinon c'est token de restauration de mot de passe
 				} else {
@@ -167,7 +168,7 @@ class ConnexionController extends \Library\BackController
 				
 			// Personne n'a ce token
 			} else {
-				$this->app->httpResponse()->redirect('/connexion');
+				$this->app->httpResponse()->redirect('/');
 			}
 			
 		// Le token n'est pas présent dans l'url
@@ -195,10 +196,10 @@ class ConnexionController extends \Library\BackController
 					$this->app->mail()->setMail($test->email());
 					$this->app->mail()->setMessage($sujet, $message);
 					$this->app->mail()->setSujet($sujet);
-					$this->app->mail()->setHeaders('noreply@mika-p.fr');
 					$this->app->mail()->send();
 					$this->app->user()->setFlash('<script>noty({type: "success", layout: "topCenter", text: "<strong>Mail envoyé</strong>"});</script>');
 					//echo "<pre>";print_r($this->app->mail()); echo "</pre>";
+					//echo '<pre>';print_r($this->app->config()->get('conf_email'));echo '</pre>';
 					$this->app->httpResponse()->redirect('/');
 				} else {
 					$this->app->user()->setFlash('<script>noty({type: "information", layout: "topCenter", text: "Votre compte est déjà activé"});</script>');
@@ -237,7 +238,6 @@ class ConnexionController extends \Library\BackController
 					$this->app->mail()->setMail($test->email());
 					$this->app->mail()->setMessage($sujet, $message);
 					$this->app->mail()->setSujet($sujet);
-					$this->app->mail()->setHeaders('noreply@mika-p.fr');
 					$this->app->mail()->send();
 					$this->app->user()->setFlash('<script>noty({type: "information", layout: "topCenter", text: "<strong>Mail envoyé</strong>"});</script>');
 					$this->app->httpResponse()->redirect('/connexion');

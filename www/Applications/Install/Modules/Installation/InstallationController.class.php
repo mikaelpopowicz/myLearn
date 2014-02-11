@@ -124,6 +124,7 @@ class InstallationController extends \Library\BackController
 		$this->page->addVar('app', $app);
 		$this->page->addVar('dir', $dir);
 		$this->page->addVar('message', $message);
+		$this->page->addVar('mod', $mod);
 	}
 	
 	public function executeInit2(\Library\HTTPRequest $request)
@@ -208,7 +209,8 @@ class InstallationController extends \Library\BackController
 				if($request->postExists('next')) {
 					$infos = array(
 						"nom" => $request->postData('nom'),
-						"description" => $request->postData('description')
+						"description" => $request->postData('description'),
+						"email" => $request->postData('email')
 					);
 					$erreur = array();
 					foreach ($infos as $donnee => $value) {
@@ -264,6 +266,7 @@ class InstallationController extends \Library\BackController
 	<define var="db_user_pass" value="'.$bdd['password'].'" />
 	<define var="conf_nom" value="'.$infos['nom'].'" />
 	<define var="conf_description" value="'.$infos['description'].'" />
+	<define var="conf_email" value="'.$infos['email'].'" />
 	<define var="conf_date" value="'.$date->format('d/m/Y').'" />
 	<define var="installed" value="true" />
 </definitions>';
@@ -279,19 +282,24 @@ class InstallationController extends \Library\BackController
 						fclose($app[$i]);
 						rename("../Applications/".$dir[$i]."/".$dir[$i]."Application.back.class.php", "../Applications/".$dir[$i]."/".$dir[$i]."Application.class.php");
 					}
-					$str = "";
-					$pdo = fopen('../Applications/Install/Modules/Installation/mylearn.sql', 'r');
-					while (!feof($pdo)) {
-						$str .= fgets($pdo, 4096);
+					$str1 = "";
+					$pdo1 = fopen('../Applications/Install/Modules/Installation/mylearn.sql', 'r');
+					while (!feof($pdo1)) {
+						$str1 .= fgets($pdo1, 12040);
 					}
-					fclose($pdo);
+					fclose($pdo1);
+					/*
+					$dba = new \PDO('mysql:host='.$bdd['hote'].';dbname=information_schema', $bdd['user'], $bdd['password']);
+					$dba->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING);
+					$query = $dba->query("DELETE FROM TABLES WHERE TABLE_NAME = 'mylearn'");
+					*/
 					$dbh = new \PDO('mysql:host='.$bdd['hote'].';dbname='.$bdd['base'], $bdd['user'], $bdd['password']);
 					$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING);
-					$sql = $dbh->query($str);
-					if(!$sql) {
+					$sql1 = $dbh->exec($str1);
+					if(!$sql1) {
 						$erreur[] = "bdd";
 					}
-					
+					//echo '<pre>';print_r($str2);echo '</pre>';
 					$conf = !in_array('infos', $erreur) ? '<span class="label label-success"><i class="fa fa-check"></i> </span>' : '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
 					$db = !in_array('bdd', $erreur) ? '<span class="label label-success"><i class="fa fa-check"></i> </span>' : '<span class="label label-danger"><i class="fa fa-times"></i> </span>';
 					

@@ -7,6 +7,7 @@ class FrontendApplication extends \Library\Application {
 		parent::__construct();
 		
 		$this->name = "Frontend";
+		$this->mail = new \Library\Mailer($this);
 	}
 	
 	public function run() {

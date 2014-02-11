@@ -31,6 +31,17 @@
 							?>
 						</div>
 					</div>
+					<div class="form-group">
+						<label for="email" class="col-sm-3 control-label">Email myLearn</label>
+						<div class="col-sm-4">
+							<input type="text" id="email" name="email" class="form-control" placeholder="Mail d'envoi de myLearn" value="<?php echo isset($infos) ? $infos['email'] : "";?>">
+							<?php
+							if(isset($erreur) && in_array('description', $erreur)) {
+								echo "<span class='help-block'></span>";
+							}
+							?>
+						</div>
+					</div>
 				</div>
 				<div class="panel-footer">
 					<button name="previous" class="btn btn-default">Retour</button>

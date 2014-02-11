@@ -19,7 +19,6 @@ abstract class Application
 		$this->config = new Config($this);
 		$this->name = '';
 		$this->key = new Keygen($this);
-		$this->mail = new Mailer($this);
 	}
    
 	public function getController()

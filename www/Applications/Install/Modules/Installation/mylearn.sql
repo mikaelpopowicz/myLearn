@@ -293,9 +293,8 @@ ALTER TABLE avoir
 # -----------------------------------------------------------------------------
 #       CREATION TRIGGERS ET PROCEDURES
 # -----------------------------------------------------------------------------
-Delimiter @@
 /*
-*	Procédure d'archivage de cours d'une session
+* Procédure d'archivage de cours d'une session
 */
 CREATE PROCEDURE archiver_cours(sess VARCHAR(128))
 BEGIN
@@ -305,207 +304,206 @@ Declare titre, description VARCHAR(128);
 Declare contenu TEXT;
 Declare dateAjout, dateModif DATETIME;
 Declare curc CURSOR
-	FOR SELECT co.id_cours, co.id_m, co.id_classe, co.id_u, co.titre, co.description, co.contenu, co.dateAjout, co.dateModif
-		FROM cours co
-		INNER JOIN classe cl ON co.id_classe = cl.id_classe
-		INNER JOIN session s ON cl.session = s.session
-		WHERE s.session = sess;
+  FOR SELECT co.id_cours, co.id_m, co.id_classe, co.id_u, co.titre, co.description, co.contenu, co.dateAjout, co.dateModif
+    FROM cours co
+    INNER JOIN classe cl ON co.id_classe = cl.id_classe
+    INNER JOIN session s ON cl.session = s.session
+    WHERE s.session = sess;
 Declare continue HANDLER
-	FOR NOT FOUND SET fini = 1;
+  FOR NOT FOUND SET fini = 1;
 Open curc;
 FETCH curc INTO cours, matiere, classe, user, titre, description, contenu, dateAjout, dateModif;
 
 While fini != 1
-	DO
-	INSERT INTO histo_cours VALUES(cours, matiere, classe, user, titre, description, contenu, dateAjout, dateModif, sysdate());
-	DELETE FROM vers_cours WHERE id_cours = cours;
-	DELETE FROM cours WHERE id_cours = cours;
-	FETCH curc INTO cours, matiere, classe, user, titre, contenu, description, dateAjout, dateModif;
+  DO
+  INSERT INTO histo_cours VALUES(cours, matiere, classe, user, titre, description, contenu, dateAjout, dateModif, sysdate());
+  DELETE FROM vers_cours WHERE id_cours = cours;
+  DELETE FROM cours WHERE id_cours = cours;
+  FETCH curc INTO cours, matiere, classe, user, titre, contenu, description, dateAjout, dateModif;
 END While;
 Close curc;
-END @@
-
+END ;
 /*
-*	Trigger versioning cours
+* Trigger versioning cours
 */
 CREATE TRIGGER version_cours
 BEFORE UPDATE ON cours
 FOR EACH ROW
 BEGIN
-	# Compter le nombre de versions existantes
-	Declare versions int;
-	SELECT COUNT(*) INTO versions
-	FROM vers_cours
-	WHERE id_cours = new.id_cours;
-	# Suppression de la plus vielle version si il y en déjà 5
-	IF versions > 4
-	THEN
-		# /!\ ATTENTION /!\ pour trouver le dateModif le plus petit, il faut utiliser une sous-requête avec un alias, car l'on cherche dans la table ou l'on veut supprimer cela bloque la table en question !!
-		DELETE FROM vers_cours
-		WHERE id_cours = new.id_cours
-		AND dateModif in (
-			SELECT * FROM (
-				SELECT MIN(dateModif)
-				FROM vers_cours
-				WHERE id_cours = new.id_cours
-			) AS t
-		);
-	END IF;
-	INSERT INTO vers_cours VALUES(new.id_cours,old.titre,old.description,old.contenu,sysdate());
-	SET new.dateModif = sysdate();
-END @@
+  # Compter le nombre de versions existantes
+  Declare versions int;
+  SELECT COUNT(*) INTO versions
+  FROM vers_cours
+  WHERE id_cours = new.id_cours;
+  # Suppression de la plus vielle version si il y en déjà 5
+  IF versions > 4
+  THEN
+    # /!\ ATTENTION /!\ pour trouver le dateModif le plus petit, il faut utiliser une sous-requête avec un alias, car l'on cherche dans la table ou l'on veut supprimer cela bloque la table en question !!
+    DELETE FROM vers_cours
+    WHERE id_cours = new.id_cours
+    AND dateModif in (
+      SELECT * FROM (
+        SELECT MIN(dateModif)
+        FROM vers_cours
+        WHERE id_cours = new.id_cours
+      ) AS t
+    );
+  END IF;
+  INSERT INTO vers_cours VALUES(new.id_cours,old.titre,old.description,old.contenu,sysdate());
+  SET new.dateModif = sysdate();
+END ;
 /*
-*	Procédure de restauration d'une version de cours
+* Procédure de restauration d'une version de cours
 */
 CREATE PROCEDURE restaurer_cours(id int, version DATETIME)
 BEGIN
-	# Déclaration
-	Declare v_titre, v_desc VARCHAR(128);
-	Declare v_contenu TEXT;
-	# Récupération du titre, description et contenu de la version choisie
-	SELECT titre, description, contenu INTO v_titre, v_desc, v_contenu
-	FROM vers_cours 
-	WHERE id_cours=id
-	AND dateModif=version;
-	# Insertion des informations récupérés dans le cours choisi
-	UPDATE cours 
-	SET titre = v_titre, 
-	description = v_desc,
-	contenu = v_contenu
-	WHERE id_cours=id;
-END @@
+  # Déclaration
+  Declare v_titre, v_desc VARCHAR(128);
+  Declare v_contenu TEXT;
+  # Récupération du titre, description et contenu de la version choisie
+  SELECT titre, description, contenu INTO v_titre, v_desc, v_contenu
+  FROM vers_cours 
+  WHERE id_cours=id
+  AND dateModif=version;
+  # Insertion des informations récupérés dans le cours choisi
+  UPDATE cours 
+  SET titre = v_titre, 
+  description = v_desc,
+  contenu = v_contenu
+  WHERE id_cours=id;
+END ;
 /*
-*	Fonction gérant l'auto-incrément
+* Fonction gérant l'auto-incrément
 */
 Create function autoincrement()
 returns INTEGER(2)
-	Deterministic
+  Deterministic
 Begin
-	Declare nbi int;
-	SELECT MAX(id_u) INTO nbi
-	FROM user;
-	IF nbi IS NULL
-	THEN
-		SET nbi = 0;
-	END IF;
-	SET nbi = nbi+1;
-	return nbi;
-END @@
+  Declare nbi int;
+  SELECT MAX(id_u) INTO nbi
+  FROM user;
+  IF nbi IS NULL
+  THEN
+    SET nbi = 0;
+  END IF;
+  SET nbi = nbi+1;
+  return nbi;
+END ;
 /*
-*	Enregistrement d'un élève
+* Enregistrement d'un élève
 */
 CREATE PROCEDURE ajouter_eleve(a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_salt VARCHAR(40), a_token VARCHAR(40), a_dateNaissance DATE)
 BEGIN
-	# Récupération du nouvel id
-	Declare id int;
-	SET id = (SELECT autoincrement());
-	
-	# Vérifions que l'admin n'est pas bête au point de faire des doublons
-	IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON u.id_u = e.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND e.dateNaissance = a_dateNaissance) < 1
-	THEN
-		# Insertion de l'élève dans la table USER
-		INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
-		INSERT INTO eleve VALUES(id, a_dateNaissance);
-	END IF;
-END @@
+  # Récupération du nouvel id
+  Declare id int;
+  SET id = (SELECT autoincrement());
+  
+  # Vérifions que l'admin n'est pas bête au point de faire des doublons
+  IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON u.id_u = e.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND e.dateNaissance = a_dateNaissance) < 1
+  THEN
+    # Insertion de l'élève dans la table USER
+    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
+    INSERT INTO eleve VALUES(id, a_dateNaissance);
+  END IF;
+END ;
 /*
-*	Créer un élève gestionnaire
+* Créer un élève gestionnaire
 */
 CREATE PROCEDURE ajouter_gest(id INTEGER(2))
 BEGIN
-	# Vérifier qu'il s'agit d'un élève
-	# Vérifions que l'admin n'est pas bête au point de faire des doublons
-	IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON e.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND e.dateNaissance = a_dateNaissance) < 1
-	THEN
-		# Insertion de l'élève dans la table USER
-		INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
-		INSERT INTO eleve VALUES(id, a_dateNaissance);
-	END IF;
+  # Vérifier qu'il s'agit d'un élève
+  # Vérifions que l'admin n'est pas bête au point de faire des doublons
+  IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON e.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND e.dateNaissance = a_dateNaissance) < 1
+  THEN
+    # Insertion de l'élève dans la table USER
+    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
+    INSERT INTO eleve VALUES(id, a_dateNaissance);
+  END IF;
 
-END @@
+END ;
 /*
-*	Enregistrement d'un professeur
+* Enregistrement d'un professeur
 */
 CREATE PROCEDURE ajouter_prof(a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_salt VARCHAR(40), a_token VARCHAR(40), matiere INTEGER(2))
 BEGIN
-	# Récupération du nouvel id
-	Declare id int;
-	SET id = (SELECT autoincrement());
-	# Vérifions que l'admin n'est pas bête au point de faire des doublons
-	IF (SELECT COUNT(*) FROM user u INNER JOIN professeur p ON p.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND p.id_m = matiere) < 1
-	THEN
-		# Insertion du professeur dans la table USER
-		INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
-		INSERT INTO professeur VALUES(id, matiere);
-	END IF;
-END @@
+  # Récupération du nouvel id
+  Declare id int;
+  SET id = (SELECT autoincrement());
+  # Vérifions que l'admin n'est pas bête au point de faire des doublons
+  IF (SELECT COUNT(*) FROM user u INNER JOIN professeur p ON p.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND p.id_m = matiere) < 1
+  THEN
+    # Insertion du professeur dans la table USER
+    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
+    INSERT INTO professeur VALUES(id, matiere);
+  END IF;
+END ;
 /*
-*	Enregistrement d'un administrateur
+* Enregistrement d'un administrateur
 */
 CREATE PROCEDURE ajouter_admin(a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_salt VARCHAR(40), a_token VARCHAR(40), a_poste VARCHAR(80))
 BEGIN
-	# Récupération du nouvel id
-	Declare id int;
-	SET id = (SELECT autoincrement());
-	# Vérifions que l'admin n'est pas bête au point de faire des doublons
-	IF (SELECT COUNT(*) FROM user u INNER JOIN administrateur a ON a.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND a.poste = a_poste) < 1
-	THEN
-		# Insertion du professeur dans la table USER
-		INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 1, a_salt, a_token, CURDATE());
-		INSERT INTO administrateur VALUES(id, a_poste);
-	END IF;
-END @@
+  # Récupération du nouvel id
+  Declare id int;
+  SET id = (SELECT autoincrement());
+  # Vérifions que l'admin n'est pas bête au point de faire des doublons
+  IF (SELECT COUNT(*) FROM user u INNER JOIN administrateur a ON a.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND a.poste = a_poste) < 1
+  THEN
+    # Insertion du professeur dans la table USER
+    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 1, a_salt, a_token, CURDATE());
+    INSERT INTO administrateur VALUES(id, a_poste);
+  END IF;
+END ;
 /*
-*	Recherche de la session en cours
+* Recherche de la session en cours
 */
 CREATE FUNCTION trouver_session()
 returns VARCHAR(10)
-	Deterministic
+  Deterministic
 Begin
-	Declare sess VARCHAR(10);
-	IF MONTH(CURDATE()) < 8
-	THEN
-		SELECT session INTO sess
-		FROM session
-		WHERE session like CONCAT("%/",YEAR(CURDATE()));
-	ELSE
-		SELECT session INTO sess
-		FROM session
-		WHERE session like CONCAT(YEAR(CURDATE()),"/%");
-	END IF;
-	IF sess IS NULL
-	THEN
-		SET sess = "NOT FOUND";
-	END IF;
-	return sess;
-END @@
+  Declare sess VARCHAR(10);
+  IF MONTH(CURDATE()) < 8
+  THEN
+    SELECT session INTO sess
+    FROM session
+    WHERE session like CONCAT("%/",YEAR(CURDATE()));
+  ELSE
+    SELECT session INTO sess
+    FROM session
+    WHERE session like CONCAT(YEAR(CURDATE()),"/%");
+  END IF;
+  IF sess IS NULL
+  THEN
+    SET sess = "NOT FOUND";
+  END IF;
+  return sess;
+END ;
 /*
-*	Enregistrement d'une session
+* Enregistrement d'une session
 */
 CREATE PROCEDURE ajouter_session(sess VARCHAR(10))
 BEGIN
-	Declare message VARCHAR(10);
-	IF sess = "FIRST"
-	THEN
-		IF MONTH(CURDATE()) < 7
-		THEN
-			INSERT INTO session VALUES(CONCAT(YEAR(CURDATE())-1,'/',YEAR(CURDATE())));
-		ELSE
-			INSERT INTO session VALUES(CONCAT(YEAR(CURDATE()),"/",YEAR(CURDATE())+1));
-		END IF;
-	ELSE
-		INSERT INTO session VALUES(sess);
-		SELECT session INTO message
-		FROM session
-		WHERE session like CONCAT("%/",SUBSTR(sess,1,4));
-		IF message IS NOT NULL
-		THEN
-			CALL auto_class(message, sess);
-		END IF;
-	END IF;
-END @@
+  Declare message VARCHAR(10);
+  IF sess = "FIRST"
+  THEN
+    IF MONTH(CURDATE()) < 7
+    THEN
+      INSERT INTO session VALUES(CONCAT(YEAR(CURDATE())-1,'/',YEAR(CURDATE())));
+    ELSE
+      INSERT INTO session VALUES(CONCAT(YEAR(CURDATE()),"/",YEAR(CURDATE())+1));
+    END IF;
+  ELSE
+    INSERT INTO session VALUES(sess);
+    SELECT session INTO message
+    FROM session
+    WHERE session like CONCAT("%/",SUBSTR(sess,1,4));
+    IF message IS NOT NULL
+    THEN
+      CALL auto_class(message, sess);
+    END IF;
+  END IF;
+END ;
 /*
-*	Création automatique des classes d'une nouvelle session en fonction d'une autre
+* Création automatique des classes d'une nouvelle session en fonction d'une autre
 */
 CREATE PROCEDURE auto_class(prev VARCHAR(128), next VARCHAR(128))
 BEGIN
@@ -513,23 +511,26 @@ Declare fini int default 0;
 Declare c_section INTEGER(2);
 Declare c_libelle VARCHAR(128); 
 Declare curc CURSOR
-	FOR SELECT id_section, libelle
-		FROM classe c
-		INNER JOIN session s ON c.session = s.session
-		WHERE s.session like prev;
+  FOR SELECT id_section, libelle
+    FROM classe c
+    INNER JOIN session s ON c.session = s.session
+    WHERE s.session like prev;
 Declare continue HANDLER
-	FOR NOT FOUND SET fini = 1;
+  FOR NOT FOUND SET fini = 1;
 Open curc;
 FETCH curc INTO c_section, c_libelle;
 While fini != 1
-	DO
-	INSERT INTO classe VALUES("", next, c_section, c_libelle);
-	FETCH curc INTO c_section, c_libelle;
+  DO
+  INSERT INTO classe VALUES("", next, c_section, c_libelle);
+  FETCH curc INTO c_section, c_libelle;
 END While;
 Close curc;
-END @@
-Delimiter ;
+END ;
 # -----------------------------------------------------------------------------
 #       CREATION COMPTE ADMIN, PROF, ELEVE
 # -----------------------------------------------------------------------------
-CALL ajouter_admin("admin", "admin", "admin", "admin@domain.tld","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "superAdmin");
+CALL ajouter_admin("admin", "admin", "admin", "admin@domain.tld","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "administrateur");
+INSERT INTO matiere VALUES("", "Matière", "fa fa-cog");
+CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);
+CALL ajouter_eleve("eleve", "eleve", "eleve", "eleve@domain.tld", "59cee2a6f0ff147433684a69020158e115a40f41", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokeneleve')), "1989-10-2");
+CALL ajouter_session("FIRST");
