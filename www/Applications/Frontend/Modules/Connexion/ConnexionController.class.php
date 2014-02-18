@@ -163,6 +163,7 @@ class ConnexionController extends \Library\BackController
 					
 				// Sinon c'est token de restauration de mot de passe
 				} else {
+					$this->app->user()->setFlash('<script>noty({type: "warning", layout: "top", text: "Compte déjà activé"});</script>');
 					$this->app->httpResponse()->redirect('/');
 				}
 				
@@ -240,7 +241,9 @@ class ConnexionController extends \Library\BackController
 					$this->app->mail()->setSujet($sujet);
 					$this->app->mail()->send();
 					$this->app->user()->setFlash('<script>noty({type: "information", layout: "topCenter", text: "<strong>Mail envoyé</strong>"});</script>');
-					$this->app->httpResponse()->redirect('/connexion');
+					//echo "<pre>";print_r($this->app->mail()); echo "</pre>";
+					//echo $this->app->mail()->headers();
+					//$this->app->httpResponse()->redirect('/');
 				} else {
 					$this->page->addVar('erreurs', array('warning', 'Vous devez d\'abord <a href="/connexion/activer">activez</a> votre compte !'));
 				}
@@ -291,7 +294,7 @@ class ConnexionController extends \Library\BackController
 						} 
 					}
 				} else {
-					$this->app->httpResponse()->redirect('/connexion');
+					$this->app->httpResponse()->redirect('/');
 				}
 	
 			// Personne n'a ce token
@@ -301,7 +304,7 @@ class ConnexionController extends \Library\BackController
 				$this->page->addVar('disabled', 'disabled');
 			}
 		} else {
-			$this->app->httpResponse()->redirect('/connexion');
+			$this->app->httpResponse()->redirect('/');
 		}
 	}
 }

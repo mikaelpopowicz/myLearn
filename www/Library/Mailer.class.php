@@ -42,6 +42,8 @@ class Mailer extends \Library\ApplicationComponent
 		$this->headers.= "MIME-Version: 1.0".$this->ligne;
 		$this->headers.= "Content-Type: multipart/alternative;".$this->ligne." boundary=\"$this->boundary\"".$this->ligne;
 	}
+
+	public function headers() { return $this->headers; }
 	
 	public function setLigne($ligne) {
 		$this->ligne = $ligne;

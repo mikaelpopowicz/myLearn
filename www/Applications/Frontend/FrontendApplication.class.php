@@ -20,16 +20,24 @@ class FrontendApplication extends \Library\Application {
 				} else if($this->user->getAttribute('status') == 'Admin') {
 					$this->httpResponse->redirect('/admin');
 				}
-				
+			} else {
+				$controller->execute();
 			}
 		}
 		else
 		{
-			if($controller->action() != 'activate' && $controller->action() != 'newPass' && $controller->action() != 'passReload') {
-				$controller = new Modules\Connexion\ConnexionController($this, 'Connexion', 'index');
-			}			
+			if($controller != false) {
+				if($controller->action() == 'activate' || $controller->action() == 'newPass' || $controller->action() == 'passReload') {
+					$controller->execute();
+				} else {
+					$controller = new Modules\Connexion\ConnexionController($this, 'Connexion', 'index');
+					$controller->execute();
+				}
+			} else {
+				$this->httpResponse->redirect('/');
+			}
 		}
-		$controller->execute();
+		
 		$this->httpResponse->setPage($controller->page());
 		$this->httpResponse->send();
 	}

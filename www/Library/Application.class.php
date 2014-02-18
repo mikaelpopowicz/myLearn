@@ -55,7 +55,11 @@ abstract class Application
 			if ($e->getCode() == \Library\Router::NO_ROUTE)
 			{
 				// Si aucune route ne correspond, c'est que la page demandée n'existe pas.
-				$this->httpResponse->redirect404();
+				if ($this->user->isAuthenticated()) {
+					$this->httpResponse->redirect404();
+				} else {
+					return false;
+				}
 			}
 		}
      

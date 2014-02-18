@@ -5,9 +5,8 @@
 	<define var="db_user" value="root" />
 	<define var="db_user_pass" value="toor" />
 	<define var="conf_nom" value="Iris - BDE Escape" />
-	<define var="conf_description" value="Ecole supérieure d'informatique - Fournis par le BDE Escape" />
+	<define var="conf_description" value="Ecole" />
 	<define var="conf_email" value="mylearn@moniris.com" />
-	<define var="conf_contact" value="support@moniris.com" />
-	<define var="conf_date" value="11/02/2014" />
+	<define var="conf_date" value="17/02/2014" />
 	<define var="installed" value="true" />
 </definitions>
