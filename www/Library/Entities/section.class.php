@@ -1,7 +1,7 @@
 <?php
-namespace Library\Entities\NEW;
+namespace Library\Entities;
 
-class Cours extends \Library\Entity {
+class Section extends \Library\Entity {
 	
 	protected  $libelle,						// Nom de la section
 	$admin;										// Identifiant de l'administrateur de la section (clé étrangère)
@@ -28,12 +28,12 @@ class Cours extends \Library\Entity {
 		}
 	}
    
-	public function setAdmin(admin)
+	public function setAdmin($admin)
 	{
-		$this->admin = admin;
+		$this->admin = $admin;
 	}
 
-		// GETTERS //
+	// GETTERS //
    
 	public function libelle() { return $this->libelle; }
 	public function admin() { return $this->admin; }

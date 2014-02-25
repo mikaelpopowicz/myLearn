@@ -20,9 +20,9 @@
 	<!-- Custom styles for this template -->
 	<link href="/css/doc.css" rel="stylesheet">
 	<link href="/css/navbar.css" rel="stylesheet">
-	<link href="/assets/css/datatables.css" rel="stylesheet">
+	<link href="/css/dataTables.bootstrap.css" rel="stylesheet">
 	<link href="/assets/css/font-awesome.css" rel="stylesheet">
-	
+	<link href="/css/bootstrap-select.css" rel="stylesheet">
 	<script type="text/javascript" src="/js/tinymce/tinymce.min.js"></script>
 	<script>
 	tinymce.init({
@@ -66,18 +66,18 @@
 				<div class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
 						<li class="<?php echo $class_accueil;?>"><a href="/admin">Tableau de bord</a></li>
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle <?php echo $class_cours;?>" data-toggle="dropdown">Gestion <b class="caret"></b></a>
+						<li class="dropdown <?php echo isset($class_gest) ? $class_gest : "";?>">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Gestion <b class="caret"></b></a>
 							<ul class="dropdown-menu">
-								<li><a href="/admin/section">Section</a></li>
-								<li><a href="/admin/session">Session</a></li>
-								<li><a href="/admin/classe">Classe</a></li>
+								<li class="<?php echo isset($class_sec) ? $class_sec : "";?>"><a href="/admin/sections">Section</a></li>
+								<li class="<?php echo isset($class_sess) ? $class_sess : "";?>"><a href="/admin/sessions">Session</a></li>
+								<li class="<?php echo isset($class_cls) ? $class_cls : "";?>"><a href="/admin/classes">Classe</a></li>
 							</ul>
 						</li>
-						<li class="dropdown">
-							<a href="#" class="dropdown-toggle <?php echo $class_cours;?>" data-toggle="dropdown">Cours <b class="caret"></b></a>
+						<li class="dropdown <?php echo isset($class_cours) ? $class_cours : "";?>">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Cours <b class="caret"></b></a>
 							<ul class="dropdown-menu">
-								<li><a href="/admin/matiere">Matières</a></li>
+								<li class="<?php echo isset($class_mat) ? $class_mat : "";?>"><a href="/admin/matieres">Matières</a></li>
 								<li><a href="/admin/cours">Cours</a></li>
 								<li><a href="/admin/devoirs">Devoirs</a></li>
 							</ul>
@@ -116,16 +116,13 @@
 	?>
 	<!--===  End Includes modal ===-->
 
-	<!-- Bootstrap core JavaScript ================ -->
-	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="/js/jquery-1.7.2.min.js"></script>
-	<script src="/js/jquery.uniform.min.js"></script>
+	<script src="/js/jquery-1.10.2.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
-	<script src="/js/holder.js"></script>
-	<!-- Noty ================ -->
 	<script src='/assets/js/noty/packaged/jquery.noty.packaged.min.js'></script>
-	<script src='/assets/js/jquery.dataTables.js'></script>
-	<script src='/assets/js/datatables.js'></script>
+	<script src='/js/dataTables/jquery.dataTables.js'></script>
+	<script src='/js/dataTables/dataTables.bootstrap.js'></script>
+	
+	<script src='/js/bootstrap-select.js'></script>
 	<script src='/js/custom.js'></script>
 	
 	<!--=== JavaScript insert code ===-->

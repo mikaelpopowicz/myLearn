@@ -1,9 +1,9 @@
 <?php
 namespace Library\Models;
 
-use \Library\Entities\Matiere;
+use \Library\Entities\Section;
  
-abstract class MatiereManager extends \Library\Manager
+abstract class SectionManager extends \Library\Manager
 {
 	/**
 	* Méthode retournant la liste des matières
@@ -13,24 +13,17 @@ abstract class MatiereManager extends \Library\Manager
 	
 	/**
 	* Méthode permettant d'ajouter une news.
-	* @param $libelle Le libelle de la matière à recherher
-	* @return void
-	*/
-	abstract public function getByName($libelle);
-	
-	/**
-	* Méthode permettant d'ajouter une news.
 	* @param $news News La news à ajouter
 	* @return void
 	*/
-	abstract protected function add(Matiere $matiere);
+	abstract protected function add(Section $section);
 
 	/**
 	* Méthode permettant d'ajouter une news.
 	* @param $news News La news à ajouter
 	* @return void
 	*/
-	abstract protected function modify(Matiere $matiere);
+	abstract protected function modify(Section $section);
    
 	/**
 	* Méthode permettant d'enregistrer une news.
@@ -39,8 +32,8 @@ abstract class MatiereManager extends \Library\Manager
 	* @see self::modify()
 	* @return void
 	*/
-	public function save(Matiere $matiere)
+	public function save(Section $section)
 	{
-		$matiere->isNew() ? $this->add($matiere) : $this->modify($matiere);
+		$section->isNew() ? $this->add($section) : $this->modify($section);
 	}
 }

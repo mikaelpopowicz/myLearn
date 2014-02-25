@@ -18,7 +18,7 @@ class Classe extends \Library\Entity
 	{
 		if (!is_string($libelle) || empty($libelle))
 		{
-			$this->erreurs[] = self::CONTENU_INVALIDE;
+			$this->erreurs[] = self::LIBELLE_INVALIDE;
 		}
 		else
 		{

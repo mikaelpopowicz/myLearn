@@ -6,14 +6,18 @@ use \Library\Entities\Professeur;
 class ProfesseurManager_PDO extends ProfesseurManager
 {
 	public function getList()
-	{include 'ProfesseurManager.class.php';
-	
+	{
 		$requete = $this->dao->prepare('SELECT id_u AS id, id_m AS matiere FROM professeur');
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
 		$listeByte = $requete->fetchAll();
 		$requete->closeCursor();
 		return $listeByte;
+	}
+
+	public function countOf($matiere)
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM professeur WHERE id_m = '.$matiere)->fetchColumn();
 	}
 	
 	public function getUnique($id)

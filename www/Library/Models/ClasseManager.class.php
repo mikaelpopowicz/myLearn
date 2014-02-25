@@ -1,10 +1,12 @@
 <?php
 namespace Library\Models;
 
-use \Library\Entities\Matiere;
+use \Library\Entities\Classe;
  
-abstract class MatiereManager extends \Library\Manager
+abstract class ClasseManager extends \Library\Manager
 {
+	abstract public function getUnique($id);
+
 	/**
 	* Méthode retournant la liste des matières
 	* @return array La liste des matières. Chaque entrée est une instance de Matière.
@@ -13,24 +15,17 @@ abstract class MatiereManager extends \Library\Manager
 	
 	/**
 	* Méthode permettant d'ajouter une news.
-	* @param $libelle Le libelle de la matière à recherher
-	* @return void
-	*/
-	abstract public function getByName($libelle);
-	
-	/**
-	* Méthode permettant d'ajouter une news.
 	* @param $news News La news à ajouter
 	* @return void
 	*/
-	abstract protected function add(Matiere $matiere);
+	abstract protected function add(Classe $classe);
 
 	/**
 	* Méthode permettant d'ajouter une news.
 	* @param $news News La news à ajouter
 	* @return void
 	*/
-	abstract protected function modify(Matiere $matiere);
+	abstract protected function modify(Classe $classe);
    
 	/**
 	* Méthode permettant d'enregistrer une news.
@@ -39,8 +34,8 @@ abstract class MatiereManager extends \Library\Manager
 	* @see self::modify()
 	* @return void
 	*/
-	public function save(Matiere $matiere)
+	public function save(Classe $classe)
 	{
-		$matiere->isNew() ? $this->add($matiere) : $this->modify($matiere);
+		$classe->isNew() ? $this->add($classe) : $this->modify($classe);
 	}
 }

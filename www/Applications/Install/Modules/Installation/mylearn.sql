@@ -220,10 +220,12 @@ CREATE TABLE IF NOT EXISTS avoir
 # -----------------------------------------------------------------------------
 ALTER TABLE devoir 
   ADD FOREIGN KEY FK_devoir_professeur (id_u)
-      REFERENCES professeur (id_u) ;
+      REFERENCES professeur (id_u)
+         ON DELETE CASCADE ;
 ALTER TABLE devoir 
   ADD FOREIGN KEY FK_devoir_classe (id_classe)
-      REFERENCES classe (id_classe) ;
+      REFERENCES classe (id_classe)
+         ON DELETE CASCADE ;
 ALTER TABLE administrateur 
   ADD FOREIGN KEY FK_administrateur_user (id_u)
       REFERENCES user (id_u) ;
@@ -232,64 +234,82 @@ ALTER TABLE professeur
       REFERENCES matiere (id_m) ;
 ALTER TABLE professeur 
   ADD FOREIGN KEY FK_professeur_user (id_u)
-      REFERENCES user (id_u) ;
+      REFERENCES user (id_u)
+         ON DELETE CASCADE ;
 ALTER TABLE eleve 
   ADD FOREIGN KEY FK_eleve_user (id_u)
-      REFERENCES user (id_u) ;
+      REFERENCES user (id_u)
+         ON DELETE CASCADE ;
 ALTER TABLE etre 
  ADD FOREIGN KEY FK_etre_eleve (id_u)
-     REFERENCES eleve (id_u) ;
+     REFERENCES eleve (id_u)
+        ON DELETE CASCADE ;
 ALTER TABLE etre 
 ADD FOREIGN KEY FK_etre_classe (id_classe)
-    REFERENCES classe (id_classe) ;
+    REFERENCES classe (id_classe)
+       ON DELETE CASCADE ;
 ALTER TABLE section 
   ADD FOREIGN KEY FK_section_administrateur (id_u)
       REFERENCES administrateur (id_u) ;
 ALTER TABLE gestionnaire 
   ADD FOREIGN KEY FK_gestionnaire_user (id_u)
-      REFERENCES user (id_u) ;
+      REFERENCES user (id_u)
+         ON DELETE CASCADE ;
 ALTER TABLE gerer 
   ADD FOREIGN KEY FK_gerer_gestionnaire (id_u)
-      REFERENCES gestionnaire (id_u) ;
+      REFERENCES gestionnaire (id_u)
+         ON DELETE CASCADE ;
 ALTER TABLE gerer 
   ADD FOREIGN KEY FK_gerer_classe (id_classe)
-      REFERENCES classe (id_classe) ;
+      REFERENCES classe (id_classe)
+         ON DELETE CASCADE ;
 ALTER TABLE classe 
   ADD FOREIGN KEY FK_classe_session (session)
-      REFERENCES session (session) ;
+      REFERENCES session (session)
+         ON DELETE CASCADE ;
 ALTER TABLE classe 
   ADD FOREIGN KEY FK_classe_section (id_section)
-      REFERENCES section (id_section) ;
+      REFERENCES section (id_section)
+         ON DELETE CASCADE ;
 ALTER TABLE cours 
   ADD FOREIGN KEY FK_cours_matiere (id_m)
       REFERENCES matiere (id_m) ;
 ALTER TABLE cours 
   ADD FOREIGN KEY FK_cours_classe (id_classe)
-      REFERENCES classe (id_classe) ;
+      REFERENCES classe (id_classe)
+         ON DELETE CASCADE ;
 ALTER TABLE cours 
   ADD FOREIGN KEY FK_cours_user (id_u)
-      REFERENCES user (id_u) ;
+      REFERENCES user (id_u)
+         ON DELETE CASCADE ;
 ALTER TABLE vers_cours 
    ADD FOREIGN KEY FK_vers_cours_cours (id_cours)
-       REFERENCES cours (id_cours) ;
+       REFERENCES cours (id_cours)
+          ON DELETE CASCADE ;
 ALTER TABLE assigner 
   ADD FOREIGN KEY FK_assigner_matiere (id_m)
-      REFERENCES matiere (id_m) ;
+      REFERENCES matiere (id_m)
+         ON DELETE ;
 ALTER TABLE assigner 
   ADD FOREIGN KEY FK_assigner_classe (id_classe)
-      REFERENCES classe (id_classe) ;
+      REFERENCES classe (id_classe)
+         ON DELETE CASCADE ;
 ALTER TABLE commenter 
   ADD FOREIGN KEY FK_commenter_user (id_u)
-      REFERENCES user (id_u) ;
+      REFERENCES user (id_u)
+         ON DELETE CASCADE ;
 ALTER TABLE commenter 
   ADD FOREIGN KEY FK_commenter_cours (id_cours)
-      REFERENCES cours (id_cours) ;
+      REFERENCES cours (id_cours)
+         ON DELETE CASCADE ;
 ALTER TABLE avoir 
   ADD FOREIGN KEY FK_avoir_devoir (id_d)
-      REFERENCES devoir (id_d) ;
+      REFERENCES devoir (id_d)
+         ON DELETE CASCADE ;
 ALTER TABLE avoir 
   ADD FOREIGN KEY FK_avoir_eleve (id_u)
-      REFERENCES eleve (id_u) ;
+      REFERENCES eleve (id_u)
+         ON DELETE CASCADE ;
 # -----------------------------------------------------------------------------
 #       CREATION TRIGGERS ET PROCEDURES
 # -----------------------------------------------------------------------------

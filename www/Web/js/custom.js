@@ -1,9 +1,15 @@
 $(document).ready(function() {
 	$('.datatable').dataTable({
-		"sPaginationType": "bs_normal",
 		"aoColumnDefs": [
 		      { "bSortable": false, "aTargets": [ 0 ] }
 		]
+	});
+
+	$('.selectpicker').selectpicker();
+
+	$('#check_all').click(function () {
+		var cases = $('#tabs').find('input[type=checkbox]');
+		$(cases).prop('checked', this.checked);
 	});
 	
 	

@@ -60,11 +60,24 @@ class MatiereManager_PDO extends MatiereManager
 	}
 	
 	protected function add(Matiere $matiere)
-	  {
-	    $requete = $this->dao->prepare('INSERT INTO matiere SET libelle = :libelle');
-     
-	    $requete->bindValue(':libelle', $matiere->libelle());
-     
-	    $requete->execute();
-	  }
+	{
+		$requete = $this->dao->prepare('INSERT INTO matiere SET libelle = :libelle, icon = :icon');
+		$requete->bindValue(':libelle', $matiere->libelle());
+		$requete->bindValue(':icon', $matiere->icon());
+		$requete->execute();
+	}
+
+	protected function modify(Matiere $matiere)
+	{
+		$requete = $this->dao->prepare('UPDATE matiere SET libelle = :libelle, icon = :icon WHERE id_m = :id');
+		$requete->bindValue(':libelle', $matiere->libelle());
+		$requete->bindValue(':icon', $matiere->icon());
+		$requete->bindValue(':id', $matiere->id());
+		$requete->execute();
+	}
+
+	public function delete(Matiere $matiere)
+  	{
+  		$this->dao->exec('DELETE FROM matiere WHERE id_m = '.$matiere['id']);
+  	}
 }

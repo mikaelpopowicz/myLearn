@@ -44,15 +44,15 @@
 			</div>
 			<div class="panel-body">
 				<div class="list-group">
-					<a href="/admin/section" class="list-group-item">
+					<a href="/admin/sections" class="list-group-item">
 						<span class="badge badge-info">3</span>
 						Section
 					</a>
-					<a href="/admin/session" class="list-group-item">
+					<a href="/admin/sessions" class="list-group-item">
 						<span class="badge badge-info">3</span>
 						Session
 					</a>
-					<a href="/admin/classe" class="list-group-item">
+					<a href="/admin/classes" class="list-group-item">
 						<span class="badge badge-info">3</span>
 						Classe
 					</a>
@@ -67,7 +67,7 @@
 			</div>
 			<div class="panel-body">
 				<div class="list-group">
-					<a href="/admin/matiere" class="list-group-item">
+					<a href="/admin/matieres" class="list-group-item">
 						<span class="badge badge-success">3</span>
 						Matière
 					</a>

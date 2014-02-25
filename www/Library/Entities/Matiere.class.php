@@ -8,6 +8,11 @@ class Matiere extends \Library\Entity {
 
 	const LIBELLE_INVALIDE = 1;
 	const ICON_INVALIDE = 2;
+
+	public function isValid()
+	{
+		return !(empty($this->libelle));
+	}
 	
 	// SETTERS //
    
