@@ -5,7 +5,7 @@ class MatiereController extends \Library\BackController
 {
 	public function executeIndex(\Library\HTTPRequest $request)
 	{
-		$this->page->addVar('title', 'myLearn - Liste des matières');
+		$this->page->addVar('title', 'myAdmin - Liste des matières');
 		$this->page->addVar('class_cours', "active");
 		$this->page->addVar('class_mat', "active");
 		$this->page->addVar('listeMatiere', $this->managers->getManagerOf('Matiere')->getList());
@@ -43,7 +43,7 @@ class MatiereController extends \Library\BackController
 
 	public function executeAjout(\Library\HTTPRequest $request)
 	{
-		$this->page->addVar('title', 'myLearn - Nouvelle matière');
+		$this->page->addVar('title', 'myAdmin - Nouvelle matière');
 		$this->page->addVar('class_cours', "active");
 		$this->page->addVar('class_mat', "active");
 		$this->page->addVar('fas',$this->getIcons());
@@ -74,7 +74,7 @@ class MatiereController extends \Library\BackController
 	{
 		$matiere = $this->managers->getManagerOf('Matiere')->getUnique($request->getData('id'));
 		if($matiere != NULL) {
-			$this->page->addVar('title', 'myLearn - Modifier '.$matiere['libelle']);
+			$this->page->addVar('title', 'myAdmin - Modifier '.$matiere['libelle']);
 			$this->page->addVar('class_cours', "active");
 			$this->page->addVar('class_mat', "active");
 			$this->page->addVar('fas',$this->getIcons());

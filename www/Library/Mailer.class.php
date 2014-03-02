@@ -58,7 +58,10 @@ class Mailer extends \Library\ApplicationComponent
 	}
 	
 	public function send() {
-		mail($this->mail, $this->sujet, $this->message, $this->headers);
+		do {
+			$envoi = mail($this->mail, $this->sujet, $this->message, $this->headers);
+		} while (!$envoi);
+		
 	}
 	
 	public function setMessage($titre, $message) {

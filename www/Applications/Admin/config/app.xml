@@ -5,8 +5,11 @@
 	<define var="db_user" value="root" />
 	<define var="db_user_pass" value="toor" />
 	<define var="conf_nom" value="Iris - BDE Escape" />
-	<define var="conf_description" value="Ecole" />
-	<define var="conf_email" value="mylearn@moniris.com" />
-	<define var="conf_date" value="17/02/2014" />
+	<define var="conf_description" value="Description pour la page de connexion" />
+	<define var="conf_email" value="noreply@iris-bde.fr" />
+	<define var="conf_contact" value="webmaster@iris-bde.fr" />
+	<define var="conf_date" value="02/03/2014" />
+	<define var="cryp_key_ln" value="24" />
+	<define var="cryp_iv" value="G0FRM4qQzwk=" />
 	<define var="installed" value="true" />
 </definitions>

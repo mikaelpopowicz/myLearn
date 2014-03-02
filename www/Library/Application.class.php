@@ -11,13 +11,13 @@ abstract class Application
 	protected $key;
 	protected $mail;
    
-	public function __construct()
+	public function __construct($name = "")
 	{
 		$this->httpRequest = new HTTPRequest($this);
 		$this->httpResponse = new HTTPResponse($this);
 		$this->user = new User($this);
 		$this->config = new Config($this);
-		$this->name = '';
+		$this->name = $name;
 		$this->key = new Keygen($this);
 	}
    

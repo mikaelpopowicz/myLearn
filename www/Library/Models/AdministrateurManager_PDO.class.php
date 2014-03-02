@@ -30,7 +30,7 @@ class AdministrateurManager_PDO extends AdministrateurManager
 	
 	public function count()
 	{
-		return $this->dao->query('SELECT COUNT(*) FROM eleve')->fetchColumn();
+		return $this->dao->query('SELECT COUNT(*) FROM administrateur')->fetchColumn();
 	}
 	
 	protected function add(Administrateur $administrateur)

@@ -59,6 +59,19 @@ CREATE TABLE IF NOT EXISTS user
    , PRIMARY KEY (id_u) 
  ) 
  comment = "";
+
+# -----------------------------------------------------------------------------
+#       TABLE : crypt
+# -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS crypt
+ (
+   token VARCHAR(40) NOT NULL  ,
+   message VARCHAR(1024) NULL  ,
+   cle VARCHAR(32) NULL  ,
+   PRIMARY KEY (token)
+ )
+ comment = "";
+
 # -----------------------------------------------------------------------------
 #       TABLE : administrateur
 # -----------------------------------------------------------------------------
@@ -90,6 +103,18 @@ CREATE TABLE IF NOT EXISTS professeur
    , PRIMARY KEY (id_u) 
  ) 
  comment = "";
+
+# -----------------------------------------------------------------------------
+#       TABLE : charger
+# -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS charger
+ (
+   id_classe INTEGER NOT NULL  ,
+   id_u INTEGER NOT NULL  ,
+   PRIMARY KEY (id_classe,id_u)
+ )
+ comment = "";
+
 # -----------------------------------------------------------------------------
 #       TABLE : eleve
 # -----------------------------------------------------------------------------
@@ -291,9 +316,6 @@ ALTER TABLE etre
 ADD FOREIGN KEY FK_etre_classe (id_classe)
     REFERENCES classe (id_classe)
        ON DELETE CASCADE ;
-ALTER TABLE section 
-  ADD FOREIGN KEY FK_section_administrateur (id_u)
-      REFERENCES administrateur (id_u) ;
 ALTER TABLE gestionnaire 
   ADD FOREIGN KEY FK_gestionnaire_user (id_u)
       REFERENCES user (id_u)
@@ -352,6 +374,14 @@ ALTER TABLE avoir
 ALTER TABLE avoir 
   ADD FOREIGN KEY FK_avoir_eleve (id_u)
       REFERENCES eleve (id_u)
+         ON DELETE CASCADE ;
+ALTER TABLE charger 
+  ADD FOREIGN KEY FK_charger_classe (id_classe)
+      REFERENCES classe (id_classe)
+         ON DELETE CASCADE ;
+ALTER TABLE charger 
+  ADD FOREIGN KEY FK_charger_professeur (id_u)
+      REFERENCES professeur (id_u)
          ON DELETE CASCADE ;
 
 
@@ -495,6 +525,18 @@ BEGIN
 END @@
 
 # -----------------------------------------------------------------------------
+#       TRIGGER : del_el
+# -----------------------------------------------------------------------------
+
+CREATE TRIGGER del_el
+AFTER DELETE ON eleve
+FOR EACH ROW
+BEGIN
+  DELETE FROM user
+  WHERE id_u = old.id_u;
+END @@
+
+# -----------------------------------------------------------------------------
 #       PROCEDURE : ajouter_gest()
 # -----------------------------------------------------------------------------
 
@@ -502,7 +544,7 @@ CREATE PROCEDURE ajouter_gest(id INTEGER(2))
 BEGIN
   # Vérifier qu'il s'agit d'un élève
   # Vérifions que l'admin n'est pas bête au point de faire des doublons
-  IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON e.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND e.dateNaissance = a_dateNaissance) = 1
+  IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON e.id_u = u.id_u WHERE u.id_u = id) = 1 AND (SELECT COUNT(*) FROM gestionnaire WHERE id_u = id) < 1
   THEN
     # Insertion de l'élève dans la table USER
     INSERT INTO gestionnaire VALUES(id);
@@ -528,6 +570,18 @@ BEGIN
 END @@
 
 # -----------------------------------------------------------------------------
+#       TRIGGER : del_prof
+# -----------------------------------------------------------------------------
+
+CREATE TRIGGER del_prof
+AFTER DELETE ON professeur
+FOR EACH ROW
+BEGIN
+  DELETE FROM user
+  WHERE id_u = old.id_u;
+END @@
+
+# -----------------------------------------------------------------------------
 #       PROCEDURE : ajouter_admin()
 # -----------------------------------------------------------------------------
 
@@ -542,6 +596,32 @@ BEGIN
     # Insertion du professeur dans la table USER
     INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 1, a_salt, a_token, CURDATE());
     INSERT INTO administrateur VALUES(id, a_poste);
+  END IF;
+END @@
+
+# -----------------------------------------------------------------------------
+#       TRIGGER : del_admin
+# -----------------------------------------------------------------------------
+
+CREATE TRIGGER del_admin
+AFTER DELETE ON administrateur
+FOR EACH ROW
+BEGIN
+  DELETE FROM user
+  WHERE id_u = old.id_u;
+END @@
+
+# -----------------------------------------------------------------------------
+#       TRIGGER : up_user
+# -----------------------------------------------------------------------------
+
+CREATE TRIGGER up_user
+BEFORE UPDATE ON user
+FOR EACH ROW
+BEGIN
+  IF old.token != new.token AND old.active = 0 AND new.active = 1
+  THEN
+    DELETE FROM crypt WHERE token = old.token;
   END IF;
 END @@
 
@@ -645,9 +725,11 @@ Delimiter ;
 # /////////////////////////////////////////////////////////////////////////////
 
 CALL ajouter_admin("admin", "admin", "admin", "admin@domain.tld","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "administrateur");
-INSERT INTO matiere VALUES("", "Matière", "fa fa-cog");
+
+INSERT INTO matiere VALUES("", "MatiÃ¨re", "fa fa-cog");
 CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);
 CALL ajouter_eleve("eleve", "eleve", "eleve", "eleve@domain.tld", "59cee2a6f0ff147433684a69020158e115a40f41", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokeneleve')), "1989-10-2");
+/*
 CALL ajouter_session("FIRST");
 INSERT INTO section VALUES("",1,"BTS SIO");
 INSERT INTO section VALUES("",1,"BAC SEN");
@@ -666,4 +748,5 @@ UPDATE cours SET titre = "Titre 4";
 SELECT SLEEP(1);
 UPDATE cours SET titre = "Titre 5";
 SELECT SLEEP(1);
+*/
 UPDATE cours SET titre = "Titre 6";

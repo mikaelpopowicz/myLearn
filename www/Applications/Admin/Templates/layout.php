@@ -78,16 +78,15 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Cours <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								<li class="<?php echo isset($class_mat) ? $class_mat : "";?>"><a href="/admin/matieres">Matières</a></li>
-								<li><a href="/admin/cours">Cours</a></li>
-								<li><a href="/admin/devoirs">Devoirs</a></li>
+								<li class="<?php echo isset($class_cr) ? $class_cr : "";?>"><a href="/admin/cours">Cours</a></li>
+								<li class="<?php echo isset($class_devoir) ? $class_devoir : "";?>"><a href="/admin/devoirs">Devoirs</a></li>
 							</ul>
 						</li>
-						<li class="dropdown">
+						<li class="dropdown <?php echo isset($class_user) ? $class_user : "";?>">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Utilisateurs <b class="caret"></b></a>
 							<ul class="dropdown-menu">
-								<li><a href="/admin/administrateur">Administrateurs</a></li>
-								<li><a href="/admin/professeurs">Professeurs</a></li>
-								<li><a href="/admin/eleves">Elèves</a></li>
+								<li class="<?php echo isset($class_prof) ? $class_prof : "";?>"><a href="/admin/professeurs">Professeurs</a></li>
+								<li class="<?php echo isset($class_eleve) ? $class_eleve : "";?>"><a href="/admin/eleves">Elèves</a></li>
 							</ul>
 						</li>
 					</ul>

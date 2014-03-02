@@ -5,9 +5,7 @@ class ProfApplication extends \Library\Application
 {
 	public function __construct()
 	{
-		parent::__construct();
-     
-		$this->name = 'Prof';
+		parent::__construct('Prof');
 	}
    
 	public function run()

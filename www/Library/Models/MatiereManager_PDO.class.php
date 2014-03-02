@@ -39,6 +39,11 @@ class MatiereManager_PDO extends MatiereManager
 		return $listeMatiere;
 	}
 	
+	public function count()
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM matiere')->fetchColumn();
+	}
+
 	public function getCountCours($id) {
 		return $this->dao->query('SELECT COUNT(id_c) FROM cours WHERE id_m = '.$id)->fetchColumn();
 	}

@@ -49,6 +49,11 @@ class SessionManager_PDO extends SessionManager
 		}
 		return null;
 	}
+
+	public function count()
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM session')->fetchColumn();
+	}
 	
 	protected function add(Session $session)
 	{

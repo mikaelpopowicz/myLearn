@@ -9,7 +9,7 @@ class ConnexionController extends \Library\BackController
 		$this->page->addVar('title', 'myLearn - Connexion');
 		$this->page->addVar('nom', $this->app->config()->get('conf_nom'));
 		$this->page->addVar('desc', $this->app->config()->get('conf_description'));
-		$this->page->addVar('mail', $this->app->config()->get('conf_email'));
+		$this->page->addVar('mail', $this->app->config()->get('conf_contact'));
 		
 	 	if($this->app->user()->isAuthenticated()) {
 			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "Vous êtes déjà connecté"});</script>');
@@ -169,6 +169,7 @@ class ConnexionController extends \Library\BackController
 				
 			// Personne n'a ce token
 			} else {
+				$this->app->user()->setFlash('<script>noty({type: "error", layout: "top", text: "Mauvaise requête"});</script>');
 				$this->app->httpResponse()->redirect('/');
 			}
 			
@@ -187,12 +188,15 @@ class ConnexionController extends \Library\BackController
 				// Vérification que l'utilisateur n'est pas activé
 				if($test->active() == 0) {
 					// Envoi du mail d'activation
-					$message = '<h3>Bonjour, '.$test->username().'</h3>
+					$crypt = $this->managers->getManagerOf('Crypt')->getUnique($test['token']);
+					$message = $this->app->key()->decode($crypt->message(), $crypt->cle());
+					/*$message = '<h3>Bonjour, '.$test->username().'</h3>
 								<p class="lead">Nous vous souhaitons la bienvenue sur myLearn</p>
 								<p>Une fois votre compte activé vous pourrez participer activement au site, de la création de cours jusqu\'au simple commentaire des autres. Nous déterminerons dans quelle(s) matière(s) vous aurez le droit créer des cours. Une fois fait, vous accéderez à la création de cours directement depuis la barre de naviguation du site lorsque vous serrez connecté.</p>
 								<p class="callout">
 									Pour activer votre compte  <a href="http://ppe/connexion/'.$test->token().'"> cliquez ici!</a>
 								</p>';
+					*/
 					$sujet = 'Activation de votre compte';
 					$this->app->mail()->setMail($test->email());
 					$this->app->mail()->setMessage($sujet, $message);
@@ -229,11 +233,11 @@ class ConnexionController extends \Library\BackController
 				// Vérification que l'utilisateur n'est pas activé
 				if($test->active() == 1) {
 					// Envoi du mail d'activation
-					$message = '<h3>Bonjour, '.$test->username().'</h3>
+					$message = '<h3>Bonjour, '.$test->nom().' '.$test->prenom().'</h3>
 								<p class="lead">Vous avez perdu votre mot de passe ?</p>
 								<p>Pour réinitialiser veuillez simplement suivre le lien ci-dessous. <strong>Attention</strong>, si vous n\'avez pas fait cette demande veuillez ne pas la en prendre compte !</p>
 								<p class="callout">
-									Pour reinitialiser votre mot de passe  <a href="http://ppe/connexion/mot-de-passe-perdu/'.$test->token().'"> cliquez ici!</a>
+									Pour reinitialiser votre mot de passe  <a href="http://'.$_SERVER['HTTP_HOST'].'/connexion/mot-de-passe-perdu/'.$test->token().'"> cliquez ici!</a>
 								</p>';
 					$sujet = "Réinitialisation du mot de passe";
 					$this->app->mail()->setMail($test->email());
@@ -243,7 +247,7 @@ class ConnexionController extends \Library\BackController
 					$this->app->user()->setFlash('<script>noty({type: "information", layout: "topCenter", text: "<strong>Mail envoyé</strong>"});</script>');
 					//echo "<pre>";print_r($this->app->mail()); echo "</pre>";
 					//echo $this->app->mail()->headers();
-					//$this->app->httpResponse()->redirect('/');
+					$this->app->httpResponse()->redirect('/');
 				} else {
 					$this->page->addVar('erreurs', array('warning', 'Vous devez d\'abord <a href="/connexion/activer">activez</a> votre compte !'));
 				}

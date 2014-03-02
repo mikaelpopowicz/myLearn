@@ -4,9 +4,19 @@
 	</div>
 	<div class="panel-body">
 		<div class="progress progress-striped active">
+			<?php
+			if($etapes['2']['compteur'] + $etapes['3']['compteur'] < 66.66) {
+			?>
 			<div class="progress-bar progress-bar-primary"  role="progressbar" style="width: 33.34%"></div>
-			<div class="progress-bar progress-bar-info"  role="progressbar" style="width: 11.11%"></div>
-			<div class="progress-bar progress-bar-warning"  role="progressbar" style="width: 22.22%"></div>
+			<div class="progress-bar progress-bar-info"  role="progressbar" style="width: <?php echo $etapes['2']['compteur'];?>%"></div>
+			<div class="progress-bar progress-bar-warning"  role="progressbar" style="width: <?php echo $etapes['3']['compteur'];?>%"></div>
+			<?php
+			} else {
+			?>
+			<div class="progress-bar progress-bar-success"  role="progressbar" style="width: 100%"></div>
+			<?php
+			}
+			?>
 		</div>
 		<div class="row">
 			<div class="col-md-4">
@@ -17,22 +27,21 @@
 					<li>Création base de donnée <span class="pull-right label label-primary"><i class="fa fa-check"></i> </span></li>
 				</ul>
 			</div>
-			<div class="col-md-4">
-				<h4 class="text-info">Etape 2 :</h4>
-				<ul>
-					<li>Créer une section <span class="pull-right">1</span></li>
-					<li>Créer une session <span class="pull-right">1</span></li>
-					<li>Créer une classe <span class="pull-right">1</span></li>
-				</ul>
-			</div>
-			<div class="col-md-4">
-				<h4 class="text-warning">Etape 3 :</h4>
-				<ul>
-					<li>Créer une matière <span class="pull-right">1</span></li>
-					<li>Ajouter un professeur <span class="pull-right">1</span></li>
-					<li>Ajouter un élève <span class="pull-right">1</span></li>
-				</ul>
-			</div>
+			<?php
+			foreach ($etapes as $key => $value) {
+				$class = $key == '2' ? 'text-info' : 'text-warning';
+				echo '<div class="col-md-4">';
+				echo '<h4 class="'.$class.'">Etape '.$key.' :</h4>';
+				echo '<ul>';
+				foreach ($value as $par => $val) {
+					if($par != 'compteur') {
+						echo '<li>'.$val['text'].$val['icon'].'</li>';
+					}
+				}
+				echo '</ul>';
+				echo '</div>';
+			}
+			?>
 		</div>
 	</div>
 </div>
@@ -45,15 +54,15 @@
 			<div class="panel-body">
 				<div class="list-group">
 					<a href="/admin/sections" class="list-group-item">
-						<span class="badge badge-info">3</span>
+						<span class="badge badge-info"><?php echo $section->count();?></span>
 						Section
 					</a>
 					<a href="/admin/sessions" class="list-group-item">
-						<span class="badge badge-info">3</span>
+						<span class="badge badge-info"><?php echo $session->count();?></span>
 						Session
 					</a>
 					<a href="/admin/classes" class="list-group-item">
-						<span class="badge badge-info">3</span>
+						<span class="badge badge-info"><?php echo $classe->count();?></span>
 						Classe
 					</a>
 				</div>		
@@ -68,15 +77,15 @@
 			<div class="panel-body">
 				<div class="list-group">
 					<a href="/admin/matieres" class="list-group-item">
-						<span class="badge badge-success">3</span>
+						<span class="badge badge-success"><?php echo $matiere->count();?></span>
 						Matière
 					</a>
 					<a href="/admin/cours" class="list-group-item">
-						<span class="badge badge-success">3</span>
+						<span class="badge badge-success"><?php echo $cours->count();?></span>
 						Cours
 					</a>
 					<a href="/admin/devoirs" class="list-group-item">
-						<span class="badge badge-success">3</span>
+						<span class="badge badge-success"><?php echo $devoir->count();?></span>
 						Devoirs
 					</a>
 				</div>	
@@ -90,16 +99,12 @@
 			</div>
 			<div class="panel-body">
 				<div class="list-group">
-					<a href="/admin/administrateur" class="list-group-item">
-						<span class="badge badge-warning">3</span>
-						Administrateur
-					</a>
 					<a href="/admin/professeurs" class="list-group-item">
-						<span class="badge badge-warning">3</span>
+						<span class="badge badge-warning"><?php echo $prof->count();?></span>
 						Professeur
 					</a>
 					<a href="/admin/eleves" class="list-group-item">
-						<span class="badge badge-warning">3</span>
+						<span class="badge badge-warning"><?php echo $eleve->count();?></span>
 						Elève
 					</a>
 				</div>	
@@ -127,6 +132,10 @@
 					<dd><?php echo $nom;?></dd>
 					<dt>Description</dt>
 					<dd><?php echo $desc;?></dd>
+					<dt>Email d'envoi</dt>
+					<dd><?php echo $mail;?></dd>
+					<dt>Email de contact</dt>
+					<dd><?php echo $mail;?></dd>
 				</dl>
 			</div>
 			<div class="col-md-4">
@@ -147,6 +156,8 @@
 				<dl class="dl-horizontal">
 					<dt>Login</dt>
 					<dd><?php echo $user->getAttribute('username');?></dd>
+					<dt>Email</dt>
+					<dd><?php echo $user->getAttribute('email');?></dd>
 				</dl>
 			</div>
 		</div>

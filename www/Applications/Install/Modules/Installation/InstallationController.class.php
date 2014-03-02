@@ -210,7 +210,8 @@ class InstallationController extends \Library\BackController
 					$infos = array(
 						"nom" => $request->postData('nom'),
 						"description" => $request->postData('description'),
-						"email" => $request->postData('email')
+						"email" => $request->postData('email'),
+						"contact" => $request->postData('contact')
 					);
 					$erreur = array();
 					foreach ($infos as $donnee => $value) {
@@ -254,6 +255,9 @@ class InstallationController extends \Library\BackController
 					$date = new \DateTime(date('Y-m-d'));					
 					$bdd = unserialize(base64_decode($this->app->user()->getAttribute('bdd')));
 					$infos = unserialize(base64_decode($this->app->user()->getAttribute('infos')));
+					$cle_taille = mcrypt_module_get_algo_key_size(MCRYPT_3DES);
+					$iv_taille = mcrypt_get_iv_size(MCRYPT_3DES, MCRYPT_MODE_NOFB);
+					$iv = mcrypt_create_iv($iv_taille, MCRYPT_RAND);
 					$app = array();
 					$app[] = fopen('../Applications/Frontend/Config/app.xml', 'w+');
 					$app[] = fopen('../Applications/Admin/Config/app.xml', 'w+');
@@ -267,7 +271,10 @@ class InstallationController extends \Library\BackController
 	<define var="conf_nom" value="'.$infos['nom'].'" />
 	<define var="conf_description" value="'.$infos['description'].'" />
 	<define var="conf_email" value="'.$infos['email'].'" />
+	<define var="conf_contact" value="'.$infos['contact'].'" />
 	<define var="conf_date" value="'.$date->format('d/m/Y').'" />
+	<define var="cryp_key_ln" value="'.$cle_taille.'" />
+	<define var="cryp_iv" value="'.base64_encode($iv).'" />
 	<define var="installed" value="true" />
 </definitions>';
 					$put = array();
@@ -296,7 +303,7 @@ class InstallationController extends \Library\BackController
 					$dbh = new \PDO('mysql:host='.$bdd['hote'].';dbname='.$bdd['base'], $bdd['user'], $bdd['password']);
 					$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING);
 					$sql1 = $dbh->exec($str1);
-					if(!$sql1) {
+					if(!isset($sql1)) {
 						$erreur[] = "bdd";
 					}
 					//echo '<pre>';print_r($str2);echo '</pre>';

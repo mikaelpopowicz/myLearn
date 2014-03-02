@@ -3,19 +3,29 @@ namespace Library;
  
 class Keygen extends ApplicationComponent
 {
-	protected $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	private $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	private $key_ln,
+	$key,
+	$iv;
    
 	public function __construct(Application $app)
 	{
 		parent::__construct($app);
+		$this->key_ln = $this->app->config()->get('cryp_key_ln');
+		$this->iv = base64_decode($this->app->config()->get('cryp_iv'));
 	}
 	
-	public function getNewSalt($length = 12)
+	public function getNewSalt($length = 12, $unique = true)
 	{
-		$managers = new \Library\Managers('PDO', \Library\PDOFactory::getMysqlConnexion($this->app->config()));
-		$manager = $managers->getManagerOf('User');
-		$tokens = $manager->getTokens();
-	    // initialiser la variable $mdp
+		if($unique == true) {
+			$managers = new \Library\Managers('PDO', \Library\PDOFactory::getMysqlConnexion($this->app->config()));
+			$manager = $managers->getManagerOf('User');
+			$tokens = $manager->getTokens();
+		} else {
+			$tokens = array();
+		}
+		
+	    // initialiser la variable $salt
 	    $salt = "";
 	
 		//Longueur de la variable contenant les caractère
@@ -26,7 +36,7 @@ class Keygen extends ApplicationComponent
 		
 		do {
 			$permut = false;
-		    // ajouter un caractère aléatoire à $mdp jusqu'à ce que $longueur soit atteint
+		    // ajouter un caractère aléatoire à $salt jusqu'à ce que $longueur soit atteint
 		    while ($i < $length) {
 		        // prendre un caractère aléatoire
 		        $occurence = substr($this->chars, mt_rand(0, $longueurMax-1), 1);
@@ -41,6 +51,24 @@ class Keygen extends ApplicationComponent
 		} while ($permut = false);
 		 
 	    return $salt;
+	}
+
+	public function encode($str)
+	{
+		$this->key = $this->getNewSalt($this->key_ln, false);
+		$this->key = substr($this->key, 0, $this->key_ln);
+		$crypted = base64_encode(mcrypt_encrypt(MCRYPT_3DES, $this->key, $str, MCRYPT_MODE_NOFB, $this->iv));
+		return array("key" => base64_encode($this->key), "crypted" => $crypted);
+		$this->key = "";
+	}
+
+	public function decode($str, $key)
+	{
+		$str = base64_decode($str);
+		$this->key = base64_decode($key);
+		$decrypted = mcrypt_decrypt(MCRYPT_3DES, $this->key, $str, MCRYPT_MODE_NOFB, $this->iv);
+		$this->key = "";
+		return $decrypted;
 	}
 	
 }

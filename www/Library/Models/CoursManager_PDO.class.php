@@ -79,6 +79,11 @@ class CoursManager_PDO extends CoursManager
 		return $listeCours;
 	}
 
+	public function count()
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM cours')->fetchColumn();
+	}
+
 	public function countOf($matiere)
 	{
 		return $this->dao->query('SELECT COUNT(*) FROM cours WHERE id_m = '.$matiere)->fetchColumn();
@@ -175,11 +180,6 @@ class CoursManager_PDO extends CoursManager
 		$requete->execute();
 		$result = $requete->fetch();
 		return $result;
-	}
-	
-	public function count()
-	{
-		return $this->dao->query('SELECT COUNT(*) FROM cours')->fetchColumn();
 	}
 	
 	protected function add(Cours $cours)

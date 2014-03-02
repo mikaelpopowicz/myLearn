@@ -38,6 +38,11 @@ class SectionManager_PDO extends SectionManager
      
 		return $listeSection;
 	}
+
+	public function count()
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM section')->fetchColumn();
+	}
 	
 	protected function add(Section $section)
 	{

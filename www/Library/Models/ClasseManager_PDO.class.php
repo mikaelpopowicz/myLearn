@@ -49,6 +49,11 @@ class ClasseManager_PDO extends ClasseManager
 		}
 		return null;
 	}
+
+	public function count()
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM classe')->fetchColumn();
+	}
 	
 	protected function add(Classe $classe)
 	{

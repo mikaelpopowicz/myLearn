@@ -21,8 +21,9 @@
 	<route url="/admin/matieres/supprimer" module="Matiere" action="delete" />
 
 	<route url="/admin/devoirs(/?)" module="Cours" action="indexDevoirs" />
-	<route url="/admin/administrateur(/?)" module="User" action="indexAdministrateur" />
-	<route url="/admin/professeurs(/?)" module="User" action="indexProfesseurs" />
+	<route url="/admin/professeurs(/?)" module="Professeur" action="index" />
+	<route url="/admin/professeurs/nouveau-professeur" module="Professeur" action="ajout" />
+	<route url="/admin/professeurs/supprimer" module="Professeur" action="delete" />
 	<route url="/admin/eleves(/?)" module="User" action="indexEleves" />
 	<route url="/admin/parametres(/?)" module="Param" action="index" />
 	<route url="/admin/cours/supprimer" module="Cours" action="delete" />

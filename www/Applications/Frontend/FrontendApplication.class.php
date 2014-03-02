@@ -4,9 +4,7 @@ namespace Applications\Frontend;
 class FrontendApplication extends \Library\Application {
 	
 	public function __construct() {
-		parent::__construct();
-		
-		$this->name = "Frontend";
+		parent::__construct('Frontend');
 		$this->mail = new \Library\Mailer($this);
 	}
 	
