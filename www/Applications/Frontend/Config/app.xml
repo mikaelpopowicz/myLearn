@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <definitions>
-	<define var="db_host" value="WNYRMzrnHygT" />
-	<define var="db_name" value="WcAeNzf9Hg==" />
-	<define var="db_user" value="RtYdJg==" />
-	<define var="db_user_pass" value="RtYdJg==" />
-	<define var="conf_nom" value="Iris" />
-	<define var="conf_description" value="Bienvenue sur le MyLearn de l'IRIS" />
-	<define var="conf_email" value="noreply@iris.fr" />
-	<define var="conf_contact" value="contact@iris.fr" />
+	<define var="db_host" value="3quyvt+TBe23" />
+	<define var="db_name" value="3729utKJBA==" />
+	<define var="db_user" value="wKu+qw==" />
+	<define var="db_user_pass" value="xqu+rQ==" />
+	<define var="conf_nom" value="Super école" />
+	<define var="conf_description" value="Description pour la page de connexion" />
+	<define var="conf_email" value="noreply@ecole.fr" />
+	<define var="conf_contact" value="contact@ecole.fr" />
 	<define var="conf_date" value="04/03/2014" />
-	<define var="cryp_iv" value="ac8nAAt+Duc=" />
-	<define var="cryp_key" value="S1NQeTR4VVYxemZiU3dSbVVBeHhsdjBU" />
+	<define var="cryp_iv" value="e6nY+AwQx00=" />
+	<define var="cryp_key" value="U1hWeTJlbEVGS09pc3VOaExhY0ljV3Fo" />
 	<define var="installed" value="true" />
 </definitions>
