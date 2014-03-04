@@ -7,12 +7,38 @@ class EleveManager_PDO extends EleveManager
 {
 	public function getList()
 	{
-		$requete = $this->dao->prepare('SELECT id_u AS id, dateNaissance FROM eleve');
+		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.nom, u.prenom, e.dateNaissance, u.dateUser
+										FROM eleve e
+										INNER JOIN user u ON u.id_u = e.id_u
+										ORDER BY u.nom,u.prenom');
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Eleve');
-		$listeByte = $requete->fetchAll();
+		$listeEleve = $requete->fetchAll();
+		foreach ($listeEleve as $eleve) {
+			//$eleve->setDateNaissance(new \DateTime("0000-00-00"));
+			$eleve->setDateUser(new \DateTime($eleve->dateUser()));
+		}
 		$requete->closeCursor();
-		return $listeByte;
+		return $listeEleve;
+	}
+	
+	public function getLast(Eleve $professeur)
+	{
+		$requete = $this->dao->prepare('SELECT p.id_u AS id, u.token
+										FROM professeur p
+										INNER JOIN user u ON p.id_u = u.id_u
+										AND u.username = :username
+										AND u.nom = :nom
+										AND u.email = :email');
+		$requete->bindValue(':username', $professeur->username());
+		$requete->bindValue(':nom', $professeur->nom());
+		$requete->bindValue(':email', $professeur->email());
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
+		if ($user = $requete->fetch()) {
+			return $user;
+		}
+		return null;
 	}
 	
 	public function getUnique($id)
@@ -34,8 +60,15 @@ class EleveManager_PDO extends EleveManager
 	
 	protected function add(Eleve $eleve)
 	{
-	    $requete = $this->dao->prepare('PROCEDURE SQL');
-	    $requete->bindValue(':id', $eleve['id']);
+	    $requete = $this->dao->prepare('CALL ajouter_eleve(:username, :nom, :prenom, :email, :password, :salt, :token, :dateNaissance)');
+	    $requete->bindValue(':username', $eleve->username());
+	    $requete->bindValue(':nom', $eleve->nom());
+	    $requete->bindValue(':prenom', $eleve->prenom());
+	    $requete->bindValue(':email', $eleve->email());
+	    $requete->bindValue(':password', $eleve->password());
+	    $requete->bindValue(':salt', $eleve->salt());
+	    $requete->bindValue(':token', $eleve->token());
+	    $requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('d/m/Y'));
 	    $requete->execute();
 	}
 	
