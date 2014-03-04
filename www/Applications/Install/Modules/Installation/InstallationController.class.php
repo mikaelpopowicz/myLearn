@@ -237,6 +237,7 @@ class InstallationController extends \Library\BackController
 		} else {
 			$this->app->httpresponse()->redirect('/install-1');
 		}
+		$this->page->addVar('title', 'myLearn - Informations');
 	}
 	
 	public function executeInit4(\Library\HTTPRequest $request)
@@ -264,17 +265,17 @@ class InstallationController extends \Library\BackController
 					$app[] = fopen('../Applications/Prof/Config/app.xml', 'w+');
 					$str = '<?xml version="1.0" encoding="utf-8" ?>
 <definitions>
-	<define var="db_host" value="'.$bdd['hote'].'" />
-	<define var="db_name" value="'.$bdd['base'].'" />
-	<define var="db_user" value="'.$bdd['user'].'" />
-	<define var="db_user_pass" value="'.$bdd['password'].'" />
+	<define var="db_host" value="'.$this->app->key()->encode($bdd['hote'], $this->app->key()->key())['crypted'].'" />
+	<define var="db_name" value="'.$this->app->key()->encode($bdd['base'], $this->app->key()->key())['crypted'].'" />
+	<define var="db_user" value="'.$this->app->key()->encode($bdd['user'], $this->app->key()->key())['crypted'].'" />
+	<define var="db_user_pass" value="'.$this->app->key()->encode($bdd['password'], $this->app->key()->key())['crypted'].'" />
 	<define var="conf_nom" value="'.$infos['nom'].'" />
 	<define var="conf_description" value="'.$infos['description'].'" />
 	<define var="conf_email" value="'.$infos['email'].'" />
 	<define var="conf_contact" value="'.$infos['contact'].'" />
 	<define var="conf_date" value="'.$date->format('d/m/Y').'" />
-	<define var="cryp_key_ln" value="'.$cle_taille.'" />
-	<define var="cryp_iv" value="'.base64_encode($iv).'" />
+	<define var="cryp_iv" value="'.base64_encode($this->app->key()->iv()).'" />
+	<define var="cryp_key" value="'.base64_encode($this->app->key()->key()).'" />
 	<define var="installed" value="true" />
 </definitions>';
 					$put = array();
@@ -334,6 +335,7 @@ class InstallationController extends \Library\BackController
 		} else {
 			$this->app->httpresponse()->redirect('/install-1');
 		}
+		$this->page->addVar('title', 'myLearn - Installation terminiée');
 	}
 }
 ?>

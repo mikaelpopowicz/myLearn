@@ -32,6 +32,7 @@
 						<th>Prénom</th>
 						<th>Actif</th>
 						<th>Matière</th>
+						<th>Ajouté le</th>
 					</tr>
 				</thead>
 				<tbody id='tabs'>
@@ -47,6 +48,7 @@
 							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$professeur['prenom']."\n\t\t\t\t\t\t\t</td>";
 							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$active."\n\t\t\t\t\t\t\t</td>";
 							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$matiere->getUnique($professeur->matiere())['libelle']."\n\t\t\t\t\t\t\t</td>";
+							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$professeur['dateUser']->format('d/m/Y')."\n\t\t\t\t\t\t\t</td>";
 							echo "\n\t\t\t\t\t\t</tr>\n";
 						}
 					}

@@ -67,9 +67,9 @@ class DashboardController extends \Library\BackController
 		$this->page->addVar('desc', $this->app->config()->get('conf_description'));
 		$this->page->addVar('mail', $this->app->config()->get('conf_email'));
 		$this->page->addVar('contact', $this->app->config()->get('conf_contact'));
-		$this->page->addVar('hote', $this->app->config()->get('db_host'));
-		$this->page->addVar('base', $this->app->config()->get('db_name'));
-		$this->page->addVar('db_user', $this->app->config()->get('db_user'));
+		$this->page->addVar('hote', $this->app->key()->decode($this->app->config()->get('db_host'), $this->app->config()->get('cryp_key')));
+		$this->page->addVar('base', $this->app->key()->decode($this->app->config()->get('db_name'), $this->app->config()->get('cryp_key')));
+		$this->page->addVar('db_user', $this->app->key()->decode($this->app->config()->get('db_user'), $this->app->config()->get('cryp_key')));
 		$this->page->addVar('section', $this->managers->getManagerOf('Section'));
 		$this->page->addVar('session', $this->managers->getManagerOf('Session'));
 		$this->page->addVar('classe', $this->managers->getManagerOf('Classe'));

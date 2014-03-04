@@ -94,7 +94,7 @@ class MatiereController extends \Library\BackController
 			
 			if($mat->isValid()) {
 				$this->managers->getManagerOf('Matiere')->save($mat);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Création de la matière réussie"});</script>');
+				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification de la matière réussie"});</script>');
 				$this->app->httpresponse()->redirect('/admin/matieres');
 			} else {
 				$this->page->addVar('erreurs', $mat['erreurs']);

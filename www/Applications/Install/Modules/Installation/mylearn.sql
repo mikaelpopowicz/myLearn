@@ -504,6 +504,28 @@ BEGIN
 END ;
 
 # -----------------------------------------------------------------------------
+#       PROCEDURE : up_eleve()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE up_eleve(id INTEGER, a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_active BOOLEAN, a_salt VARCHAR(40), a_token VARCHAR(40), a_dateNaissance DATE)
+BEGIN
+  UPDATE user SET
+  username = a_username,
+  nom = a_nom,
+  prenom = a_prenom,
+  email = a_email,
+  password = a_pass,
+  active = a_active,
+  salt = a_salt,
+  token = a_token
+  WHERE id_u = id;
+
+  UPDATE eleve SET
+  dateNaissance = a_dateNaissance
+  WHERE id_u = id;
+END ;
+
+# -----------------------------------------------------------------------------
 #       TRIGGER : del_el
 # -----------------------------------------------------------------------------
 
@@ -549,6 +571,28 @@ BEGIN
 END ;
 
 # -----------------------------------------------------------------------------
+#       PROCEDURE : up_prof()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE up_prof(id INTEGER, a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_active BOOLEAN, a_salt VARCHAR(40), a_token VARCHAR(40), matiere INTEGER(2))
+BEGIN
+  UPDATE user SET
+  username = a_username,
+  nom = a_nom,
+  prenom = a_prenom,
+  email = a_email,
+  password = a_pass,
+  active = a_active,
+  salt = a_salt,
+  token = a_token
+  WHERE id_u = id;
+
+  UPDATE professeur SET
+  id_m = matiere
+  WHERE id_u = id;
+END ;
+
+# -----------------------------------------------------------------------------
 #       TRIGGER : del_prof
 # -----------------------------------------------------------------------------
 
@@ -579,6 +623,28 @@ BEGIN
 END ;
 
 # -----------------------------------------------------------------------------
+#       PROCEDURE : up_padmin()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE up_admin(id INTEGER, a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_active BOOLEAN, a_salt VARCHAR(40), a_token VARCHAR(40), a_poste VARCHAR(80))
+BEGIN
+  UPDATE user SET
+  username = a_username,
+  nom = a_nom,
+  prenom = a_prenom,
+  email = a_email,
+  password = a_pass,
+  active = a_active,
+  salt = a_salt,
+  token = a_token
+  WHERE id_u = id;
+
+  UPDATE administrateur SET
+  poste = a_poste
+  WHERE id_u = id;
+END ;
+
+# -----------------------------------------------------------------------------
 #       TRIGGER : del_admin
 # -----------------------------------------------------------------------------
 
@@ -599,6 +665,20 @@ BEFORE UPDATE ON user
 FOR EACH ROW
 BEGIN
   IF old.token != new.token AND old.active = 0 AND new.active = 1
+  THEN
+    DELETE FROM crypt WHERE token = old.token;
+  END IF;
+END ;
+
+# -----------------------------------------------------------------------------
+#       TRIGGER : del_user
+# -----------------------------------------------------------------------------
+
+CREATE TRIGGER del_user
+BEFORE DELETE ON user
+FOR EACH ROW
+BEGIN
+  IF old.active = 0 AND (SELECT COUNT(*) FROM crypt WHERE token = old.token) > 0
   THEN
     DELETE FROM crypt WHERE token = old.token;
   END IF;

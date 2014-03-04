@@ -23,6 +23,7 @@
 	<route url="/admin/devoirs(/?)" module="Cours" action="indexDevoirs" />
 	<route url="/admin/professeurs(/?)" module="Professeur" action="index" />
 	<route url="/admin/professeurs/nouveau-professeur" module="Professeur" action="ajout" />
+	<route url="/admin/professeurs/modifier-([0-9]*)" module="Professeur" action="modif" vars="id" />
 	<route url="/admin/professeurs/supprimer" module="Professeur" action="delete" />
 	<route url="/admin/eleves(/?)" module="User" action="indexEleves" />
 	<route url="/admin/parametres(/?)" module="Param" action="index" />

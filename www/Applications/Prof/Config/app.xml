@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <definitions>
-	<define var="db_host" value="localhost" />
-	<define var="db_name" value="mylearn" />
-	<define var="db_user" value="root" />
-	<define var="db_user_pass" value="toor" />
+	<define var="db_host" value="PH+JqgS33n7d" />
+	<define var="db_name" value="PWmGrgmt3w==" />
+	<define var="db_user" value="In+Fvw==" />
+	<define var="db_user_pass" value="JH+FuQ==" />
 	<define var="conf_nom" value="Super école" />
 	<define var="conf_description" value="Description pour la page de connexion" />
 	<define var="conf_email" value="noreply@ecole.fr" />
 	<define var="conf_contact" value="contact@ecole.fr" />
-	<define var="conf_date" value="03/03/2014" />
-	<define var="cryp_key_ln" value="24" />
-	<define var="cryp_iv" value="TQEU2YBSJwQ=" />
+	<define var="conf_date" value="04/03/2014" />
+	<define var="cryp_iv" value="U/W7QqSF9XQ=" />
+	<define var="cryp_key" value="dUoxcFFTSWpoQjlPenZFSkhxWjkzdlZj" />
 	<define var="installed" value="true" />
 </definitions>

@@ -7,14 +7,17 @@ class ProfesseurManager_PDO extends ProfesseurManager
 {
 	public function getList()
 	{
-		$requete = $this->dao->prepare('SELECT p.id_u AS id, p.id_m AS matiere, u.nom, u.prenom, u.active
+		$requete = $this->dao->prepare('SELECT p.id_u AS id, p.id_m AS matiere, u.nom, u.prenom, u.active, u.dateUser
 										FROM professeur p
 										INNER JOIN user u ON u.id_u = p.id_u');
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
-		$listeByte = $requete->fetchAll();
+		$listeProf = $requete->fetchAll();
+		foreach ($listeProf as $prof) {
+			$prof->setDateUser(new \DateTime($prof->dateUser()));
+		}
 		$requete->closeCursor();
-		return $listeByte;
+		return $listeProf;
 	}
 
 	public function getLast(Professeur $professeur)
@@ -43,15 +46,16 @@ class ProfesseurManager_PDO extends ProfesseurManager
 	
 	public function getUnique($id)
 	{
-		$requete = $this->dao->prepare('SELECT p.id_u AS id, p.id_m AS matiere, u.nom, u.prenom
+		$requete = $this->dao->prepare('SELECT p.id_u AS id, u.username, p.id_m AS matiere, u.nom, u.prenom, u.email, u.dateUser, u.password, u.salt, u.token, u.active
 										FROM professeur p
 										INNER JOIN user u ON p.id_u = u.id_u
 										WHERE p.id_u = :id');
 		$requete->bindValue(':id', $id, \PDO::PARAM_INT);
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
-		if ($user = $requete->fetch()) {
-			return $user;
+		if ($prof = $requete->fetch()) {
+			$prof->setDateUser(new \DateTime($prof->dateUser()));
+			return $prof;
 		}
 		return null;
 	}
@@ -77,9 +81,18 @@ class ProfesseurManager_PDO extends ProfesseurManager
 	
 	protected function modify(Professeur $professeur)
 	  {
-	    $requete = $this->dao->prepare('PROCEDURE SQL');
-		$requete->bindValue(':id', $professeur['id']);
-	    $requete->execute();
+  	    $requete = $this->dao->prepare('CALL up_prof(:id, :username, :nom, :prenom, :email, :password, :active, :salt, :token, :matiere)');
+		$requete->bindValue(':id', $professeur->id());
+  	    $requete->bindValue(':username', $professeur->username());
+  	    $requete->bindValue(':nom', $professeur->nom());
+  	    $requete->bindValue(':prenom', $professeur->prenom());
+  	    $requete->bindValue(':email', $professeur->email());
+  	    $requete->bindValue(':password', $professeur->password());
+		$requete->bindValue(':active', $professeur->active());
+  	    $requete->bindValue(':salt', $professeur->salt());
+  	    $requete->bindValue(':token', $professeur->token());
+  	    $requete->bindValue(':matiere', $professeur->matiere());
+  	    $requete->execute();
 	  }
 
   	public function delete(Professeur $professeur)

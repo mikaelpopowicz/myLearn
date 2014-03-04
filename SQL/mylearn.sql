@@ -525,6 +525,28 @@ BEGIN
 END @@
 
 # -----------------------------------------------------------------------------
+#       PROCEDURE : up_eleve()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE up_eleve(id INTEGER, a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_active BOOLEAN, a_salt VARCHAR(40), a_token VARCHAR(40), a_dateNaissance DATE)
+BEGIN
+  UPDATE user SET
+  username = a_username,
+  nom = a_nom,
+  prenom = a_prenom,
+  email = a_email,
+  password = a_pass,
+  active = a_active,
+  salt = a_salt,
+  token = a_token
+  WHERE id_u = id;
+
+  UPDATE eleve SET
+  dateNaissance = a_dateNaissance
+  WHERE id_u = id;
+END @@
+
+# -----------------------------------------------------------------------------
 #       TRIGGER : del_el
 # -----------------------------------------------------------------------------
 
@@ -570,6 +592,28 @@ BEGIN
 END @@
 
 # -----------------------------------------------------------------------------
+#       PROCEDURE : up_prof()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE up_prof(id INTEGER, a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_active BOOLEAN, a_salt VARCHAR(40), a_token VARCHAR(40), matiere INTEGER(2))
+BEGIN
+  UPDATE user SET
+	username = a_username,
+	nom = a_nom,
+	prenom = a_prenom,
+	email = a_email,
+	password = a_pass,
+	active = a_active,
+  salt = a_salt,
+  token = a_token
+  WHERE id_u = id;
+
+  UPDATE professeur SET
+  id_m = matiere
+  WHERE id_u = id;
+END @@
+
+# -----------------------------------------------------------------------------
 #       TRIGGER : del_prof
 # -----------------------------------------------------------------------------
 
@@ -600,6 +644,28 @@ BEGIN
 END @@
 
 # -----------------------------------------------------------------------------
+#       PROCEDURE : up_padmin()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE up_admin(id INTEGER, a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_active BOOLEAN, a_salt VARCHAR(40), a_token VARCHAR(40), a_poste VARCHAR(80))
+BEGIN
+  UPDATE user SET
+  username = a_username,
+  nom = a_nom,
+  prenom = a_prenom,
+  email = a_email,
+  password = a_pass,
+  active = a_active,
+  salt = a_salt,
+  token = a_token
+  WHERE id_u = id;
+
+  UPDATE administrateur SET
+  poste = a_poste
+  WHERE id_u = id;
+END @@
+
+# -----------------------------------------------------------------------------
 #       TRIGGER : del_admin
 # -----------------------------------------------------------------------------
 
@@ -624,6 +690,20 @@ BEGIN
     DELETE FROM crypt WHERE token = old.token;
   END IF;
 END @@
+
+# -----------------------------------------------------------------------------
+#       TRIGGER : del_user
+# -----------------------------------------------------------------------------
+
+CREATE TRIGGER del_user
+BEFORE DELETE ON user
+FOR EACH ROW
+BEGIN
+  IF old.active = 0 AND (SELECT COUNT(*) FROM crypt WHERE token = old.token) > 0
+  THEN
+    DELETE FROM crypt WHERE token = old.token;
+  END IF;
+END ;
 
 # -----------------------------------------------------------------------------
 #       FUNCTION : trouver_session() (Trouver la session en cours)
@@ -725,11 +805,10 @@ Delimiter ;
 # /////////////////////////////////////////////////////////////////////////////
 
 CALL ajouter_admin("admin", "admin", "admin", "admin@domain.tld","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "administrateur");
-
+/*
 INSERT INTO matiere VALUES("", "MatiÃ¨re", "fa fa-cog");
 CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);
 CALL ajouter_eleve("eleve", "eleve", "eleve", "eleve@domain.tld", "59cee2a6f0ff147433684a69020158e115a40f41", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokeneleve')), "1989-10-2");
-/*
 CALL ajouter_session("FIRST");
 INSERT INTO section VALUES("",1,"BTS SIO");
 INSERT INTO section VALUES("",1,"BAC SEN");
@@ -748,5 +827,5 @@ UPDATE cours SET titre = "Titre 4";
 SELECT SLEEP(1);
 UPDATE cours SET titre = "Titre 5";
 SELECT SLEEP(1);
-*/
 UPDATE cours SET titre = "Titre 6";
+*/

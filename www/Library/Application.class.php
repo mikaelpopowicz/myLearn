@@ -13,11 +13,11 @@ abstract class Application
    
 	public function __construct($name = "")
 	{
+		$this->name = $name;
 		$this->httpRequest = new HTTPRequest($this);
 		$this->httpResponse = new HTTPResponse($this);
 		$this->user = new User($this);
 		$this->config = new Config($this);
-		$this->name = $name;
 		$this->key = new Keygen($this);
 	}
    

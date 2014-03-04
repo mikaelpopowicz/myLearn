@@ -109,33 +109,40 @@ class ProfesseurController extends \Library\BackController
 
 	public function executeModif(\Library\HTTPRequest $request)
 	{
-		$matiere = $this->managers->getManagerOf('Matiere')->getUnique($request->getData('id'));
-		if($matiere != NULL) {
-			$this->page->addVar('title', 'myAdmin - Modifier '.$matiere['libelle']);
-			$this->page->addVar('class_cours', "active");
-			$this->page->addVar('class_mat', "active");
-			$this->page->addVar('fas',$this->getIcons());
-			$this->page->addVar('matiere', $matiere);
+		$professeur = $this->managers->getManagerOf('Professeur')->getUnique($request->getData('id'));
+		if($professeur != NULL) {
+			$this->page->addVar('title', 'myAdmin - Modifier '.$professeur['nom']);
+			$this->page->addVar('class_user', "active");
+			$this->page->addVar('class_prof', "active");
+			$this->page->addVar('professeur', $professeur);
+			$this->page->addVar('listeMatiere', $this->managers->getManagerOf('Matiere')->getList());
 
 			if($request->postExists('annuler')) {
-				$this->app->httpResponse()->redirect('/admin/matieres');
+				$this->app->httpResponse()->redirect('/admin/professeurs');
 			}
 
 			if($request->postExists('modifier')) {
 			
-			$mat = new \Library\Entities\Matiere(array(
-				"id" => $matiere['id'],
-				"libelle" => $request->postData('libelle'),
-				"icon" => $request->postData('icon')
+			$prof = new \Library\Entities\Professeur(array(
+				"id" => $professeur['id'],
+				"username" => $request->postData('username'),
+				"nom" => $request->postData('nom'),
+				"prenom" => $request->postData('prenom'),
+				"email" => $request->postData('email'),
+				"password" => $professeur['password'],
+				"salt" => $professeur['salt'],
+				"token" => $professeur['token'],
+				"active" => $professeur['active'],
+				"matiere" => $request->postData('matiere')
 			));
 			
-			if($mat->isValid()) {
-				$this->managers->getManagerOf('Matiere')->save($mat);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Création de la matière réussie"});</script>');
-				$this->app->httpresponse()->redirect('/admin/matieres');
+			if($prof->isValid()) {
+				$this->managers->getManagerOf('Professeur')->save($prof);
+				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification réussie"});</script>');
+				$this->app->httpresponse()->redirect('/admin/professeurs');
 			} else {
-				$this->page->addVar('erreurs', $mat['erreurs']);
-				$this->page->addVar('matiere', $mat);
+				$this->page->addVar('erreurs', $prof['erreurs']);
+				$this->page->addVar('professeur', $prof);
 			}
 		}
 

@@ -4,21 +4,47 @@ namespace Library;
 class Keygen extends ApplicationComponent
 {
 	private $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	private $key_ln,
-	$key,
+	private $key,
 	$iv;
+	
+	const KEY_LN = 24;
+	const IV_LN = 8;
    
 	public function __construct(Application $app)
 	{
 		parent::__construct($app);
-		$this->key_ln = $this->app->config()->get('cryp_key_ln');
-		$this->iv = base64_decode($this->app->config()->get('cryp_iv'));
+		
+		
+		
+		if($app->name() != 'Install') {
+			$this->iv = base64_decode($this->app->config()->get('cryp_iv'));
+		} else {
+			$this->setIv(mcrypt_create_iv(self::IV_LN, MCRYPT_RAND));
+			$this->setKey($this->getNewSalt(self::KEY_LN, false));
+		}
 	}
+	
+	// SETTERS //
+	
+	public function setKey($key)
+	{
+		$this->key = substr($key, 0, self::KEY_LN);
+	}
+	
+	public function setIv($iv)
+	{
+		$this->iv = $iv;
+	}
+	
+	// GETTERS //
+	
+	public function key() { return $this->key; }
+	public function iv() { return $this->iv; }
 	
 	public function getNewSalt($length = 12, $unique = true)
 	{
 		if($unique == true) {
-			$managers = new \Library\Managers('PDO', \Library\PDOFactory::getMysqlConnexion($this->app->config()));
+			$managers = new \Library\Managers('PDO', \Library\PDOFactory::getMysqlConnexion($this->app->config(), $this));
 			$manager = $managers->getManagerOf('User');
 			$tokens = $manager->getTokens();
 		} else {
@@ -53,10 +79,11 @@ class Keygen extends ApplicationComponent
 	    return $salt;
 	}
 
-	public function encode($str)
+	public function encode($str, $key = NULL)
 	{
-		$this->key = $this->getNewSalt($this->key_ln, false);
-		$this->key = substr($this->key, 0, $this->key_ln);
+		if($key == NULL) {
+			$this->setKey($this->getNewSalt(self::KEY_LN, false));
+		}
 		$crypted = base64_encode(mcrypt_encrypt(MCRYPT_3DES, $this->key, $str, MCRYPT_MODE_NOFB, $this->iv));
 		return array("key" => base64_encode($this->key), "crypted" => $crypted);
 		$this->key = "";

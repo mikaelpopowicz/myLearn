@@ -13,7 +13,7 @@ abstract class BackController extends ApplicationComponent
 	{
 		parent::__construct($app);
      	
-		$this->managers = new Managers('PDO', PDOFactory::getMysqlConnexion($this->app->config()));
+		$this->managers = new Managers('PDO', PDOFactory::getMysqlConnexion($this->app->config(), $this->app->key()));
 		$this->page = new Page($app);
 		$this->page->addVar("js", array());
 		$this->page->addVar("includes", array());
