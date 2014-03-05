@@ -18,6 +18,11 @@ abstract class Entity implements \ArrayAccess
 	{
 		return empty($this->id);
 	}
+	
+	public function addErreur($erreur)
+	{
+		$this->erreurs[] = $erreur;
+	}
    
 	public function erreurs() { return $this->erreurs; }
 	public function id() { return $this->id; }

@@ -6,7 +6,7 @@
 		</ol>
 	</div>
 </div>
-<?php echo "<pre>";print_r($listeEleve);echo '</pre>';?>
+<?php //echo "<pre>";print_r($listeEleve);echo '</pre>';?>
 <div class="row">
 	<div class="col-lg-12">
 		<form method="post" class="form-horizontal">
@@ -40,6 +40,8 @@
 					<?php
 					if (isset($listeEleve) && is_array($listeEleve)) {
 						foreach($listeEleve as $eleve) {
+							//var_dump($eleve->dateNaissance() instanceof \DateTime);
+							$date = ($eleve->dateNaissance() instanceof \DateTime) ? $eleve->dateNaissance()->format('d/m/Y') : "non renseignée";
 							$active = $eleve['active'] == 1 ? "<span class='label label-success'>oui</span>" : "<span class='label label-danger'>non</span>";
 							echo "<tr>";
 							echo "\n\t\t\t\t\t\t\t<td>";
@@ -48,7 +50,7 @@
 							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$eleve['nom']."\n\t\t\t\t\t\t\t</td>";
 							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$eleve['prenom']."\n\t\t\t\t\t\t\t</td>";
 							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$active."\n\t\t\t\t\t\t\t</td>";
-							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$eleve['dateNaissance']."\n\t\t\t\t\t\t\t</td>";
+							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$date."\n\t\t\t\t\t\t\t</td>";
 							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$eleve['dateUser']->format('d/m/Y')."\n\t\t\t\t\t\t\t</td>";
 							echo "\n\t\t\t\t\t\t</tr>\n";
 						}

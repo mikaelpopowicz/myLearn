@@ -15,28 +15,30 @@ class EleveManager_PDO extends EleveManager
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Eleve');
 		$listeEleve = $requete->fetchAll();
 		foreach ($listeEleve as $eleve) {
-			//$eleve->setDateNaissance(new \DateTime("0000-00-00"));
+			if($eleve->dateNaissance() != '0000-00-00') {
+				$eleve->setDateNaissance(new \DateTime($eleve->dateNaissance()));
+			}
 			$eleve->setDateUser(new \DateTime($eleve->dateUser()));
 		}
 		$requete->closeCursor();
 		return $listeEleve;
 	}
 	
-	public function getLast(Eleve $professeur)
+	public function getLast(Eleve $eleve)
 	{
 		$requete = $this->dao->prepare('SELECT p.id_u AS id, u.token
-										FROM professeur p
+										FROM eleve p
 										INNER JOIN user u ON p.id_u = u.id_u
 										AND u.username = :username
 										AND u.nom = :nom
 										AND u.email = :email');
-		$requete->bindValue(':username', $professeur->username());
-		$requete->bindValue(':nom', $professeur->nom());
-		$requete->bindValue(':email', $professeur->email());
+		$requete->bindValue(':username', $eleve->username());
+		$requete->bindValue(':nom', $eleve->nom());
+		$requete->bindValue(':email', $eleve->email());
 		$requete->execute();
-		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
-		if ($user = $requete->fetch()) {
-			return $user;
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Eleve');
+		if ($eleve = $requete->fetch()) {
+			return $eleve;
 		}
 		return null;
 	}
@@ -68,7 +70,7 @@ class EleveManager_PDO extends EleveManager
 	    $requete->bindValue(':password', $eleve->password());
 	    $requete->bindValue(':salt', $eleve->salt());
 	    $requete->bindValue(':token', $eleve->token());
-	    $requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('d/m/Y'));
+	    $requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
 	    $requete->execute();
 	}
 	

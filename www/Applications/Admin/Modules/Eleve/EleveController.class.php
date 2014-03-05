@@ -65,8 +65,9 @@ class EleveController extends \Library\BackController
 			if(!empty($date)) {
 				$date = explode('/', $date);
 				$date = $date[2].'-'.$date[1].'-'.$date[0];
+				$date = new \DateTime($date);
 			} else {
-				$date = "0000-00-00";
+				$date = new \DateTime('0000-00-00');
 			}
 			
 			$eleve = new \Library\Entities\Eleve(array(

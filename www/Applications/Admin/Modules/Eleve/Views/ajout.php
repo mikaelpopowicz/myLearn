@@ -87,11 +87,20 @@
 					</div>
 					<!-- Date de naissance -->
 					<div class="form-group">
-						<label class="col-lg-3 control-label" for="date">Date de naissance</label>
+						<label class="col-lg-3 control-label" for="datepicker">Date de naissance</label>
 						<div class="col-lg-9">
 							<div class="row">
 								<div class="col-lg-8">
-									<input type="text" id="date" name="date" class="form-control datepicker" value="<?php echo (isset($eleve) ? $eleve['dateNaissance']->format('d/m/Y') :  "");?>">
+									<div class="input-group date">
+										<input type="text" id="datepicker" name="date" class="form-control" value="<?php echo (isset($eleve) ? $eleve['dateNaissance']->format('d/m/Y') :  "");?>" readonly="" required="">
+										<span class="input-group-addon"><i class="fa fa-th"></i></span>
+										<?php
+										if (isset($erreurs) && in_array(\Library\Entities\Eleve::DATE_INVALIDE, $erreurs))
+										{
+											echo '<span class="help-block erreur">Invalide</span>';
+										}
+										?>
+									</div>
 								</div>
 							</div>
 						</div>
