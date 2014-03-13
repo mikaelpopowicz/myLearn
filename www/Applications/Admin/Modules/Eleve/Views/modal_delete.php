@@ -1,14 +1,14 @@
-<form method="post" action="/admin/professeurs/supprimer">
-	<div class="modal fade" id="modalDeleteProf" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<form method="post" action="/admin/eleves/supprimer">
+	<div class="modal fade" id="modalDeleteEleve" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title" id="myModalLabel">Suppression de professeur(s)</h4>
+					<h4 class="modal-title" id="myModalLabel">Suppression d'élève(s)</h4>
 				</div>
 				<div class="modal-body">
-					<p class="text-danger"><strong>ATTENTION, la suppression d'un professeur entraine la supression de tous ses devoirs !</strong><p>
-					<p>Êtes-vous sur de vouloir supprimer le(s) professeur(s) suivant(s) :</p>
+					<p class="text-danger"><strong>ATTENTION, la suppression d'un élève entraine la supression de tous ses devoirs, ainsi que les cours dont il est l'auteur !</strong><p>
+					<p>Êtes-vous sur de vouloir supprimer l'(es) élève(s) suivant(s) :</p>
 			<ul>
 				<?php
 				$i = 0;

@@ -39,6 +39,37 @@ class MatiereManager_PDO extends MatiereManager
 		return $listeMatiere;
 	}
 	
+	public function getListNone($classe)
+	{
+		$requete = $this->dao->prepare('SELECT id_m AS id, libelle, icon
+										FROM matiere
+										WHERE id_m NOT IN (
+											SELECT id_m
+											FROM assigner
+											WHERE id_classe = :classe)
+										');
+		$requete->bindValue(':classe', $classe);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
+		$listeMatiere = $requete->fetchAll();
+		$requete->closeCursor();
+		return $listeMatiere;
+	}
+	
+	public function getListOf($classe)
+	{
+		$requete = $this->dao->prepare('SELECT m.id_m AS id, m.libelle, m.icon
+										FROM matiere m
+										INNER JOIN assigner c ON c.id_m = m.id_m
+										WHERE c.id_classe = :classe');
+		$requete->bindValue(':classe', $classe);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
+		$listeMatiere = $requete->fetchAll();
+		$requete->closeCursor();
+		return $listeMatiere;
+	}
+	
 	public function count()
 	{
 		return $this->dao->query('SELECT COUNT(*) FROM matiere')->fetchColumn();

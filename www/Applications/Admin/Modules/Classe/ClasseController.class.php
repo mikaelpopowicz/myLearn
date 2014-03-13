@@ -113,15 +113,156 @@ class ClasseController extends \Library\BackController
 
 	public function executeShow(\Library\HTTPRequest $request)
 	{
-		$session = $this->managers->getManagerOf('Session')->getUnique($request->getData('id'));
-		if($session != NULL) {
-			$this->page->addVar('title', 'myLearn - '.$session->session());
+		$classe = $this->managers->getManagerOf('Classe')->getUnique($request->getData('id'));
+		if($classe != NULL) {
+			$this->page->addVar('title', 'myLearn - '.$classe->libelle());
 			$this->page->addVar('class_gest', "active");
-			$this->page->addVar('class_sess', "active");
-			$this->page->addVar('session', $session);
-
+			$this->page->addVar('class_cls', "active");
+			$this->page->addVar('classe', $classe);
+			$this->page->addVar('session', $this->managers->getManagerOf('Session'));
+			$this->page->addVar('section', $this->managers->getManagerOf('Section'));
+			$this->page->addVar('userM', $this->managers->getManagerOf('User'));
+			$this->page->addVar('matM', $this->managers->getManagerOf('Matiere'));
+			$this->page->addVar('etre', $this->managers->getManagerOf('Etre'));
+			$this->page->addVar('assigner', $this->managers->getManagerOf('Assigner'));
+			$this->page->addVar('charger', $this->managers->getManagerOf('Charger'));
+			$this->page->addVar('matiereClasse', $this->managers->getManagerOf('Matiere')->getListOf($classe->id()));
+			$this->page->addVar('allMatiere', $this->managers->getManagerOf('Matiere')->getListNone($classe->id()));			
+			$this->page->addVar('professeurClasse', $this->managers->getManagerOf('Professeur')->getListOf($classe->id()));
+			$this->page->addVar('allProfesseur', $this->managers->getManagerOf('Professeur')->getListNone($classe->id()));
+			$this->page->addVar('eleveClasse', $this->managers->getManagerOf('Eleve')->getListOf($classe->id()));
+			$this->page->addVar('allEleve', $this->managers->getManagerOf('Eleve')->getListNone($classe->id()));
+			$this->page->updateVar('includes',  __DIR__.'/Views/modal_add_eleve.php');
+			$this->page->updateVar('includes',  __DIR__.'/Views/modal_add_matiere.php');
+			$this->page->updateVar('includes',  __DIR__.'/Views/modal_add_professeur.php');
+			
+			// Cas d'ajout d'élève
+			if($request->postExists('ajout_eleve')) {
+				$sel_el = $request->postData('eleve');
+				foreach ($sel_el as $key) {
+					$etre = new \Library\Entities\Etre(array(
+						"id" => $classe->id(),
+						"eleve" => $key
+					));
+					$this->managers->getManagerOf('Etre')->add($etre);
+				}
+				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Opération réussie"});</script>');
+				$this->app->httpresponse()->redirect('/admin/classes/'.$classe->id());
+				
+			// Cas de suppression d'élève
+			} else if ($request->postExists('supprimer_eleve')) {
+				if ($request->postExists('check')) {
+					$check = $request->postData('check');
+					$delete = array();
+					for ($i = 0; $i < count($check); $i++) {
+						$delete[$i] = new \Library\Entities\Etre(array(
+							"id" => $classe->id(),
+							"eleve" => $check[$i]
+						));
+					}
+					$this->page->addVar('delete', $delete);
+					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete_eleve.php');
+					$this->page->updateVar('js', "<script>$('#modalDeleteEleve').modal('show');</script>");
+				} else {
+					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un élève pour le supprimer"});</script>');
+				}
+			} else if ($request->postExists('ajout_professeur')) {
+				$sel_prof = $request->postData('professeur');
+				foreach ($sel_prof as $key) {
+					$charger = new \Library\Entities\Charger(array(
+						"id" => $classe->id(),
+						"professeur" => $key
+					));
+					$this->managers->getManagerOf('Charger')->add($charger);
+				}
+				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Opération réussie"});</script>');
+				$this->app->httpresponse()->redirect('/admin/classes/'.$classe->id());
+			} else if ($request->postExists('supprimer_professeur')) {
+				if ($request->postExists('check')) {
+					$check = $request->postData('check');
+					$delete = array();
+					for ($i = 0; $i < count($check); $i++) {
+						$delete[$i] = new \Library\Entities\Charger(array(
+							"id" => $classe->id(),
+							"professeur" => $check[$i]
+						));
+					}
+					$this->page->addVar('delete', $delete);
+					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete_professeur.php');
+					$this->page->updateVar('js', "<script>$('#modalDeleteProfesseur').modal('show');</script>");
+				} else {
+					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le supprimer"});</script>');
+				}
+			} else if ($request->postExists('ajout_matiere')) {
+				$sel_mat = $request->postData('matiere');
+				foreach ($sel_mat as $key) {
+					$assigner = new \Library\Entities\Assigner(array(
+						"id" => $classe->id(),
+						"matiere" => $key
+					));
+					//echo '<pre>';print_r($assigner);echo '</pre>';
+					$this->managers->getManagerOf('Assigner')->add($assigner);
+				}
+				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Opération réussie"});</script>');
+				$this->app->httpresponse()->redirect('/admin/classes/'.$classe->id());
+			} else if ($request->postExists('supprimer_matiere')) {
+				if ($request->postExists('check')) {
+					$check = $request->postData('check');
+					$delete = array();
+					for ($i = 0; $i < count($check); $i++) {
+						$delete[$i] = new \Library\Entities\Assigner(array(
+							"id" => $classe->id(),
+							"matiere" => $check[$i]
+						));
+					}
+					$this->page->addVar('delete', $delete);
+					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete_matiere.php');
+					$this->page->updateVar('js', "<script>$('#modalDeleteMatiere').modal('show');</script>");
+				} else {
+					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins une matière pour la supprimer"});</script>');
+				}
+			}
 		} else {
-			$this->app->httpresponse()->redirect('/admin/sessions');
+			$this->app->httpresponse()->redirect('/admin/classes');
+		}
+	}
+	
+	public function executeDelEleve(\Library\HTTPRequest $request)
+	{
+		if($request->postExists('del_eleve')) {
+			for ($i=0; $i < $request->postData('count'); $i++) {
+				$this->managers->getManagerOf('Etre')->delete(unserialize(base64_decode($request->postData('suppr_'.$i))));
+			}
+			$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+			$this->app->httpResponse()->redirect('/admin/classes/'.$request->postData('classe'));
+		} else {
+			$this->app->httpResponse()->redirect('/admin/classes');
+		}
+	}
+	
+	public function executeDelProfesseur(\Library\HTTPRequest $request)
+	{
+		if($request->postExists('del_professeur')) {
+			for ($i=0; $i < $request->postData('count'); $i++) {
+				$this->managers->getManagerOf('Charger')->delete(unserialize(base64_decode($request->postData('suppr_'.$i))));
+			}
+			$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+			$this->app->httpResponse()->redirect('/admin/classes/'.$request->postData('classe'));
+		} else {
+			$this->app->httpResponse()->redirect('/admin/classes');
+		}
+	}
+	
+	public function executeDelMatiere(\Library\HTTPRequest $request)
+	{
+		if($request->postExists('del_matiere')) {
+			for ($i=0; $i < $request->postData('count'); $i++) {
+				$this->managers->getManagerOf('Assigner')->delete(unserialize(base64_decode($request->postData('suppr_'.$i))));
+			}
+			$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+			$this->app->httpResponse()->redirect('/admin/classes/'.$request->postData('classe'));
+		} else {
+			$this->app->httpResponse()->redirect('/admin/classes');
 		}
 	}
 

@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="">
 	<meta name="author" content="">
-	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+	<link rel="shortcut icon" href="/images/favicon.png">
 
 	<title>
 		<?php
@@ -23,6 +23,7 @@
 	<link href="/css/dataTables.bootstrap.css" rel="stylesheet">
 	<link href="/assets/css/font-awesome.css" rel="stylesheet">
 	<link href="/css/bootstrap-select.css" rel="stylesheet">
+	<link href="/css/datepicker.css" rel="stylesheet">
 	<script type="text/javascript" src="/js/tinymce/tinymce.min.js"></script>
 	<script>
 	tinymce.init({
@@ -120,7 +121,7 @@
 	<script src='/assets/js/noty/packaged/jquery.noty.packaged.min.js'></script>
 	<script src='/js/dataTables/jquery.dataTables.js'></script>
 	<script src='/js/dataTables/dataTables.bootstrap.js'></script>
-	
+	<script src='/js/bootstrap-datepicker.js'></script>
 	<script src='/js/bootstrap-select.js'></script>
 	<script src='/js/custom.js'></script>
 	

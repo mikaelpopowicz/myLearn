@@ -787,6 +787,49 @@ BEGIN
 	Close curc;
 END @@
 
+# -----------------------------------------------------------------------------
+#       PROCEDURE : connexion()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE connexion(login VARCHAR(128), pass VARCHAR(128))
+BEGIN
+	DECLARE id INTEGER(2);
+	DECLARE user VARCHAR(128);
+	DECLARE name VARCHAR(128);
+	DECLARE last VARCHAR(128);
+	DECLARE mail VARCHAR(128);
+	DECLARE passwd VARCHAR(128);
+	DECLARE actif BOOLEAN;
+	DECLARE sel VARCHAR(40);
+	DECLARE tok VARCHAR(40);
+	DECLARE dateU DATE;
+	DECLARE no_user_for_login CONDITION FOR 1329;
+	
+	DECLARE EXIT HANDLER FOR no_user_for_login
+	BEGIN
+		SELECT "ERR1" AS "message";
+	END;
+	
+	SELECT salt INTO sel
+	FROM user
+	WHERE username = login;
+
+	SET passwd = SHA1(MD5(CONCAT(SHA1(MD5(sel)),SHA1(MD5(pass)),SHA1(MD5(sel)))));
+	
+	IF (SELECT COUNT(*) FROM user WHERE username = login AND password = passwd) > 0 THEN
+		SELECT id_u,username,nom,prenom,email,password,active,salt,token,dateUser INTO id,user,name,last,mail,passwd,actif,sel,tok,dateU
+		FROM user
+		WHERE username = login AND password = passwd;
+		IF actif THEN
+			SELECT id,  EZ user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
+		ELSE
+			SELECT "ERR3" AS "message";
+		END IF;
+	ELSE
+		SELECT "ERR2" AS "Message";
+	END IF;
+END @@
+
 Delimiter ;
 
 
