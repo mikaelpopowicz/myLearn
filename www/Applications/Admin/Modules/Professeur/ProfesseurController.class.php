@@ -148,7 +148,7 @@ class ProfesseurController extends \Library\BackController
 
 
 		} else {
-			$this->app->httpresponse()->redirect('/admin/matieres');
+			$this->app->httpresponse()->redirect('/admin/professeurs');
 		}
 	}
 

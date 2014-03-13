@@ -3,18 +3,13 @@ namespace Library\Entities;
 
 class Assigner extends \Library\Entity
 {
-	private $classe;							// Classe à laquelle est assigné la matière
+	private $matiere;
 	
-	public function isValid()
+	public function setMatiere($matiere)
 	{
-		return !(empty($this->classe));
+		$this->matiere = $matiere;
 	}
 	
-	public function setClasse($classe)
-	{
-		$this->classe = $classe;
-	}
-	
-	public function classe() { return $this->classe; }
+	public function matiere() { return $this->matiere; }
 }
 ?>

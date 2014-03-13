@@ -8,7 +8,7 @@
 				</div>
 				<div class="modal-body">
 					<p class="text-danger"><strong>ATTENTION, la suppression d'un professeur entraine la supression de tous ses devoirs !</strong><p>
-					<p>Êtes-vous sur de vouloir supprimer le(s) professeur(s) suivante(s) :</p>
+					<p>Êtes-vous sur de vouloir supprimer le(s) professeur(s) suivant(s) :</p>
 			<ul>
 				<?php
 				$i = 0;

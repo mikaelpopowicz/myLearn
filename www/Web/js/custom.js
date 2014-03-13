@@ -19,6 +19,16 @@ $(document).ready(function() {
 		$(cases).prop('checked', this.checked);
 	});
 	
+	$('#check_all1').click(function () {
+		var cases = $('#tabs1').find('input[type=checkbox]');
+		$(cases).prop('checked', this.checked);
+	});
+	
+	$('#check_all2').click(function () {
+		var cases = $('#tabs2').find('input[type=checkbox]');
+		$(cases).prop('checked', this.checked);
+	});
+	
 	
 	$('span.help-block').parents('div.form-group').addClass('has-error');
 })

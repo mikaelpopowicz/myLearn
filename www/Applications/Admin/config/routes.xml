@@ -13,6 +13,10 @@
 	<route url="/admin/sessions/([0-9]*)" module="Session" action="show" vars="id" />
 	
 	<route url="/admin/classes(/?)" module="Classe" action="index" />
+	<route url="/admin/classes/([0-9]*)" module="Classe" action="show" vars="id" />
+	<route url="/admin/classes/([0-9]*)/supprimer-eleve" module="Classe" action="delEleve" vars="id" />
+	<route url="/admin/classes/([0-9]*)/supprimer-professeur" module="Classe" action="delProfesseur" vars="id" />
+	<route url="/admin/classes/([0-9]*)/supprimer-matiere" module="Classe" action="delMatiere" vars="id" />
 	<route url="/admin/classes/nouvelle-classe" module="Classe" action="ajout" />
 	<route url="/admin/classes/modifier-([0-9]*)" module="Classe" action="modif" vars="id" />
 	<route url="/admin/classes/supprimer" module="Classe" action="delete" />

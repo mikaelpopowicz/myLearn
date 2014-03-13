@@ -7,7 +7,7 @@ class EleveManager_PDO extends EleveManager
 {
 	public function getList()
 	{
-		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.nom, u.prenom, e.dateNaissance, u.dateUser
+		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.nom, u.prenom, e.dateNaissance, u.dateUser, u.active
 										FROM eleve e
 										INNER JOIN user u ON u.id_u = e.id_u
 										ORDER BY u.nom,u.prenom');
@@ -24,12 +24,45 @@ class EleveManager_PDO extends EleveManager
 		return $listeEleve;
 	}
 	
+	public function getListNone($classe)
+	{
+		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.nom, u.prenom
+										FROM eleve e
+										INNER JOIN user u ON u.id_u = e.id_u
+										WHERE u.id_u NOT IN (
+											SELECT id_u
+											FROM etre
+											WHERE id_classe = :classe)
+										');
+		$requete->bindValue(':classe', $classe);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Eleve');
+		$listeEleve = $requete->fetchAll();
+		$requete->closeCursor();
+		return $listeEleve;
+	}
+	
+	public function getListOf($classe)
+	{
+		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.nom, u.prenom
+										FROM eleve e
+										INNER JOIN user u ON u.id_u = e.id_u
+										INNER JOIN etre et ON et.id_u = e.id_u
+										WHERE et.id_classe = :classe');
+		$requete->bindValue(':classe', $classe);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Eleve');
+		$listeEleve = $requete->fetchAll();
+		$requete->closeCursor();
+		return $listeEleve;
+	}
+	
 	public function getLast(Eleve $eleve)
 	{
 		$requete = $this->dao->prepare('SELECT p.id_u AS id, u.token
 										FROM eleve p
 										INNER JOIN user u ON p.id_u = u.id_u
-										AND u.username = :username
+										WHERE u.username = :username
 										AND u.nom = :nom
 										AND u.email = :email');
 		$requete->bindValue(':username', $eleve->username());
@@ -45,12 +78,19 @@ class EleveManager_PDO extends EleveManager
 	
 	public function getUnique($id)
 	{
-		$requete = $this->dao->prepare('SELECT id_u AS id, dateNaissance FROM eleve WHERE id_u = :id');
+		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.username, u.nom, u.prenom, u.email, u.password, u.salt, u.active, u.token, u.dateUser, e.dateNaissance
+										FROM eleve e
+										INNER JOIN user u ON u.id_u = e.id_u
+										WHERE u.id_u = :id');
 		$requete->bindValue(':id', $id, \PDO::PARAM_INT);
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Eleve');
-		if ($user = $requete->fetch()) {
-			return $user;
+		if ($eleve = $requete->fetch()) {
+			if($eleve->dateNaissance() != '0000-00-00') {
+				$eleve->setDateNaissance(new \DateTime($eleve->dateNaissance()));
+			}
+			$eleve->setDateUser(new \DateTime($eleve->dateUser()));
+			return $eleve;
 		}
 		return null;
 	}
@@ -76,8 +116,17 @@ class EleveManager_PDO extends EleveManager
 	
 	protected function modify(Eleve $eleve)
 	  {
-	    $requete = $this->dao->prepare('PROCEDURE SQL');
-		$requete->bindValue(':id', $eleve['id']);
+	    $requete = $this->dao->prepare('CALL up_eleve(:id, :username, :nom, :prenom, :email, :password, :active, :salt, :token, :dateNaissance)');
+		$requete->bindValue(':id', $eleve->id());
+	    $requete->bindValue(':username', $eleve->username());
+	    $requete->bindValue(':nom', $eleve->nom());
+	    $requete->bindValue(':prenom', $eleve->prenom());
+	    $requete->bindValue(':email', $eleve->email());
+	    $requete->bindValue(':password', $eleve->password());
+		$requete->bindValue(':active', $eleve->active());
+	    $requete->bindValue(':salt', $eleve->salt());
+	    $requete->bindValue(':token', $eleve->token());
+	    $requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
 	    $requete->execute();
 	  }
 

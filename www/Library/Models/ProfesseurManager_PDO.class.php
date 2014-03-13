@@ -19,6 +19,39 @@ class ProfesseurManager_PDO extends ProfesseurManager
 		$requete->closeCursor();
 		return $listeProf;
 	}
+	
+	public function getListNone($classe)
+	{
+		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.nom, u.prenom
+										FROM professeur p
+										INNER JOIN user u ON u.id_u = p.id_u
+										WHERE u.id_u NOT IN (
+											SELECT id_u
+											FROM charger
+											WHERE id_classe = :classe)
+										');
+		$requete->bindValue(':classe', $classe);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
+		$listeEleve = $requete->fetchAll();
+		$requete->closeCursor();
+		return $listeEleve;
+	}
+	
+	public function getListOf($classe)
+	{
+		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.nom, u.prenom
+										FROM professeur p
+										INNER JOIN user u ON u.id_u = p.id_u
+										INNER JOIN charger c ON c.id_u = p.id_u
+										WHERE c.id_classe = :classe');
+		$requete->bindValue(':classe', $classe);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
+		$listeEleve = $requete->fetchAll();
+		$requete->closeCursor();
+		return $listeEleve;
+	}
 
 	public function getLast(Professeur $professeur)
 	{

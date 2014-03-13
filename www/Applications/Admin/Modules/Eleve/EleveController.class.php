@@ -23,12 +23,12 @@ class EleveController extends \Library\BackController
 			if ($request->postExists('check')) {
 				$check = $request->postData('check');
 				if (count($check) > 1) {
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous ne pouvez modifier qu\'un professeur à la fois"});</script>');
+					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous ne pouvez modifier qu\'un élève à la fois"});</script>');
 				} else {
-					$this->app->httpResponse()->redirect('/admin/professeurs/modifier-'.$check[0]);
+					$this->app->httpResponse()->redirect('/admin/eleves/modifier-'.$check[0]);
 				}
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,timeout: 10000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le modifier"});</script>');
+				$this->app->user()->setFlash('<script>noty({timeout: 4000,timeout: 10000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un élève pour le modifier"});</script>');
 			}
 			
 		// Cas de suppression
@@ -37,13 +37,13 @@ class EleveController extends \Library\BackController
 				$check = $request->postData('check');
 				$delete = array();
 				for ($i = 0; $i < count($check); $i++) {
-					$delete[$i] = $this->managers->getManagerOf('Professeur')->getUnique($check[$i]);
+					$delete[$i] = $this->managers->getManagerOf('Eleve')->getUnique($check[$i]);
 				}
 				$this->page->addVar('delete', $delete);
 				$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete.php');
-				$this->page->updateVar('js', "<script>$('#modalDeleteProf').modal('show');</script>");
+				$this->page->updateVar('js', "<script>$('#modalDeleteEleve').modal('show');</script>");
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le supprimer"});</script>');
+				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un élève pour le supprimer"});</script>');
 			}
 		}
 	}
@@ -116,46 +116,57 @@ class EleveController extends \Library\BackController
 
 	public function executeModif(\Library\HTTPRequest $request)
 	{
-		$professeur = $this->managers->getManagerOf('Professeur')->getUnique($request->getData('id'));
-		if($professeur != NULL) {
-			$this->page->addVar('title', 'myAdmin - Modifier '.$professeur['nom']);
+		$eleve = $this->managers->getManagerOf('Eleve')->getUnique($request->getData('id'));
+		if($eleve != NULL) {
+			$this->page->addVar('title', 'myAdmin - Modifier '.$eleve['nom']);
 			$this->page->addVar('class_user', "active");
-			$this->page->addVar('class_prof', "active");
-			$this->page->addVar('professeur', $professeur);
-			$this->page->addVar('listeMatiere', $this->managers->getManagerOf('Matiere')->getList());
+			$this->page->addVar('class_eleve', "active");
+			$this->page->addVar('eleve', $eleve);
+			if($eleve->dateNaissance() != "0000-00-00") {
+				$dateN = $eleve->dateNaissance()->format('d/m/Y');
+			} else {
+				$dateN = "";
+			}
+			$this->page->addVar('date', $dateN);
 
 			if($request->postExists('annuler')) {
-				$this->app->httpResponse()->redirect('/admin/professeurs');
+				$this->app->httpResponse()->redirect('/admin/eleves');
 			}
-
+			
 			if($request->postExists('modifier')) {
+				$date = $request->postData('date');
+				if(!empty($date)) {
+					$date = explode('/', $date);
+					$date = $date[2].'-'.$date[1].'-'.$date[0];
+					$date = new \DateTime($date);
+				} else {
+					$date = new \DateTime('0000-00-00');
+				}
 			
-			$prof = new \Library\Entities\Professeur(array(
-				"id" => $professeur['id'],
-				"username" => $request->postData('username'),
-				"nom" => $request->postData('nom'),
-				"prenom" => $request->postData('prenom'),
-				"email" => $request->postData('email'),
-				"password" => $professeur['password'],
-				"salt" => $professeur['salt'],
-				"token" => $professeur['token'],
-				"active" => $professeur['active'],
-				"matiere" => $request->postData('matiere')
-			));
+				$el = new \Library\Entities\Eleve(array(
+					"id" => $eleve['id'],
+					"username" => $request->postData('username'),
+					"nom" => $request->postData('nom'),
+					"prenom" => $request->postData('prenom'),
+					"email" => $request->postData('email'),
+					"password" => $eleve['password'],
+					"salt" => $eleve['salt'],
+					"token" => $eleve['token'],
+					"active" => $eleve['active'],
+					"dateNaissance" => $date
+				));
 			
-			if($prof->isValid()) {
-				$this->managers->getManagerOf('Professeur')->save($prof);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification réussie"});</script>');
-				$this->app->httpresponse()->redirect('/admin/professeurs');
-			} else {
-				$this->page->addVar('erreurs', $prof['erreurs']);
-				$this->page->addVar('professeur', $prof);
+				if($el->isValid()) {
+					$this->managers->getManagerOf('Eleve')->save($el);
+					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification réussie"});</script>');
+					$this->app->httpresponse()->redirect('/admin/eleves');
+				} else {
+					$this->page->addVar('erreurs', $el['erreurs']);
+					$this->page->addVar('eleve', $el);
+				}
 			}
-		}
-
-
 		} else {
-			$this->app->httpresponse()->redirect('/admin/matieres');
+			$this->app->httpresponse()->redirect('/admin/eleves');
 		}
 	}
 
@@ -163,10 +174,10 @@ class EleveController extends \Library\BackController
 	{
 		for ($i=0; $i < $request->postData('count'); $i++) {
 			$suppr = unserialize(base64_decode($request->postData('suppr_'.$i)));
-				$this->managers->getManagerOf('Professeur')->delete($suppr);
+				$this->managers->getManagerOf('Eleve')->delete($suppr);
 			}
 		$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
-		$this->app->httpResponse()->redirect('/admin/professeurs');
+		$this->app->httpResponse()->redirect('/admin/eleves');
 	}
 }
 ?>
