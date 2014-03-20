@@ -28,21 +28,16 @@ class Section extends \Library\Entity {
 		}
 	}
    
-<<<<<<< HEAD
+
 	public function setId_u($id_u)
-<<<<<<< HEAD
-		{
-			$this->id_u = $id_u;
-		}
-=======
+
 	{
 		$this->id_u = $id_u;
->>>>>>> 997bb83b3e65114c5914d1b16bb34cde04da24e9
-=======
+	}
+		
 	public function setAdmin($admin)
 	{
 		$this->admin = $admin;
->>>>>>> mikael
 	}
 
 	// GETTERS //
