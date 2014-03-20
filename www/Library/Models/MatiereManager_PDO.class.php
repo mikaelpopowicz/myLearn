@@ -79,10 +79,15 @@ class MatiereManager_PDO extends MatiereManager
 		return $this->dao->query('SELECT COUNT(id_c) FROM cours WHERE id_m = '.$id)->fetchColumn();
 	}
 	
-	public function getByName($libelle) {
+	public function getByName($libelle,$classe) {
 		
-		$requete = $this->dao->prepare('SELECT id_m AS id, libelle, icon FROM matiere WHERE libelle = :libelle');
+		$requete = $this->dao->prepare('SELECT m.id_m AS id, m.libelle, m.icon 
+										FROM matiere m
+										INNER JOIN assigner a ON m.id_m = a.id_m
+										WHERE libelle = :libelle
+										AND a.id_classe = :classe');
 		$requete->bindValue(':libelle', $libelle, \PDO::PARAM_STR);
+		$requete->bindValue(':classe', $classe, \PDO::PARAM_INT);
 		$requete->execute();
  
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');

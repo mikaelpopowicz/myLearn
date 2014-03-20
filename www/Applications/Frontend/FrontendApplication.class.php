@@ -18,9 +18,8 @@ class FrontendApplication extends \Library\Application {
 				} else if($this->user->getAttribute('status') == 'Admin') {
 					$this->httpResponse->redirect('/admin');
 				}
-			} else {
-				$controller->execute();
 			}
+			$controller->execute();
 		}
 		else
 		{

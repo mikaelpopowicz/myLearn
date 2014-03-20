@@ -13,8 +13,10 @@ class ProfesseurManager_PDO extends ProfesseurManager
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
 		$listeProf = $requete->fetchAll();
+		$matiere = new \Library\Models\MatiereManager_PDO($this->dao);
 		foreach ($listeProf as $prof) {
 			$prof->setDateUser(new \DateTime($prof->dateUser()));
+			$prof->setMatiere($matiere->getUnique($prof->matiere()));
 		}
 		$requete->closeCursor();
 		return $listeProf;
@@ -86,8 +88,10 @@ class ProfesseurManager_PDO extends ProfesseurManager
 		$requete->bindValue(':id', $id, \PDO::PARAM_INT);
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
-		if ($prof = $requete->fetch()) {
+		if ($prof = $requete->fetch()) {			
 			$prof->setDateUser(new \DateTime($prof->dateUser()));
+			$matiere = new \Library\Models\MatiereManager_PDO($this->dao);
+			$prof->setMatiere($matiere->getUnique($prof->matiere()));
 			return $prof;
 		}
 		return null;
@@ -108,7 +112,7 @@ class ProfesseurManager_PDO extends ProfesseurManager
 	    $requete->bindValue(':password', $professeur->password());
 	    $requete->bindValue(':salt', $professeur->salt());
 	    $requete->bindValue(':token', $professeur->token());
-	    $requete->bindValue(':matiere', $professeur->matiere());
+	    $requete->bindValue(':matiere', $professeur->matiere()->id());
 	    $requete->execute();
 	}
 	
@@ -124,7 +128,7 @@ class ProfesseurManager_PDO extends ProfesseurManager
 		$requete->bindValue(':active', $professeur->active());
   	    $requete->bindValue(':salt', $professeur->salt());
   	    $requete->bindValue(':token', $professeur->token());
-  	    $requete->bindValue(':matiere', $professeur->matiere());
+  	    $requete->bindValue(':matiere', $professeur->matiere()->id());
   	    $requete->execute();
 	  }
 

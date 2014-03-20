@@ -1,5 +1,5 @@
 <div class="page-header">
-	<h1>Liste des matières</h1>
+	<h1>Liste des classes</h1>
 </div>
 <div class="strip primary">
 	<div class="container">
@@ -11,36 +11,31 @@
 				/
 			</li>
 			<li>
-				<a href="/cours" class="primary-color">Cours</a>
-			</li>
-			<li class="primary-color">
-				/
-			</li>
-			<li>
-					<?php echo $classe->libelle()." - Session ".$classe->session()->session();?>
+				Cours
 			</li>
 		</ul>
 	</div>
 </div>
 <div class="main-content container">
     <div class="headline">
-		<h3>Choisissez votre matière</h3>
+		<h3>Choisissez une classe</h3>
 	</div>
 	<div class="row-fluid equal equal-style">
 	<?php
 	$i = 0;
-	$listeMatiere = $classe->matieres();
-	if(isset($listeMatiere) && is_array($listeMatiere))
+	if(isset($classes) && is_array($classes))
 	{	
-		foreach ($listeMatiere as $matiere) {
+		foreach ($classes as $classe) {
+			$classe = unserialize(base64_decode($classe));
 	?>
+	
 	<div class="span3">
-		<a class="innershadows btn btn-block btn-primary" href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()))."/".str_replace(' ','-',$matiere->libelle());?>"><h2><i class="<?php echo $matiere->icon();?>"></i> <?php echo $matiere->libelle();?></h2></a>
+		<a class="innershadows btn btn-block btn-primary" href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()));?>"><h2> <?php echo $classe->libelle();?> <small><span class="muted"><?php echo $classe->session()->session();?></span></small></h2></a>
 		<div class="content">
 			<p class="text-center">
 				<?php 
-				//echo $controller->getCountCours($matiere['id']);
-				?> cours dans cette section
+				echo count($classe->matieres());
+				?> matière(s) disponible(s)
 			</p>
 		</div>          
 		</a>

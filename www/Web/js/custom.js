@@ -27,8 +27,7 @@ $(document).ready(function() {
 	$('#check_all2').click(function () {
 		var cases = $('#tabs2').find('input[type=checkbox]');
 		$(cases).prop('checked', this.checked);
-	});
-	
+	});	
 	
 	$('span.help-block').parents('div.form-group').addClass('has-error');
 })

@@ -12,8 +12,8 @@
 						<?php
 						$i = 0;
 						foreach($delete as $suppr) {
-							echo '<li class="text-danger">'.$matM->getUnique($suppr->matiere())->libelle().'</li>';
-							echo '<input type="hidden" name="suppr_'.$i.'" value="'.base64_encode(serialize($suppr)).'">';
+							echo '<li class="text-danger">'.$suppr['matiere']->libelle().'</li>';
+							echo '<input type="hidden" name="suppr_'.$i.'" value="'.base64_encode(serialize($suppr['assigner'])).'">';
 							$i += 1;
 						}
 						?>

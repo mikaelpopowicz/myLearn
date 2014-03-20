@@ -10,13 +10,7 @@ class ProfesseurController extends \Library\BackController
 		$this->page->addVar('class_prof', "active");
 		$this->page->addVar('listeProfesseur', $this->managers->getManagerOf('Professeur')->getList());
 		$this->page->addVar('matiere', $this->managers->getManagerOf('Matiere'));
-		$test = "Truc de fou, j'aime très fort ma doudou, elle est trop belle !";
-		$test_cr = $this->app->key()->encode($test);
-		$test_de = $this->app->key()->decode($test_cr['crypted'], $test_cr['key']);
-
-		$this->page->addVar('test', $test);
-		$this->page->addVar('test_cr', $test_cr);
-		$this->page->addVar('test_de', $test_de);
+	
 
 		// Cas de modification
 		if ($request->postExists('modifier')) {
@@ -71,7 +65,7 @@ class ProfesseurController extends \Library\BackController
 				"salt" => $salt,
 				"password" => sha1(md5(sha1(md5($salt)).sha1(md5($mdp)).sha1(md5($salt)))),
 				"token" => $this->app->key()->getNewSalt(40),
-				"matiere" => $request->postData('matiere')
+				"matiere" => unserialize(base64_decode($request->postData('matiere')))
 			));
 			
 			if($professeur->isValid()) {
@@ -133,7 +127,7 @@ class ProfesseurController extends \Library\BackController
 				"salt" => $professeur['salt'],
 				"token" => $professeur['token'],
 				"active" => $professeur['active'],
-				"matiere" => $request->postData('matiere')
+				"matiere" => unserialize(base64_decode($request->postData('matiere')))
 			));
 			
 			if($prof->isValid()) {

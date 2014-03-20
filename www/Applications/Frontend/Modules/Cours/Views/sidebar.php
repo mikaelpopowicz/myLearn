@@ -3,9 +3,11 @@
 		<h5 class="short_headline"><span>Matières</span></h5>
 		<ul class="navigation">
 			<?php
-			if(isset($matieres)) {
-				foreach($matieres as $cat) {
-					echo "<li><a href='/cours/".$cat['libelle']."'>".$cat['libelle']."</a>";
+			$matieres = $classe->matieres();
+			if(isset($matieres) && is_array($matieres)) {
+				foreach($matieres as $mat) {
+					$active = $mat->id() == $matiere->id() ? "active" : "";
+					echo "<li class='".$active."'><a href='/cours/".str_replace('/','-',$classe->session()->session())."/".urlencode(str_replace(' ','-',$classe->libelle()))."/".str_replace(' ','-',$mat->libelle())."'>".$mat['libelle']."</a>";
 				}
 			}
 			?>

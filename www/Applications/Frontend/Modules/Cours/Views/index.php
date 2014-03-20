@@ -1,22 +1,13 @@
-<pre>
-	
-	
-	
-	
-	
-	
-	
-	
-	<?php print_r($_SESSION);?>
-</pre>
 <div class="container">
 	<div class="hero-unit text-center">
 		<div class="headline">
-			<h1 class="primary-color">Un monde de partage</h1>
+			<h1 class="primary-color">Bienvenue sur MyLearn</h1>
 		</div>
 		<div class="content">
 			<p>
-				Pour avoir il faut donner. N'hésitez pas à partager vos connaissances, les travaux que vous effectuez en cours.
+				Cette plateforme vous est mise à disposition par <?php 
+				echo $config->get('conf_nom')
+					?>
 			</p>
 		</div>
 	</div>
@@ -26,11 +17,14 @@
 		<div class="container">
 			<div class="hero-unit text-center">
 				<div class="headline">
-					<h1 class="white-text">Retrouver les cours de BTS SIO</h1>
+					<h1 class="white-text">Retrouver les cours de <?php 
+						echo unserialize(base64_decode($user->getAttribute('classes')[0]))->libelle()
+							?>
+					</h1>
 				</div>
 				<div class="content">
 					<p class="white-text">Partagez, récupérez, commenter ! Tous y est.</p>
-					<p><a href="/cours" class="btn btn-large btn-white custom-btn">Commencer</a></p>
+					<p><a href="/cours/" class="btn btn-large btn-white custom-btn">Commencer</a></p>
 				</div>
 			</div>
 		</div>
@@ -38,11 +32,13 @@
 	<div class="container">
 		<div class="row-fluid equal equal-style">
 			<div class="span4">
-				<a class="innershadows btn btn-block btn-primary" href="/cours/slam"><h2><i class="fa fa-code"></i> SLAM</h2></a>
+				<a class="innershadows" href="/cours">
+					<img class="banner-img" src="/images/learn.jpg">					
+				</a>
 				<div class="content">
-					<h4 class="text-center primary-color">La programmation</h4>
+					<h3 class="primary-color">Vos cours</h3>
 					<p>
-						Retrouvez les cours et exercices de programmation, d'analyse et de base de données
+						Ecrivez-vos cours ici, et retrouver n'importe quand. Idéal pour les révisions.
 					</p>
 				</div>
 			</div>
@@ -65,25 +61,5 @@
 				</div>
 			</div>
 		</div>
-		<p>Hashage du mot de passe admin</p>
-		<pre>
-			$salt = "AZszBS8273dxz";
-			$mdp = "mdp";
-			echo sha1(md5(sha1(md5($salt)).sha1(md5($mdp)).sha1(md5($salt))));
-			RESULTAT :
-			<?php
-				$salt = "AZszBS8273dxz";
-				$mdp = "irisbde75";
-				echo sha1(md5(sha1(md5($salt)).sha1(md5($mdp)).sha1(md5($salt))));
-			?>
-			
-			Test :
-			echo (md5(sha1(md5($salt)).sha1(md5($mdp)).sha1(md5($salt))));
-			<?php
-				echo (md5(sha1(md5($salt)).sha1(md5($mdp)).sha1(md5($salt))));
-				
-			?>
-			Test sha-3 :
-		</pre>
 	</div>
 </div>

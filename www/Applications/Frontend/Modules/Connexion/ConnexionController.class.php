@@ -19,47 +19,20 @@ class ConnexionController extends \Library\BackController
 	 			$login = $request->postData('login');
 				$pass = $request->postData('password');
 				
-				// Vérification du login
-				$exists = $this->managers->getManagerOf('User')->getByName($login);
-				
-				// Si un utilisateur a ce login
-				if($exists != NULL) {
-					
-					// On vérifie qu'il a le bon mot de passe
-					$match = $this->managers->getManagerOf('User')->getByNamePass($login, sha1(md5(sha1(md5($exists['salt'])).sha1(md5($pass)).sha1(md5($exists['salt'])))));
-					
-					// Si cela nous retourne l'utilisateur
-					if($match != NULL) {
-						
-						// Si le compte est activé
-						if($match['active'] == 1) {
-							$this->app->user()->setAuthenticated(true);
-							$this->app->user()->setAttribute('username', $match['username']);
-							$this->app->user()->setAttribute('id', $match['id']);
-							
-							if($this->managers->getManagerOf('Eleve')->getUnique($match['id']) != NULL) {
-								$this->app->user()->setAttribute('status', 'Eleve');
-							} else if($this->managers->getManagerOf('Administrateur')->getUnique($match['id']) != NULL) {
-								$this->app->user()->setAttribute('status', 'Admin');
-								$this->app->httpResponse()->redirect('/admin');
-							} else if($this->managers->getManagerOf('Professeur')->getUnique($match['id']) != NULL) {
-								$this->app->user()->setAttribute('status', 'Prof');
-								$this->app->httpResponse()->redirect('/professeur');
-							} else if($this->managers->getManagerOf('Gestionnaire')->getUnique($match['id']) != NULL) {
-								$this->app->user()->setAttribute('status', 'Gestionnaire');
-							}
-							
-							$this->app->httpResponse()->redirect('/');
-							
-						// Si le compte n'est pas activé
-						} else {
-							$this->page->addVar('erreurs', array('warning', 'Votre compte n\'est pas encore activé, cliquer <a href="/connexion/activer"><strong>ICI</strong></a> si vous n\'avez pas reçu le mail d\'activation'));
-						}
-					} else {
-						$this->page->addVar('erreurs', array('danger', 'Vous avec commis une erreur sur votre identifiant/mot de passe'));
+				$user = $this->managers->getManagerOf('User')->connexion($login,$pass);
+
+				if(isset($user['user']) && ($user['user'] instanceof \Library\Entities\User)) {
+					$this->app->user()->setAuthenticated(true);
+					$this->app->user()->setAttribute('username', $user['user']['username']);
+					$this->app->user()->setAttribute('id', $user['user']['id']);
+					$this->app->user()->setAttribute('status', $user['statut']);
+					if(isset($user['classes']) && is_array($user['classes']))
+					{
+						$this->app->user()->setAttribute('classes', $user['classes']);
 					}
+					$this->app->httpResponse()->redirect('/');
 				} else {
-					$this->page->addVar('erreurs', array('danger', 'Vous avec commis une erreur sur votre identifiant/mot de passe'));
+					$this->page->addVar('erreurs', array($user['Type'], $user['Message']));
 				}
 	 		}
 	 	}
