@@ -1,18 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <definitions>
-<<<<<<< HEAD
-	<define var="db_host" value="FU/ElvnE677h" />
-	<define var="db_name" value="FFnLkvTe6g==" />
-	<define var="db_user" value="C0/Igw==" />
-	<define var="db_user_pass" value="C0/Igw==" />
-	<define var="conf_nom" value="ecole" />
-	<define var="conf_description" value="Description pour la page de connexion" />
-	<define var="conf_email" value="noreply@iris-bde.fr" />
-	<define var="conf_contact" value="contact@iris-bde.fr" />
-	<define var="conf_date" value="04/03/2014" />
-	<define var="cryp_iv" value="RIhCO1VpVo4=" />
-	<define var="cryp_key" value="SnZmaENaSUc2WGhvalljRnBlVUVWaEcy" />
-=======
 	<define var="db_host" value="ipvvhPLMf5Ak" />
 	<define var="db_name" value="i43ggP/Wfg==" />
 	<define var="db_user" value="lJvjkQ==" />
@@ -24,6 +11,5 @@
 	<define var="conf_date" value="12/03/2014" />
 	<define var="cryp_iv" value="zSkR3WknVNg=" />
 	<define var="cryp_key" value="aVMwUW5Ebnpkd1NUbXh1bXdMWTM3bzRu" />
->>>>>>> FETCH_HEAD
 	<define var="installed" value="true" />
 </definitions>
