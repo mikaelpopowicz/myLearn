@@ -39,14 +39,55 @@ class MatiereManager_PDO extends MatiereManager
 		return $listeMatiere;
 	}
 	
+	public function getListNone($classe)
+	{
+		$requete = $this->dao->prepare('SELECT id_m AS id, libelle, icon
+										FROM matiere
+										WHERE id_m NOT IN (
+											SELECT id_m
+											FROM assigner
+											WHERE id_classe = :classe)
+										');
+		$requete->bindValue(':classe', $classe);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
+		$listeMatiere = $requete->fetchAll();
+		$requete->closeCursor();
+		return $listeMatiere;
+	}
+	
+	public function getListOf($classe)
+	{
+		$requete = $this->dao->prepare('SELECT m.id_m AS id, m.libelle, m.icon
+										FROM matiere m
+										INNER JOIN assigner c ON c.id_m = m.id_m
+										WHERE c.id_classe = :classe');
+		$requete->bindValue(':classe', $classe);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
+		$listeMatiere = $requete->fetchAll();
+		$requete->closeCursor();
+		return $listeMatiere;
+	}
+	
+	public function count()
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM matiere')->fetchColumn();
+	}
+
 	public function getCountCours($id) {
 		return $this->dao->query('SELECT COUNT(id_c) FROM cours WHERE id_m = '.$id)->fetchColumn();
 	}
 	
-	public function getByName($libelle) {
+	public function getByName($libelle,$classe) {
 		
-		$requete = $this->dao->prepare('SELECT id_m AS id, libelle, icon FROM matiere WHERE libelle = :libelle');
+		$requete = $this->dao->prepare('SELECT m.id_m AS id, m.libelle, m.icon 
+										FROM matiere m
+										INNER JOIN assigner a ON m.id_m = a.id_m
+										WHERE libelle = :libelle
+										AND a.id_classe = :classe');
 		$requete->bindValue(':libelle', $libelle, \PDO::PARAM_STR);
+		$requete->bindValue(':classe', $classe, \PDO::PARAM_INT);
 		$requete->execute();
  
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
@@ -60,11 +101,24 @@ class MatiereManager_PDO extends MatiereManager
 	}
 	
 	protected function add(Matiere $matiere)
-	  {
-	    $requete = $this->dao->prepare('INSERT INTO matiere SET libelle = :libelle');
-     
-	    $requete->bindValue(':libelle', $matiere->libelle());
-     
-	    $requete->execute();
-	  }
+	{
+		$requete = $this->dao->prepare('INSERT INTO matiere SET libelle = :libelle, icon = :icon');
+		$requete->bindValue(':libelle', $matiere->libelle());
+		$requete->bindValue(':icon', $matiere->icon());
+		$requete->execute();
+	}
+
+	protected function modify(Matiere $matiere)
+	{
+		$requete = $this->dao->prepare('UPDATE matiere SET libelle = :libelle, icon = :icon WHERE id_m = :id');
+		$requete->bindValue(':libelle', $matiere->libelle());
+		$requete->bindValue(':icon', $matiere->icon());
+		$requete->bindValue(':id', $matiere->id());
+		$requete->execute();
+	}
+
+	public function delete(Matiere $matiere)
+  	{
+  		$this->dao->exec('DELETE FROM matiere WHERE id_m = '.$matiere['id']);
+  	}
 }

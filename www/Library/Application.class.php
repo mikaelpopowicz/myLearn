@@ -9,14 +9,15 @@ abstract class Application
 	protected $user;
 	protected $config;
 	protected $key;
+	protected $mail;
    
-	public function __construct()
+	public function __construct($name = "")
 	{
+		$this->name = $name;
 		$this->httpRequest = new HTTPRequest($this);
 		$this->httpResponse = new HTTPResponse($this);
 		$this->user = new User($this);
 		$this->config = new Config($this);
-		$this->name = '';
 		$this->key = new Keygen($this);
 	}
    
@@ -54,7 +55,11 @@ abstract class Application
 			if ($e->getCode() == \Library\Router::NO_ROUTE)
 			{
 				// Si aucune route ne correspond, c'est que la page demandée n'existe pas.
-				$this->httpResponse->redirect404();
+				if ($this->user->isAuthenticated()) {
+					$this->httpResponse->redirect404(new \Library\Page($this));
+				} else {
+					return false;
+				}
 			}
 		}
      
@@ -93,5 +98,9 @@ abstract class Application
 	
 	public function key() {
 		return $this->key;
+	}
+
+	public function mail() {
+		return $this->mail;
 	}
 }

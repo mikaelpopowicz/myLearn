@@ -17,7 +17,13 @@
 				/
 			</li>
 			<li>
-				<?php echo $matiere;?>
+				<a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()));?>" class="primary-color"><?php echo $classe->libelle().' - Session '.$classe->session()->session();?></a>
+			</li>
+			<li class="primary-color">
+				/
+			</li>
+			<li>
+				<?php echo $matiere->libelle();?>
 			</li>
 		</ul>
 	</div>

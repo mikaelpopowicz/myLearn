@@ -1,7 +1,7 @@
 <?php
 namespace Library;
 
-class Mailer
+class Mailer extends \Library\ApplicationComponent
 {
 	private $mail;
 	private $sujet;
@@ -10,23 +10,26 @@ class Mailer
 	private $headers;
 	private $ligne;
 	private $boundary;
+	private $team;
+	private $contact;
 	
-	public function __construct($mail, $sujet, $message, $headers) {
+	
+	public function __construct($app) {
+		parent::__construct($app);
+		$this->setLigne("\n");
 		$this->boundary = "-----=".md5(rand());
-		if (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $mail)) {
-			$this->setLigne("\r\n");
-		} else {
-			$this->setLigne("\n");
-		}
-		$this->setMail($mail);
-		$this->setSujet($sujet);
-		$this->setMessage($sujet, $message);
-		$this->setHeaders($headers);
-		$this->send();
+		$this->setHeaders($this->app->config()->get('conf_email'));
+		$this->setTeam($app->config()->get('conf_nom'));
+		$this->setContact($app->config()->get('conf_contact'));
+		//echo $app->config()->get('conf_email');
 	}
 	
 	public function setMail($mail) {
 		$this->mail = $mail;
+		
+		if (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $mail)) {
+			$this->setLigne("\r\n");
+		}
 	}
 	
 	public function setSujet($sujet) {
@@ -34,22 +37,35 @@ class Mailer
 	}
 	
 	public function setHeaders($sender) {
-		$this->headers = "From: \"Mika-p.fr\"<".$sender.">".$this->ligne;
-		$this->headers.= "Reply-to: \"Mika-p.fr\" <".$sender.">".$this->ligne;
+		$this->headers = "From: \"myLearn\"<".$sender.">".$this->ligne;
+		$this->headers.= "Reply-to: \"myLearn\" <".$sender.">".$this->ligne;
 		$this->headers.= "MIME-Version: 1.0".$this->ligne;
 		$this->headers.= "Content-Type: multipart/alternative;".$this->ligne." boundary=\"$this->boundary\"".$this->ligne;
 	}
+
+	public function headers() { return $this->headers; }
 	
 	public function setLigne($ligne) {
 		$this->ligne = $ligne;
 	}
+
+	public function setTeam($team) {
+		$this->team = $team;
+	}
+
+	public function setContact($contact) {
+		$this->contact = $contact;
+	}
 	
 	public function send() {
-		mail($this->mail, $this->sujet, $this->message, $this->headers);
+		do {
+			$envoi = mail($this->mail, $this->sujet, $this->message, $this->headers);
+		} while (!$envoi);
+		
 	}
 	
 	public function setMessage($titre, $message) {
-		$dir = '../'.__DIR__;
+		//$dir = '../'.__DIR__;
 		
 		$this->message = $this->ligne."--".$this->boundary.$this->ligne;
 		
@@ -322,7 +338,7 @@ class Mailer
 									<tr>
 										<td>
 											<div id="logo" class="text-logo">
-												<h2><a href="http://poo/"><span>Mika</span>-p<span>.Fr</span></a></h2>
+												<h2><a href="http://ppe/"><span>my</span>Learn</a></h2>
 											</div>
 											</td>
 										<td align="right"><h6 class="collapse">'.$titre.'</h6></td>
@@ -371,7 +387,7 @@ class Mailer
 															<td>				
 																			
 																<h5 class="">Contacts:</h5>												
-																<p>Email: <strong><a href="mailto:webmaster@mika-p.fr">webmaster@mika-p.fr</a></strong></p>
+																<p>Email: <strong><a href="mailto:'.$this->contact.'">'.$this->contact.'</a></strong></p>
                 
 															</td>
 														</tr>
@@ -405,7 +421,7 @@ class Mailer
 								<tr>
 									<td align="center">
 										<p>
-											L\'équipe Mika-p.fr
+											L\'équipe '.$this->team.'
 										</p>
 									</td>
 								</tr>

@@ -54,13 +54,6 @@ abstract class EleveManager extends \Library\Manager
 	*/
 	public function save(Eleve $eleve)
 	{
-		if ($eleve->isValid())
-		{
-			$eleve->isNew() ? $this->add($eleve) : $this->modify($eleve);
-		}
-		else
-		{
-			throw new \RuntimeException('L\'utilisateur doit être validée pour être enregistrée');
-		}
+		$eleve->isNew() ? $this->add($eleve) : $this->modify($eleve);
 	}
 }

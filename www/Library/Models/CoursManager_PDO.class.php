@@ -58,7 +58,6 @@ class CoursManager_PDO extends CoursManager
 	{
 		$requete = $this->dao->prepare('SELECT c.id_c AS id, b.username AS auteur, c.id_m as matiere, c.titre, c.description, c.contenu, c.dateAjout, c.dateModif, c.count_c
 			FROM cours c
-			INNER JOIN byte b ON c.id_u = b.id_u
 			INNER JOIN matiere m ON c.id_m = m.id_m
 			WHERE m.libelle = :libelle
 			ORDER BY dateAjout DESC');
@@ -78,6 +77,16 @@ class CoursManager_PDO extends CoursManager
 		$requete->closeCursor();
      
 		return $listeCours;
+	}
+
+	public function count()
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM cours')->fetchColumn();
+	}
+
+	public function countOf($matiere)
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM cours WHERE id_m = '.$matiere)->fetchColumn();
 	}
 	
 	public function getLast() {
@@ -171,11 +180,6 @@ class CoursManager_PDO extends CoursManager
 		$requete->execute();
 		$result = $requete->fetch();
 		return $result;
-	}
-	
-	public function count()
-	{
-		return $this->dao->query('SELECT COUNT(*) FROM cours')->fetchColumn();
 	}
 	
 	protected function add(Cours $cours)

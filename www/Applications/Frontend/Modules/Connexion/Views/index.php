@@ -14,6 +14,7 @@
 			<h3>Connexion à la plateforme de cours en ligne</h3>
 			<h3 class="text-primary"><?php echo isset($nom) ? $nom : "";?></h3>
 			<p><?php echo isset($desc) ? $desc : "";?></p>
+			<p><?php echo isset($mail) ? $mail : "";?></p>
 		</div>
 		<div class="col-md-6">
 			<div class="well">
@@ -30,11 +31,16 @@
 				<?php
 				}
 				?>
-				<form class="form-signin" role="form" method="post">
+				<form class="form-signin" role="form" method="post" id="connexion">
 					<input type="text" class="form-control" placeholder="Utilisateur" name="login" required autofocus>
-					<input type="password" class="form-control" placeholder="Password" name="password" required>
-					<button class="btn btn-lg btn-primary btn-block" name="go" type="submit">Connexion</button>
+					<input type="password" class="form-control" placeholder="Password" name="password" id="passw0rd" required>
+					<input class="btn btn-lg btn-primary btn-block" name="go" type="submit" value="Connexion" />
 				</form>
+				<p class="text-center">
+					<a href="/connexion/activer">Activation</a>
+					/
+					<a href="/connexion/mot-de-passe-perdu">Mot de passe oublié ?</a>
+				</p>
 			</div>
 		</div>
 	</div>

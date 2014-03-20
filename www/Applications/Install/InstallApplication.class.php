@@ -4,9 +4,7 @@ namespace Applications\Install;
 class InstallApplication extends \Library\Application {
 	
 	public function __construct() {
-		parent::__construct();
-		
-		$this->name = "Install";
+		parent::__construct('Install');
 	}
 	
 	public function run() {

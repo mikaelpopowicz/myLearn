@@ -27,14 +27,7 @@ class Cours extends \Library\Entity {
    
 	public function setAuteur($auteur)
 	{
-		if (empty($auteur))
-		{
-			$this->erreurs[] = self::AUTEUR_INVALIDE;
-		}
-		else
-		{
-			$this->auteur = $auteur;
-		}
+		$this->auteur = $auteur;
 	}
    
 	public function setTitre($titre)
@@ -86,6 +79,10 @@ class Cours extends \Library\Entity {
 	public function setMatiere($matiere) {
 		$this->matiere = (int)$matiere;
 	}
+	
+	public function setClasse($classe) {
+		$this->classe = (int)$classe;
+	}
 
 	public function setCount_c($count) {
 		$this->count_c = $count;
@@ -93,43 +90,15 @@ class Cours extends \Library\Entity {
 	
 	// GETTERS //
    
-	public function auteur()
-	{
-		return $this->auteur;
-	}
-   
-	public function titre()
-	{
-		return $this->titre;
-	}
-	
-	public function description()
-	{
-		return $this->description;
-	}
-   
-	public function contenu()
-	{
-		return $this->contenu;
-	}
-   
-	public function dateAjout()
-	{
-		return $this->dateAjout;
-	}
-   
-	public function dateModif()
-	{
-		return $this->dateModif;
-	}
-	
-	public function matiere() {
-		return $this->matiere;
-	}
-
-	public function count_c() {
-		return $this->count_c;
-	}
+	public function auteur() { return $this->auteur; }
+    public function titre() { return $this->titre; }
+	public function description() { return $this->description; }
+	public function contenu() { return $this->contenu; }
+	public function dateAjout() { return $this->dateAjout; }
+	public function dateModif() { return $this->dateModif; }
+	public function matiere() { return $this->matiere; }
+	public function classe() { return $this->classe; }
+	public function count_c() { return $this->count_c; }
 }
 
 ?>
