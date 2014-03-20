@@ -2,11 +2,12 @@
 	<div class="col-lg-12">
 		<ol class="breadcrumb">
 			<li><a href="/admin">Accueil</a></li>
-			<li><a href="/admin/classe">Liste des classes</a></li>
+			<li><a href="/admin/classes">Liste des classes</a></li>
 			<li class="active"><?php echo $classe->libelle();?></li>
 		</ol>
 	</div>
 </div>
+
 <div class="row">
 	<div class="col-lg-12">
 		<div class="panel panel-default">
@@ -20,19 +21,19 @@
 							<dt>Libellé</dt>
 							<dd><?php echo $classe->libelle();?></dd>
 							<dt>Session</dt>
-							<dd><?php echo $session->getUnique($classe->session())->session();?></dd>
+							<dd><?php echo $classe->session()->session();?></dd>
 							<dt>Section</dt>
-							<dd><?php echo $section->getUnique($classe->section())->libelle();?></dd>
+							<dd><?php echo $classe->section()->libelle();?></dd>
 						</dl>
 					</div>
 					<div class="col-lg-6">
 						<dl class="dl-horizontal">
 							<dt>Nombre de matière</dt>
-							<dd><?php echo $assigner->countOf($classe->id());?>
+							<dd><?php echo count($classe->matieres());?>
 							<dt>Nombre de professeur</dt>
-							<dd><?php echo $charger->countOf($classe->id());?>
+							<dd><?php echo count($classe->professeurs());?>
 							<dt>Nombre d'élève</dt>
-							<dd><?php echo $etre->countOf($classe->id());?>
+							<dd><?php echo count($classe->eleves());?>
 						</dl>
 					</div>
 				</div>
@@ -56,7 +57,7 @@
 					</h4>
 				</div>
 				<div class="panel-body">
-					<table class="table table-striped table-hover table-bordered datatable" id="professeurTab">
+					<table class="table table-striped table-hover table-bordered table-condensed datatable" id="professeurTab">
 						<thead>
 							<tr>
 								<th width="50 px"><input name="check_all" id="check_all" type="checkbox"></th>
@@ -66,11 +67,12 @@
 						</thead>
 						<tbody id='tabs'>
 							<?php
-							if (isset($matiereClasse) && is_array($matiereClasse)) {
-								foreach($matiereClasse as $matiere) {
+							$listeMatiere = $classe->matieres();
+							if (isset($listeMatiere) && is_array($listeMatiere)) {
+								foreach($listeMatiere as $matiere) {
 									echo "<tr>";
 									echo "\n\t\t\t\t\t\t\t<td>";
-									echo "\n\t\t\t\t\t\t\t\t<input name='check[]' type='checkbox' value=".$matiere['id'].">";
+									echo "\n\t\t\t\t\t\t\t\t<input name='check[]' type='checkbox' value=".base64_encode(serialize($matiere)).">";
 									echo "\n\t\t\t\t\t\t\t</td>";
 									echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$matiere->libelle()."\n\t\t\t\t\t\t\t</td>";
 									echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t<i class='".$matiere->icon()."'></i>\n\t\t\t\t\t\t\t</td>";
@@ -104,7 +106,7 @@
 				
 				</div>
 				<div class="panel-body">
-					<table class="table table-striped table-hover table-bordered datatable" id="professeurTab">
+					<table class="table table-striped table-hover table-bordered table-condensed datatable" id="professeurTab">
 						<thead>
 							<tr>
 								<th width="50 px"><input name="check_all" id="check_all1" type="checkbox"></th>
@@ -114,11 +116,12 @@
 						</thead>
 						<tbody id='tabs1'>
 							<?php
-							if (isset($professeurClasse) && is_array($professeurClasse)) {
-								foreach($professeurClasse as $professeur) {
+							$listeProf = $classe->professeurs();
+							if (isset($listeProf) && is_array($listeProf)) {
+								foreach($listeProf as $professeur) {
 									echo "<tr>";
 									echo "\n\t\t\t\t\t\t\t<td>";
-									echo "\n\t\t\t\t\t\t\t\t<input name='check[]' type='checkbox' value=".$professeur['id'].">";
+									echo "\n\t\t\t\t\t\t\t\t<input name='check[]' type='checkbox' value=".base64_encode(serialize($professeur)).">";
 									echo "\n\t\t\t\t\t\t\t</td>";
 									echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$professeur->nom()."\n\t\t\t\t\t\t\t</td>";
 									echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$professeur->prenom()."\n\t\t\t\t\t\t\t</td>";
@@ -149,7 +152,7 @@
 					</h4>
 				</div>
 				<div class="panel-body">
-					<table class="table table-striped table-hover table-bordered datatable" id="eleveTab">
+					<table class="table table-striped table-hover table-bordered table-condensed datatable" id="eleveTab">
 						<thead>
 							<tr>
 								<th width="50 px"><input name="check_all1" id="check_all2" type="checkbox"></th>
@@ -159,11 +162,12 @@
 						</thead>
 						<tbody id="tabs2">
 							<?php
-							if (isset($eleveClasse) && is_array($eleveClasse)) {
-								foreach($eleveClasse as $eleve) {
+							$listeEleve = $classe->eleves();
+							if (isset($listeEleve) && is_array($listeEleve)) {
+								foreach($listeEleve as $eleve) {
 									echo "<tr>";
 									echo "\n\t\t\t\t\t\t\t<td>";
-									echo "\n\t\t\t\t\t\t\t\t<input name='check[]' type='checkbox' value=".$eleve['id'].">";
+									echo "\n\t\t\t\t\t\t\t\t<input name='check[]' type='checkbox' value=".base64_encode(serialize($eleve)).">";
 									echo "\n\t\t\t\t\t\t\t</td>";
 									echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$eleve->nom()."\n\t\t\t\t\t\t\t</td>";
 									echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$eleve->prenom()."\n\t\t\t\t\t\t\t</td>";

@@ -15,7 +15,6 @@
 		<meta content="Fill this in with your information" name="description"/>
 		
 		<!--- highly suggested that you un-comment this on a live site -->
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -23,7 +22,6 @@
 		
 		<!-- CSS ================ -->
 		<link href="/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-		<link href="/assets/css/docs.css" rel="stylesheet" type="text/css"/>
 		<link href="/assets/css/theme.reset.min.css" rel="stylesheet" type="text/css"/>
 		<link href="/assets/css/style.css" rel="stylesheet" type="text/css"/>
 		<link rel="stylesheet" type="text/css" href="/js/sh/styles/shCoreDjango.css">
@@ -139,14 +137,30 @@
 									<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">Cours <i class="e-icon-down-open-mini"></i></a>
 									<ul class="dropdown-menu">
 										<?php
+										
+										if(isset($classes) && is_array($classes) && count($classes) > 0)
+										{
+											foreach ($classes as $classe) {
+												$key = unserialize(base64_decode($classe));
+												$css = "class_".$key->id()."_cl";
+												$$css = isset($$css) ? $$css : "";
+												echo "<li class='".$$css."'><a href='/cours/".str_replace("/","-",$key->session()->session())."/".urlencode(str_replace(" ","-",$key->libelle()))."'>".$key->libelle()." - ".$key->session()->session()."</a></li>";
+											}
+										}
+										else
+										{
+											echo "<li>Aucune classe disponible</li>";
+										}
+										/*
 										foreach ($matieres as $key) {
 											$class = "class_".$key['libelle'];
 											echo '<li class="'.$$class.'"><a href="/cours/'.$key->libelle().'">'.$key->libelle().'</a></li>';
 										}
+										*/
 										?>
 									</ul>
 								</li>
-								<li class="<?php echo $class_tutos;?>"><a href="/tutos">Tutos</a></li>
+								<li class="<?php echo $class_devoirs;?>"><a href="/tutos">Devoirs</a></li>
 								<li class="<?php echo $class_contact;?>"><a href="/contact">Contact</a></li>
 							</ul>
 						</div>
@@ -164,7 +178,7 @@
 					<img src="/assets/images/logo.png" alt="Corporate-Elegance Responsive Retina Ready Portfolio Business"/><.no-svg fallback-->
 				</div> 
 				<!-- end #logo --> 
-				<!-- ******* print stuff --><div class="print">Phone, name of company etc., for printing</div>
+				<!-- ******* print stuff -->
 			</div>
 			<!-- /.container --> 
 		</div>
@@ -181,6 +195,60 @@
 		?>
 		<!--== FIN DU CONTENU DE LA PAGE ==-->	
 		
+		
+		<!--begin footer -->
+		<footer class="footer clearfix">
+			<div class="container">
+				<!--footer container-->
+				<div class="row-fluid">
+					<div class="span3">
+						<section>
+							<h4>Contact Us</h4>
+							<p>Corporate-Elegance Creative<br>
+								1255 Nowhere Street<br>
+								Tampa, FL 33655<br>
+								<strong>phone:</strong> <a href="tel:8135551234" class="tele">813.555.1234</a><br>
+								<strong>fax:</strong> 813.555.1235<br>
+								<span class="overflow"><strong>email:</strong> <a href="mailto:email@domain.com">email@companydomain.com</a></span>
+							</p>
+						</section>
+						<!--close section-->
+
+					</div>
+					<!-- close .span3 --> 
+			
+					<!--section containing newsletter signup and recent images-->
+					<div class="span5">
+						<section>
+							<h4>Stay Updated</h4>
+							<p>Sign up for our newsletter. We won't share your email address.</p>
+							<form action="yourscript.php" method="post">
+								<div class="input-append append-fix custom-append row-fluid">
+									<input type="email" class="span8" placeholder="Email Address" name="email" />
+									<button class="btn btn-primary">Sign Up</button>
+								</div>
+							</form>
+							<!--close input-append--> 
+						</section>
+						<!--close section-->
+					</div>
+					<!-- close .span5 --> 
+					<!--section containing blog posts-->
+					<div class="span4">
+						<section>
+							<h4>A propos</h4>
+							<p><?php 
+								//echo $config->get('conf_description');
+									?></p>
+						</section>
+					</div>
+					<!-- close .span4 -->
+				</div>
+				<!-- close .row-fluid-->
+			</div>
+			<!-- close footer .container--> 
+		</footer>
+		<!--/close footer-->
 
 		<!--change this to your stuff-->
 		<section class="footer-credits">
@@ -216,14 +284,7 @@
 	<script src='/assets/js/jquery.easytabs.min.js'></script><!-- tabs/testimonials custom.js / loads --> 
 	<script src='/assets/js/slide-to-top-accordion.min.js'></script><!-- slide to top accordion toggle / custom.js loads --> 
 	<script src='/assets/js/bootstrap-progressbar.min.js'></script><!-- progress bar loading in page --> 
-
-	<!-- Fancy Box and Isotope ================ 
-	<script src='/assets/js/jquery.isotope.min.js'></script><!--filter masonry script AND loading> 
-	<script src='/assets/js/fancybox/source/custom-fancybox-combined.js' defer></script><!--all fancy box buttons, media, helpers, thumbs AND loading--> 
-
-	<!-- Sliders ================ 
-	<script src='/assets/js/jquery.flexslider.min.js'></script><!--flexslider (twitter, blog, portfolio, full width) AND loading > 
-	<script src='/assets/js/lemmon-slider.min.js'></script><!-- variable width image slider AND loading -->
+	
 	
 	<!-- Noty ================ -->
 	<script src='/assets/js/noty/packaged/jquery.noty.packaged.min.js'></script>

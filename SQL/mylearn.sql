@@ -790,6 +790,7 @@ END @@
 # -----------------------------------------------------------------------------
 #       PROCEDURE : connexion()
 # -----------------------------------------------------------------------------
+Delimiter @@
 
 CREATE PROCEDURE connexion(login VARCHAR(128), pass VARCHAR(128))
 BEGIN
@@ -807,26 +808,180 @@ BEGIN
 	
 	DECLARE EXIT HANDLER FOR no_user_for_login
 	BEGIN
-		SELECT "ERR1" AS "message";
+		SELECT true AS "erreur";
+		SELECT "Erreur de saisie identidiant/mot de passe" AS "Message", "danger" AS "Type";
 	END;
 	
 	SELECT salt INTO sel
 	FROM user
 	WHERE username = login;
 
-	SET passwd = SHA1(MD5(CONCAT(SHA1(MD5(sel)),SHA1(MD5(pass)),SHA1(MD5(sel)))));
+	SET passwd = SHA1(MD5(CONCAT(SHA1(MD5(sel)),SHA1(pass),SHA1(MD5(sel)))));
 	
 	IF (SELECT COUNT(*) FROM user WHERE username = login AND password = passwd) > 0 THEN
 		SELECT id_u,username,nom,prenom,email,password,active,salt,token,dateUser INTO id,user,name,last,mail,passwd,actif,sel,tok,dateU
 		FROM user
 		WHERE username = login AND password = passwd;
 		IF actif THEN
-			SELECT id,  EZ user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
+			SELECT false AS "erreur";
+			SELECT id, user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
+			IF (SELECT COUNT(*) FROM administrateur WHERE id_u = id) > 0 THEN
+				SELECT "Admin" AS "Statut";
+			ELSEIF (SELECT COUNT(*) FROM professeur WHERE id_u = id) > 0 THEN
+				SELECT "Prof" AS "Statut";
+			ELSEIF (SELECT COUNT(*) FROM eleve WHERE id_u = id) > 0 THEN
+				SELECT "Eleve" AS "Statut";
+				CALL select_classes(id);
+			END IF;
 		ELSE
-			SELECT "ERR3" AS "message";
+			SELECT true AS "erreur";
+			SELECT "Votre compte n'est pas encore activÃ©" AS "Message", "warning" AS "Type";
 		END IF;
 	ELSE
-		SELECT "ERR2" AS "Message";
+		SELECT true AS "erreur";
+		SELECT "Erreur de saisie identidiant/mot de passe" AS "Message", "danger" AS "Type";
+	END IF;
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_classes()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE select_classes(user INTEGER)
+BEGIN
+	# Déclaration
+	Declare fini int default 0;
+	Declare id INTEGER;
+	
+	# Premier curseur
+	Declare cur1 CURSOR
+	FOR SELECT id_classe
+		FROM classe;
+		
+	# Deuxième curseur
+	Declare cur2 CURSOR
+	FOR SELECT c.id_classe
+		FROM classe c
+		INNER JOIN etre e ON c.id_classe = e.id_classe
+		INNER JOIN session s ON s.id_session = c.id_session
+		WHERE e.id_u = user
+		AND s.id_session IN (
+			SELECT id_session
+			FROM session
+			GROUP BY id_session
+			HAVING SUBSTR(session,6) <= YEAR(CURDATE())
+		)
+		ORDER BY s.session DESC;
+		
+	# Gestionnaire d'erreur
+	Declare continue HANDLER
+		FOR NOT FOUND SET fini = 1;
+		
+	# Nombre de classes trouvée
+	IF user IS NULL OR user = 0 THEN
+		SELECT COUNT(*) AS "Classes" FROM classe;
+		Open cur1;
+		FETCH cur1 INTO id;
+		WHILE fini != 1	DO
+			CALL select_class(id);
+			FETCH cur1 INTO id;
+		END WHILE;
+		Close cur1;
+	ELSE
+		SELECT COUNT(*) AS "Classes"
+		FROM classe c
+		INNER JOIN etre e ON c.id_classe = e.id_classe
+		INNER JOIN session s ON s.id_session = c.id_session
+		WHERE e.id_u = user
+		AND s.id_session IN (
+			SELECT id_session
+			FROM session
+			GROUP BY id_session
+			HAVING SUBSTR(session,6) <= YEAR(CURDATE())
+		);
+		Open cur2;
+		FETCH cur2 INTO id;
+		WHILE fini != 1 DO
+			CALL select_class(id);
+			FETCH cur2 INTO id;
+		END WHILE;
+		Close cur2;
+	END IF;
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_class()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE select_class(classe INTEGER)
+BEGIN
+	SELECT id_classe AS id, libelle
+	FROM classe
+	WHERE id_classe = classe;
+	
+	SELECT s.id_session AS id, s.session
+	FROM session s
+	INNER JOIN classe c ON s.id_session = c.id_session
+	WHERE c.id_classe = classe;
+	
+	SELECT s.id_section AS id, s.id_u AS admin, s.libelle
+	FROM section s
+	INNER JOIN classe c ON s.id_section = c.id_section
+	WHERE c.id_classe = classe;
+	
+	SELECT m.id_m AS id, m.libelle, m.icon
+	FROM matiere m
+	INNER JOIN assigner a ON m.id_m = a.id_m
+	WHERE a.id_classe = classe;
+	
+	SELECT u.id_u AS id, u.nom, u.prenom
+	FROM user u
+	INNER JOIN charger c ON u.id_u = c.id_u
+	INNER JOIN professeur p ON u.id_u = p.id_u
+	WHERE c.id_classe = classe;
+	
+	SELECT u.id_u AS id, u.nom, u.prenom
+	FROM user u
+	INNER JOIN etre e ON u.id_u = e.id_u
+	INNER JOIN eleve p ON u.id_u = p.id_u
+	WHERE e.id_classe = classe;
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_class_session_user()
+# -----------------------------------------------------------------------------
+DELIMITER @@
+
+CREATE PROCEDURE select_class_session_user(classe VARCHAR(128), session VARCHAR(128), user INTEGER)
+BEGIN
+	Declare id INTEGER;
+	Declare lib VARCHAR(128);
+	DECLARE no_class CONDITION FOR 1329;
+	DECLARE EXIT HANDLER FOR no_class
+	BEGIN
+		SELECT true AS "erreur";
+		SELECT "Cette classe n'existe pas" AS "Message";
+	END;
+	SELECT c.id_classe AS id, c.libelle INTO id,lib
+	FROM classe c
+	INNER JOIN session s ON c.id_session = s.id_session
+	WHERE c.libelle = classe
+	AND s.session = session;
+	IF (SELECT COUNT(*)
+		FROM classe c
+		INNER JOIN etre e ON e.id_classe = c.id_classe
+		WHERE c.id_classe = id
+		AND e.id_u = user) > 0 THEN	
+		IF (MONTH(CURDATE()) < 8 AND SUBSTR(session,1,4) < YEAR(CURDATE())) OR (MONTH(CURDATE()) > 8 AND SUBSTR(session,1,4) <= YEAR(CURDATE())) THEN
+			SELECT false AS "erreur";
+			CALL select_class(id);
+		ELSE
+			SELECT true AS "erreur";
+			SELECT "On ne peut prÃ©dire l'avenir" AS "Message";
+		END IF;
+	ELSE
+		SELECT true AS "erreur";
+		SELECT "Vous ne pouvez accÃ©der Ã cette classe" AS "Message";
 	END IF;
 END @@
 

@@ -29,6 +29,7 @@ class ConnexionController extends \Library\BackController
 					else
 					{
 						$reponse = array(
+							"logged" => true,
 							"id" => $match['id'],
 							"nom" => $match['nom'],
 							"prenom" => $match['prenom'],

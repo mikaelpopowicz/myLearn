@@ -11,7 +11,7 @@ abstract class ClasseManager extends \Library\Manager
 	* Méthode retournant la liste des matières
 	* @return array La liste des matières. Chaque entrée est une instance de Matière.
 	*/
-	abstract public function getList();
+	abstract public function getList($id);
 	
 	/**
 	* Méthode permettant d'ajouter une news.

@@ -12,8 +12,8 @@
 						<?php
 						$i = 0;
 						foreach($delete as $suppr) {
-							echo '<li class="text-danger">'.$userM->getUnique($suppr->eleve())->nom().'</li>';
-							echo '<input type="hidden" name="suppr_'.$i.'" value="'.base64_encode(serialize($suppr)).'">';
+							echo '<li class="text-danger">'.$suppr['eleve']->nom().'</li>';
+							echo '<input type="hidden" name="suppr_'.$i.'" value="'.base64_encode(serialize($suppr['etre'])).'">';
 							$i += 1;
 						}
 						?>

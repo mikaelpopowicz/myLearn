@@ -22,9 +22,16 @@ class HTTPResponse
 		exit;
 	}
 
-	public function redirect404()
+	public function redirect404($page)
 	{
+		$vars = $page->getVars();
 		$this->page = new Page($this->app);
+		if(is_array($vars))
+		{
+			foreach ($vars as $var => $value) {
+				$this->page->addVar($var,$value);
+			}
+		}
 		$this->page->setContentFile(__DIR__.'/../Errors/404.html');
 		$this->page->addVar('title', '404 Page non trouvée');
 		$this->addHeader('HTTP/1.0 404 Not Found');

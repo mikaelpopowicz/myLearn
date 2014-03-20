@@ -8,7 +8,7 @@ class ClasseController extends \Library\BackController
 		$this->page->addVar('title', 'myLearn - Liste des classes');
 		$this->page->addVar('class_gest', "active");
 		$this->page->addVar('class_cls', "active");
-		$this->page->addVar('listeClasse', $this->managers->getManagerOf('Classe')->getList());
+		$this->page->addVar('listeClasse', $this->managers->getManagerOf('Classe')->getList(0));
 		$this->page->addVar('session', $this->managers->getManagerOf('Session'));
 		$this->page->addVar('section', $this->managers->getManagerOf('Section'));
 
@@ -57,8 +57,8 @@ class ClasseController extends \Library\BackController
 		if($request->postExists('ajouter')) {
 			
 			$classe = new \Library\Entities\Classe(array(
-				"session" => $request->postData('session'),
-				"section" => $request->postData('section'),
+				"session" => unserialize(base64_decode($request->postData('session'))),
+				"section" => unserialize(base64_decode($request->postData('section'))),
 				"libelle" => $request->postData('libelle')
 			));
 			
@@ -77,7 +77,7 @@ class ClasseController extends \Library\BackController
 	{
 		$classe = $this->managers->getManagerOf('Classe')->getUnique($request->getData('id'));
 		if($classe != NULL) {
-			$this->page->addVar('title', 'myLearn - Modifier '.$classe->session());
+			$this->page->addVar('title', 'myLearn - Modifier '.$classe->libelle());
 			$this->page->addVar('class_gest', "active");
 			$this->page->addVar('class_cls', "active");
 			$this->page->addVar('classe', $classe);
@@ -92,8 +92,8 @@ class ClasseController extends \Library\BackController
 			
 				$cls = new \Library\Entities\Classe(array(
 					"id" => $classe['id'],
-					"session" => $request->postData('session'),
-					"section" => $request->postData('section'),
+					"session" => unserialize(base64_decode($request->postData('session'))),
+					"section" => unserialize(base64_decode($request->postData('section'))),
 					"libelle" => $request->postData('libelle')
 				));
 				
@@ -119,18 +119,10 @@ class ClasseController extends \Library\BackController
 			$this->page->addVar('class_gest', "active");
 			$this->page->addVar('class_cls', "active");
 			$this->page->addVar('classe', $classe);
-			$this->page->addVar('session', $this->managers->getManagerOf('Session'));
-			$this->page->addVar('section', $this->managers->getManagerOf('Section'));
-			$this->page->addVar('userM', $this->managers->getManagerOf('User'));
-			$this->page->addVar('matM', $this->managers->getManagerOf('Matiere'));
-			$this->page->addVar('etre', $this->managers->getManagerOf('Etre'));
-			$this->page->addVar('assigner', $this->managers->getManagerOf('Assigner'));
-			$this->page->addVar('charger', $this->managers->getManagerOf('Charger'));
-			$this->page->addVar('matiereClasse', $this->managers->getManagerOf('Matiere')->getListOf($classe->id()));
-			$this->page->addVar('allMatiere', $this->managers->getManagerOf('Matiere')->getListNone($classe->id()));			
-			$this->page->addVar('professeurClasse', $this->managers->getManagerOf('Professeur')->getListOf($classe->id()));
+
+
+			$this->page->addVar('allMatiere', $this->managers->getManagerOf('Matiere')->getListNone($classe->id()));
 			$this->page->addVar('allProfesseur', $this->managers->getManagerOf('Professeur')->getListNone($classe->id()));
-			$this->page->addVar('eleveClasse', $this->managers->getManagerOf('Eleve')->getListOf($classe->id()));
 			$this->page->addVar('allEleve', $this->managers->getManagerOf('Eleve')->getListNone($classe->id()));
 			$this->page->updateVar('includes',  __DIR__.'/Views/modal_add_eleve.php');
 			$this->page->updateVar('includes',  __DIR__.'/Views/modal_add_matiere.php');
@@ -155,17 +147,23 @@ class ClasseController extends \Library\BackController
 					$check = $request->postData('check');
 					$delete = array();
 					for ($i = 0; $i < count($check); $i++) {
-						$delete[$i] = new \Library\Entities\Etre(array(
-							"id" => $classe->id(),
-							"eleve" => $check[$i]
-						));
+						$eleve = unserialize(base64_decode($check[$i]));
+						$delete[$i] = array(
+							"etre" => new \Library\Entities\Etre(array(
+								"id" => $classe->id(),
+								"eleve" => $eleve->id()
+							)),
+							"eleve" => $eleve
+						);
 					}
+					//print_r($delete);
 					$this->page->addVar('delete', $delete);
 					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete_eleve.php');
 					$this->page->updateVar('js', "<script>$('#modalDeleteEleve').modal('show');</script>");
 				} else {
 					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un élève pour le supprimer"});</script>');
 				}
+			// Cas d'ajout de professeur
 			} else if ($request->postExists('ajout_professeur')) {
 				$sel_prof = $request->postData('professeur');
 				foreach ($sel_prof as $key) {
@@ -177,15 +175,20 @@ class ClasseController extends \Library\BackController
 				}
 				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Opération réussie"});</script>');
 				$this->app->httpresponse()->redirect('/admin/classes/'.$classe->id());
+			// Cas de suppression de professeur
 			} else if ($request->postExists('supprimer_professeur')) {
 				if ($request->postExists('check')) {
 					$check = $request->postData('check');
 					$delete = array();
 					for ($i = 0; $i < count($check); $i++) {
-						$delete[$i] = new \Library\Entities\Charger(array(
-							"id" => $classe->id(),
-							"professeur" => $check[$i]
-						));
+						$professeur = unserialize(base64_decode($check[$i]));
+						$delete[$i] = array(
+							"charger" => new \Library\Entities\Charger(array(
+								"id" => $classe->id(),
+								"professeur" => $professeur->id()
+							)),
+							"professeur" => $professeur
+						);
 					}
 					$this->page->addVar('delete', $delete);
 					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete_professeur.php');
@@ -193,6 +196,7 @@ class ClasseController extends \Library\BackController
 				} else {
 					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le supprimer"});</script>');
 				}
+			// Cas d'ajout de matière
 			} else if ($request->postExists('ajout_matiere')) {
 				$sel_mat = $request->postData('matiere');
 				foreach ($sel_mat as $key) {
@@ -200,20 +204,24 @@ class ClasseController extends \Library\BackController
 						"id" => $classe->id(),
 						"matiere" => $key
 					));
-					//echo '<pre>';print_r($assigner);echo '</pre>';
 					$this->managers->getManagerOf('Assigner')->add($assigner);
 				}
 				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Opération réussie"});</script>');
 				$this->app->httpresponse()->redirect('/admin/classes/'.$classe->id());
+			// Cas de suppression de matière
 			} else if ($request->postExists('supprimer_matiere')) {
 				if ($request->postExists('check')) {
 					$check = $request->postData('check');
 					$delete = array();
 					for ($i = 0; $i < count($check); $i++) {
-						$delete[$i] = new \Library\Entities\Assigner(array(
-							"id" => $classe->id(),
-							"matiere" => $check[$i]
-						));
+						$matiere = unserialize(base64_decode($check[$i]));
+						$delete[$i] = array(
+							"assigner" => new \Library\Entities\Assigner(array(
+								"id" => $classe->id(),
+								"matiere" => $matiere->id()
+							)),
+							"matiere" => $matiere
+						);
 					}
 					$this->page->addVar('delete', $delete);
 					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete_matiere.php');
@@ -231,7 +239,8 @@ class ClasseController extends \Library\BackController
 	{
 		if($request->postExists('del_eleve')) {
 			for ($i=0; $i < $request->postData('count'); $i++) {
-				$this->managers->getManagerOf('Etre')->delete(unserialize(base64_decode($request->postData('suppr_'.$i))));
+				$etre = unserialize(base64_decode($request->postData('suppr_'.$i)));
+				$this->managers->getManagerOf('Etre')->delete($etre);
 			}
 			$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
 			$this->app->httpResponse()->redirect('/admin/classes/'.$request->postData('classe'));
@@ -244,7 +253,8 @@ class ClasseController extends \Library\BackController
 	{
 		if($request->postExists('del_professeur')) {
 			for ($i=0; $i < $request->postData('count'); $i++) {
-				$this->managers->getManagerOf('Charger')->delete(unserialize(base64_decode($request->postData('suppr_'.$i))));
+				$charger = unserialize(base64_decode($request->postData('suppr_'.$i)));
+				$this->managers->getManagerOf('Charger')->delete($charger);
 			}
 			$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
 			$this->app->httpResponse()->redirect('/admin/classes/'.$request->postData('classe'));

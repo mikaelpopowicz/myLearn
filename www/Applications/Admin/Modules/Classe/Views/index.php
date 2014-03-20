@@ -24,13 +24,14 @@
 				</div>
 			</div>
 			
-			<table class="table table-striped table-hover table-bordered datatable" id="planTab">
+			<table class="table table-hover table-bordered datatable" id="planTab">
 				<thead>
 					<tr>
 						<th width="50 px"><input name="check_all" id="check_all" type="checkbox"></th>
 						<th>Classe</th>
 						<th>Section</th>
 						<th>Session</th>
+						<th>Nombre de professeurs</th>
 						<th>Nombre d'élèves</th>
 					</tr>
 				</thead>
@@ -45,9 +46,10 @@
 							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t";
 							echo "<a href='/admin/classes/".$classe['id']."'>".$classe->libelle();
 							echo "\n\t\t\t\t\t\t\t</td>";
-							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$section->getUnique($classe->section())->libelle()."\n\t\t\t\t\t\t\t</td>";
-							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$session->getUnique($classe->session())->session()."\n\t\t\t\t\t\t\t</td>";
-							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$classe->section()."\n\t\t\t\t\t\t\t</td>";
+							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$classe->section()->libelle()."\n\t\t\t\t\t\t\t</td>";
+							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".$classe->session()->session()."\n\t\t\t\t\t\t\t</td>";
+							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".count($classe->professeurs())."\n\t\t\t\t\t\t\t</td>";
+							echo "\n\t\t\t\t\t\t\t<td>\n\t\t\t\t\t\t\t\t".count($classe->eleves())."\n\t\t\t\t\t\t\t</td>";
 							echo "\n\t\t\t\t\t\t</tr>\n";
 						}
 					}

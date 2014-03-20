@@ -94,8 +94,8 @@
 									<select id="matiere" name="matiere" class="form-control selectpicker">
 										<?php
 										foreach ($listeMatiere as $matiere) {
-											$selected = isset($professeur) && $professeur['matiere'] == $matiere['id'] ? "selected" : "";
-											echo '<option value="'.$matiere['id'].'" '.$selected.'">'.$matiere['libelle'].'</option>';
+											$selected = isset($professeur) && $professeur->matiere()->id() == $matiere['id'] ? "selected" : "";
+											echo '<option value="'.base64_encode(serialize($matiere)).'" '.$selected.'">'.$matiere['libelle'].'</option>';
 										}
 										?>
 									</select>

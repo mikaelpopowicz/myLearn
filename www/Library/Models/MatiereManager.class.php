@@ -16,7 +16,7 @@ abstract class MatiereManager extends \Library\Manager
 	* @param $libelle Le libelle de la matière à recherher
 	* @return void
 	*/
-	abstract public function getByName($libelle);
+	abstract public function getByName($libelle,$classe);
 	
 	/**
 	* Méthode permettant d'ajouter une news.

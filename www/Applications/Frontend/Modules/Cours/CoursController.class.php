@@ -1,44 +1,67 @@
 <?php
 namespace Applications\Frontend\Modules\Cours;
-use \Library\Entities\Comment;
  
 class CoursController extends \Library\BackController {
 	
 	public function executeIndex(\Library\HTTPRequest $request) {
-		// On ajoute une définition pour le titre.
-		$this->page->addVar('title', 'Mika-p - Accueil');
-		$this->page->addVar('class_accueil', 'active');
+		$this->page->addVar('title', 'MyLearn - Accueil');
+		$this->page->addVar("class_accueil", "active");
+	}
+	
+	public function executeList_classe(\Library\HTTPRequest $request)
+	{
+		$this->page->addVar('title', 'MyLearn - Liste des classes');
+		$this->page->addVar('class_cours', 'active');
 	}
 	
 	public function executeList_cours(\Library\HTTPRequest $request)
 	{
-		$matiere = $this->managers->getManagerOf('Matiere')->getByName(urldecode($request->getData('libelle')));
-
-		if($matiere != NULL) {
-			$cours = $this->managers->getManagerOf('Cours')->getListOf(urldecode($request->getData('libelle')));
-		//echo "<br><br><br><br><br>".urldecode($request->getData('libelle'))."<br>";
-     	
-		
-		$this->page->addVar('title', 'Mika-p - '.urldecode($request->getData('libelle')));
-		$this->page->addVar('class_cours', 'active');
-		$this->page->addVar('class_'.urldecode($request->getData('libelle')), 'active');
-		$this->page->addVar('matiere', urldecode($request->getData('libelle')));
-		$this->page->addVar('listeCours', $cours);
-		$this->page->addVar('comments', $this->managers->getManagerOf('Comments'));
-		$this->getFav();
-		} else {
-			$this->app->httpResponse()->redirect404();
+		$classe = $this->managers->getManagerOf('Classe')->getByName(urldecode($request->getData('libelle')), $this->app->user()->getAttribute('id'));
+		if($classe instanceof \Library\Entities\Classe)
+		{
+			$matiere = $this->managers->getManagerOf('Matiere')->getByName(str_replace('-',' ',urldecode($request->getData('matiere'))),$classe->id());
+			if($matiere != NULL)
+			{
+				$this->page->addVar('title', 'MyLearn - '.$classe->libelle().' - '.$matiere->libelle());
+				$this->page->addVar('class_cours', 'active');
+				$this->page->addVar('class_'.$classe->id().'_cl', 'active');
+				$this->page->addVar('classe', $classe);
+				$this->page->addVar('matiere', $matiere);
+			}
+			else
+			{
+				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "warning", layout: "top", text: "<strong>d</strong>"});</script>');
+				//$this->app->httpResponse()->redirect("/cours/".str_replace('/','-',$classe->session()->session())."/".urlencode(str_replace(' ','-',$classe->libelle())));
+				$this->app->httpResponse()->redirect404($this->page);
+			}
 		}
+		else
+		{
+			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "warning", layout: "top", text: "<strong>'.$classe.'</strong>"});</script>');
+			$this->app->httpResponse()->redirect("/cours");
+		}
+
+		$this->page->addVar('listeCours', "");
+		$this->page->addVar('comments', "");
+
 		
 	}
 	
 	public function executeList_matiere(\Library\HTTPRequest $request) {
-		$matieres = $this->managers->getManagerOf('Matiere')->getList();
-		//echo '<pre>';print_r($matieres);echo '</pre>';
-		$this->page->addVar('title', 'Mika-p - Matières');
-		$this->page->addVar('class_cours', 'active');
-		$this->page->addVar('controller', $this->managers->getManagerOf('Matiere'));
-		$this->page->addVar('listeMatiere', $matieres);
+		$classe = $this->managers->getManagerOf('Classe')->getByName(urldecode($request->getData('libelle')), $this->app->user()->getAttribute('id'));
+		if($classe instanceof \Library\Entities\Classe)
+		{
+			$this->page->addVar('title', 'MyLearn - '.$classe->libelle());
+			$this->page->addVar('class_cours', 'active');
+			$this->page->addVar('class_'.$classe->id().'_cl', 'active');
+			$this->page->addVar('classe', $classe);
+		}
+		else
+		{
+			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "warning", layout: "top", text: "<strong>'.$classe.'</strong>"});</script>');
+			$this->app->httpResponse()->redirect("/cours");
+		}
+		
 		
 	}
 	

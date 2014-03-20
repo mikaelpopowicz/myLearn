@@ -56,7 +56,7 @@ abstract class Application
 			{
 				// Si aucune route ne correspond, c'est que la page demandée n'existe pas.
 				if ($this->user->isAuthenticated()) {
-					$this->httpResponse->redirect404();
+					$this->httpResponse->redirect404(new \Library\Page($this));
 				} else {
 					return false;
 				}

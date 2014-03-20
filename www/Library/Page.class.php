@@ -17,6 +17,8 @@ class Page extends ApplicationComponent
 		$this->vars[$var] = $value;
 	}
 	
+	public function getVars() { return $this->vars; }
+	
 	public function updateVar($var, $value)
 	{
 		if (is_array($this->vars[$var])) {
@@ -32,7 +34,6 @@ class Page extends ApplicationComponent
 		}
 		
 		$user = $this->app->user();
-		
 		extract($this->vars);
      
 		ob_start();

@@ -47,8 +47,8 @@
 									<select id="session" name="session" class="form-control selectpicker">
 										<?php
 										foreach ($sessions as $session) {
-											$selected = isset($classe) && $classe->session() == $session['id'] ? "selected" : "";
-											echo '<option value="'.$session['id'].'" '.$selected.'>'.$session->session().'</option>';
+											$selected = isset($classe) && $classe->session()->id() == $session['id'] ? "selected" : "";
+											echo '<option value="'.base64_encode(serialize($session)).'" '.$selected.'>'.$session->session().'</option>';
 										}
 										?>
 									</select>
@@ -68,7 +68,7 @@
 										<?php
 										foreach ($sections as $section) {
 											$selected = isset($classe) && $classe->section() == $section['id'] ? "selected" : "";
-											echo '<option value="'.$section['id'].'" '.$selected.'>'.$section->libelle().'</option>';
+											echo '<option value="'.base64_encode(serialize($section)).'" '.$selected.'>'.$section->libelle().'</option>';
 										}
 										?>
 									</select>
