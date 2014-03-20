@@ -821,7 +821,7 @@ BEGIN
 		FROM user
 		WHERE username = login AND password = passwd;
 		IF actif THEN
-			SELECT id,  EZ user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
+			SELECT id, user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
 		ELSE
 			SELECT "ERR3" AS "message";
 		END IF;
