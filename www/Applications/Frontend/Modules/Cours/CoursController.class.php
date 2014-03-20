@@ -55,6 +55,7 @@ class CoursController extends \Library\BackController {
 			$this->page->addVar('class_cours', 'active');
 			$this->page->addVar('class_'.$classe->id().'_cl', 'active');
 			$this->page->addVar('classe', $classe);
+			$this->page->addVar('listeMatiere', $classe->matieres());
 		}
 		else
 		{

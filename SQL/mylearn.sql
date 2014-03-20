@@ -823,9 +823,6 @@ BEGIN
 		FROM user
 		WHERE username = login AND password = passwd;
 		IF actif THEN
-<<<<<<< HEAD
-			SELECT id, user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
-=======
 			SELECT false AS "erreur";
 			SELECT id, user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
 			IF (SELECT COUNT(*) FROM administrateur WHERE id_u = id) > 0 THEN
@@ -978,7 +975,6 @@ BEGIN
 		IF (MONTH(CURDATE()) < 8 AND SUBSTR(session,1,4) < YEAR(CURDATE())) OR (MONTH(CURDATE()) > 8 AND SUBSTR(session,1,4) <= YEAR(CURDATE())) THEN
 			SELECT false AS "erreur";
 			CALL select_class(id);
->>>>>>> FETCH_HEAD
 		ELSE
 			SELECT true AS "erreur";
 			SELECT "On ne peut prÃ©dire l'avenir" AS "Message";

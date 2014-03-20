@@ -31,7 +31,7 @@
 	$i = 0;
 	$listeMatiere = $classe->matieres();
 	if(isset($listeMatiere) && is_array($listeMatiere))
-	{	
+	{
 		foreach ($listeMatiere as $matiere) {
 	?>
 	<div class="span3">
