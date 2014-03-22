@@ -157,25 +157,6 @@ CREATE TABLE IF NOT EXISTS section
  ) 
  comment = "";
 # -----------------------------------------------------------------------------
-#       TABLE : gestionnaire
-# -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS gestionnaire
- (
-   id_u INTEGER(2) NOT NULL
-   , PRIMARY KEY (id_u) 
- ) 
- comment = "";
-# -----------------------------------------------------------------------------
-#       TABLE : gerer
-# -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS gerer
- (
-   id_u INTEGER(2) NOT NULL  ,
-   id_classe INTEGER(2) NOT NULL
-   , PRIMARY KEY (id_u) 
- ) 
-comment = "";
-# -----------------------------------------------------------------------------
 #       TABLE : classe
 # -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS classe
@@ -200,7 +181,8 @@ CREATE TABLE IF NOT EXISTS cours
    description VARCHAR(128) NULL  ,
    contenu TEXT NULL  ,
    dateAjout DATETIME NULL  ,
-   dateModif DATETIME NULL  
+   dateModif DATETIME NULL  ,
+   vues INTEGER
    , PRIMARY KEY (id_cours) 
  ) 
  comment = "";
@@ -231,6 +213,7 @@ CREATE TABLE IF NOT EXISTS histo_cours
    contenu TEXT NULL  ,
    dateAjout DATETIME NULL  ,
    dateModif DATETIME NULL  ,
+   vues INTEGER  ,
    dateHisto DATETIME NULL
    , PRIMARY KEY (id_cours) 
  ) 
@@ -316,18 +299,6 @@ ALTER TABLE etre
 ADD FOREIGN KEY FK_etre_classe (id_classe)
     REFERENCES classe (id_classe)
        ON DELETE CASCADE ;
-ALTER TABLE gestionnaire 
-  ADD FOREIGN KEY FK_gestionnaire_user (id_u)
-      REFERENCES user (id_u)
-         ON DELETE CASCADE ;
-ALTER TABLE gerer 
-  ADD FOREIGN KEY FK_gerer_gestionnaire (id_u)
-      REFERENCES gestionnaire (id_u)
-         ON DELETE CASCADE ;
-ALTER TABLE gerer 
-  ADD FOREIGN KEY FK_gerer_classe (id_classe)
-      REFERENCES classe (id_classe)
-         ON DELETE CASCADE ;
 ALTER TABLE classe 
   ADD FOREIGN KEY FK_classe_session (id_session)
       REFERENCES session (id_session)
@@ -408,12 +379,12 @@ Delimiter @@
 CREATE PROCEDURE archiver_cours(sess INTEGER)
 BEGIN
 Declare fini int default 0;
-Declare cours, matiere, classe, user INTEGER(2);
+Declare cours, matiere, classe, user, vue INTEGER(2);
 Declare titre, description VARCHAR(128);
 Declare contenu TEXT;
 Declare dateAjout, dateModif DATETIME;
 Declare curc CURSOR
-  FOR SELECT co.id_cours, co.id_m, co.id_classe, co.id_u, co.titre, co.description, co.contenu, co.dateAjout, co.dateModif
+  FOR SELECT co.id_cours, co.id_m, co.id_classe, co.id_u, co.titre, co.description, co.contenu, co.dateAjout, co.dateModif, co.vues
     FROM cours co
     INNER JOIN classe cl ON co.id_classe = cl.id_classe
     INNER JOIN session s ON cl.id_session = s.id_session
@@ -421,14 +392,14 @@ Declare curc CURSOR
 Declare continue HANDLER
   FOR NOT FOUND SET fini = 1;
 Open curc;
-FETCH curc INTO cours, matiere, classe, user, titre, description, contenu, dateAjout, dateModif;
+FETCH curc INTO cours, matiere, classe, user, titre, description, contenu, dateAjout, dateModif, vue;
 
 While fini != 1
   DO
-  INSERT INTO histo_cours VALUES(cours, matiere, classe, user, titre, description, contenu, dateAjout, dateModif, sysdate());
+  INSERT INTO histo_cours VALUES(cours, matiere, classe, user, titre, description, contenu, dateAjout, dateModif, vue, sysdate());
   DELETE FROM vers_cours WHERE id_cours = cours;
   DELETE FROM cours WHERE id_cours = cours;
-  FETCH curc INTO cours, matiere, classe, user, titre, contenu, description, dateAjout, dateModif;
+  FETCH curc INTO cours, matiere, classe, user, titre, contenu, description, dateAjout, dateModif, vue;
 END While;
 Close curc;
 END @@
@@ -556,21 +527,6 @@ FOR EACH ROW
 BEGIN
   DELETE FROM user
   WHERE id_u = old.id_u;
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : ajouter_gest()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE ajouter_gest(id INTEGER(2))
-BEGIN
-  # Vérifier qu'il s'agit d'un élève
-  # Vérifions que l'admin n'est pas bête au point de faire des doublons
-  IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON e.id_u = u.id_u WHERE u.id_u = id) = 1 AND (SELECT COUNT(*) FROM gestionnaire WHERE id_u = id) < 1
-  THEN
-    # Insertion de l'élève dans la table USER
-    INSERT INTO gestionnaire VALUES(id);
-  END IF;
 END @@
 
 # -----------------------------------------------------------------------------
@@ -790,7 +746,6 @@ END @@
 # -----------------------------------------------------------------------------
 #       PROCEDURE : connexion()
 # -----------------------------------------------------------------------------
-Delimiter @@
 
 CREATE PROCEDURE connexion(login VARCHAR(128), pass VARCHAR(128))
 BEGIN
@@ -954,7 +909,6 @@ END @@
 # -----------------------------------------------------------------------------
 #       PROCEDURE : select_class_session_user()
 # -----------------------------------------------------------------------------
-DELIMITER @@
 
 CREATE PROCEDURE select_class_session_user(classe VARCHAR(128), session VARCHAR(128), user INTEGER)
 BEGIN
@@ -1008,7 +962,7 @@ BEGIN
 	FROM cours
 	WHERE id_cours = cours;
 	
-	SELECT id_cours AS id, titre, contenu, dateAjout, dateModif
+	SELECT id_cours AS id, titre, description, contenu, dateAjout, dateModif
 	FROM cours
 	WHERE id_cours = cours;
 	
@@ -1029,7 +983,66 @@ BEGIN
 	FROM classe cl
 	INNER JOIN cours c ON c.id_classe = cl.id_classe
 	WHERE c.id_cours = cours;
-	CALL select_class(classe);	
+	CALL select_class(classe);
+	
+	# Commentaires
+	CALL select_cours_com(cours);
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_cours_com()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE select_cours_com(cours INTEGER)
+BEGIN
+	# Déclaration
+	Declare fini int default 0;
+	Declare user INTEGER;
+	Declare dateCom DATETIME;
+	
+	# Curseur
+	Declare cur1 CURSOR
+	FOR SELECT id_u, dateCommentaire
+		FROM commenter
+		WHERE id_cours = cours
+		ORDER BY dateCommentaire;
+		
+	# Gestionnaire d'erreur
+	Declare continue HANDLER
+		FOR NOT FOUND SET fini = 1;
+	
+	# Nombre de cours
+	SELECT COUNT(*) AS "Commentaires"
+	FROM commenter
+	WHERE id_cours = cours;
+	
+	# Ouverture du curseur
+	Open cur1;
+	FETCH cur1 INTO user,dateCom;
+	WHILE fini != 1	DO
+		CALL select_com(user,cours,dateCom);
+		FETCH cur1 INTO user,dateCom;
+	END WHILE;
+	Close cur1;
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_comm()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE select_com(user INTEGER, cours INTEGER, dateComm DATETIME)
+BEGIN
+	# Commentaire
+	SELECT id_cours AS cours, dateCommentaire, commentaire
+	FROM commenter
+	WHERE id_cours = cours
+	AND id_u = user
+	AND dateCommentaire = dateComm;
+	
+	# Auteur
+	SELECT id_u AS id, username, nom, prenom, email, dateUser
+	FROM user
+	WHERE id_u = user;
 END @@
 
 # -----------------------------------------------------------------------------
@@ -1068,6 +1081,69 @@ BEGIN
 	Close cur1;
 END @@
 
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_cours_unique_classe_matiere()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE select_cours_unique_classe_matiere(cours VARCHAR(1024), classe INTEGER, matiere INTEGER)
+BEGIN
+	# Déclaration
+	Declare id INTEGER;
+	Declare no_cours CONDITION FOR 1329;
+	Declare EXIT HANDLER FOR no_cours
+	BEGIN
+		SELECT true AS "erreur";
+		SELECT "Cours inexistant" AS "Message";
+	END;
+	
+	SELECT id_cours INTO id
+	FROM cours
+	WHERE id_classe = classe
+	AND id_m = matiere
+	AND titre = cours;
+	
+	SELECT false AS "erreur";
+	
+	CALL select_cours(id);
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_cours_classe_matiere()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE select_cours_classe_matiere(classe INTEGER, matiere INTEGER)
+BEGIN
+	# Déclaration
+	Declare fini int default 0;
+	Declare id INTEGER;
+	
+	# Curseur
+	Declare cur1 CURSOR
+	FOR SELECT c.id_cours
+		FROM cours c
+		WHERE id_classe = classe
+		AND id_m = matiere;
+		
+	# Gestionnaire d'erreur
+	Declare continue HANDLER
+		FOR NOT FOUND SET fini = 1;
+	
+	# Nombre de cours
+	SELECT COUNT(*) AS "Cours"
+	FROM cours
+	WHERE id_classe = classe
+	AND id_m = matiere;
+	
+	# Ouverture du curseur
+	Open cur1;
+	FETCH cur1 INTO id;
+	WHILE fini != 1	DO
+		CALL select_cours(id);
+		FETCH cur1 INTO id;
+	END WHILE;
+	Close cur1;
+END @@
+
 Delimiter ;
 
 
@@ -1085,7 +1161,66 @@ Delimiter ;
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 # /////////////////////////////////////////////////////////////////////////////
 
+# Ajout d'un admin
 CALL ajouter_admin("admin", "admin", "admin", "admin@domain.tld","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "administrateur");
+
+# Ajout d'un professeur
+CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);
+
+# Ajout des élèves
+CALL ajouter_eleve("amenebhi", "Menebhi", "Adam", "adam.menebhi@gmail","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "0000-00-00");
+CALL ajouter_eleve("psoubrane", "Soubrane", "Paul", "paul.sourbane@gmail","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "0000-00-00");
+CALL ajouter_eleve("tdelgorge", "Delgorge", "Tony", "cours.tony@gmail","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "0000-00-00");
+
+# Matieres
+INSERT INTO matiere VALUES("","MathÃ©matiques","fa fa-superscript"),
+("","SLAM 4","fa fa-code"),
+("","SLAM 3","fa fa-cogs"),
+("","Droit","fa fa-gavel"),
+("","FranÃ§ais","fa fa-book"),
+("","SI7","fa fa-sitemap");
+
+# Ajout automatique de la première session
+CALL ajouter_session("2012/2013");
+CALL ajouter_session("2013/2012");
+
+# Ajout de section
+INSERT INTO section values("",1,"BTS SIO");
+
+# Ajout de classe
+INSERT INTO classe VALUES("",1,1,"SIO 1 LM"),
+("",1,1,"SIO 1 JV"),
+("",2,1,"SIO 2 LM"),
+("",2,1,"SIO 2 JV");
+
+# Assignation des matières aux classes
+INSERT INTO assigner VALUES(1,1),
+(2,1),
+(3,1),
+(4,1),
+(5,1),
+(6,1),
+(1,2),
+(2,2),
+(3,2),
+(4,2),
+(5,2),
+(6,2);
+
+# Assignation de professeur aux classes
+INSERT INTO charger VALUES(1,2),
+(2,2),
+(3,2),
+(4,2);
+
+# Assignation d'élève aux classes
+INSERT INTO etre VALUES(3,1),
+(3,3),
+(4,1),
+(4,3),
+(5,1),
+(5,3);
+
 /*
 INSERT INTO matiere VALUES("", "MatiÃ¨re", "fa fa-cog");
 CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);
