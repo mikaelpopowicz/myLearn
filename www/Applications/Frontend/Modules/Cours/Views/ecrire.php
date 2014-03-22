@@ -48,8 +48,8 @@
 							<?php
 							if(isset($matieres) && is_array($matieres)) {
 								foreach ($matieres as $matiere) {
-									$seleted = isset($cours['matiere']) && $cours['matiere'] == $matiere['id'] ? "selected" : "";
-									echo "<option value='".$matiere['id']."' ".$seleted.">".$matiere['libelle']."</option>";
+									$seleted = isset($cours) && $cours->matiere()->id() == $matiere['id'] ? "selected" : "";
+									echo "<option value='".base64_encode(serialize($matiere))."' ".$seleted.">".$matiere['libelle']."</option>";
 								}
 							}
 							?>

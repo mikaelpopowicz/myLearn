@@ -17,13 +17,19 @@
 				/
 			</li>
 			<li>
-				<a href="/cours/<?php echo $matiere;?>" class="primary-color"><?php echo $matiere;?></a>
+				<a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()));?>" class="primary-color"><?php echo $cours->classe()->libelle()." - Session ".$cours->classe()->session()->session();?></a>
 			</li>
 			<li class="primary-color">
 				/
 			</li>
 			<li>
-				<?php echo $cours['titre'];?>
+				<a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()))."/".$key->uriEncode($cours->matiere()->libelle());?>" class="primary-color"><?php echo $cours->matiere()->libelle();?></a>
+			</li>
+			<li class="primary-color">
+				/
+			</li>
+			<li>
+				<?php echo $cours->titre();?>
 			</li>
 		</ul>
 	</div>
@@ -35,18 +41,18 @@
 				<!--begin primary-column-->
 				<article class="entry-post">
 					<header class="entry-header">
-						<h1 class="primary-color"><?php echo $cours['titre'];?></h1>
+						<h1 class="primary-color"><?php echo $cours->titre();?></h1>
 						<div class="byline">
-							<i class="e-icon-pencil"></i> <?php echo ucfirst($cours['auteur']);?> &nbsp;&nbsp; <i class="e-icon-clock"></i> <abbr class="published" title="<?php echo "Le ".$cours['dateAjout']->format('d/m/Y à H\hi');?>"><?php echo $cours['dateAjout']->format('d/m/Y');?></abbr> &nbsp;&nbsp; <a href="#view-comments" class="scrollto"><i class="e-icon-chat"></i> <?php echo count($comments)?> comments</a>
+							<i class="e-icon-pencil"></i> <?php echo ucfirst($cours->auteur()->nom()).' '.ucfirst($cours->auteur()->prenom());?> &nbsp;&nbsp; <i class="e-icon-clock"></i> <abbr class="published" title="<?php echo "Le ".$cours['dateAjout']->format('d/m/Y à H\hi');?>"><?php echo $cours['dateAjout']->format('d/m/Y');?></abbr> &nbsp;&nbsp; <a href="#view-comments" class="scrollto"><i class="e-icon-chat"></i> <?php echo count($cours->commentaires())?> commentaire<?php echo count($cours->commentaires()) > 1 ? "s" : "";?></a>
 						</div>
 						<div class="entry-meta">
-							<i class="e-icon-folder"></i> <a href="/cours/<?php echo $matiere;?>"><?php echo $matiere;?></a>
+							<i class="e-icon-folder"></i> <a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()))."/".$key->uriEncode($cours->matiere()->libelle());?>"><?php echo $cours->matiere()->libelle();?></a>
 						</div>
 					</header>
 					<!--end entry-header-->
 								
 					<div class="entry-content">
-						<?php echo $cours['contenu'];?>
+						<?php echo $cours->contenu();?>
 					</div>
 					<!--end entry-content-->
 								
@@ -66,27 +72,22 @@
 				<br><br>
 				<!--begin comments section-->
 				<section id="view-comments" class="entry-comments clearfix">
-					<h3 class="short_headline"><span><?php echo count($comments)?> Commentaires <a href="#comment-form" class="scrollto"> &middot; Faire un commentaire</a></span></h3>
+					<h3 class="short_headline"><span><?php echo count($cours->commentaires())?> Commentaires <a href="#comment-form" class="scrollto"> &middot; Faire un commentaire</a></span></h3>
 					<!--begin comments-->
 					<ul>
 						<?php
-						if(isset($comments) && count($comments) > 0) {
+						$comments = $cours->commentaires();
+						if(isset($comments) && is_array($comments) && count($comments) > 0) {
 							foreach($comments as $comment) {
-								$test = $byteController->getUnique($comment['auteur']);
-								//echo '<pre>';print_r($test);echo '</pre>';
 						?>
 						<!--grand parent-->
 						<li id="comment-1"><!--parent-->
 							<footer class="comment-meta">
-								<a href="#" rel="external nofollow" title="<?php echo ucfirst($byteController->getUnique($comment['auteur'])['username']);?>">
-									<img alt="<?php echo $byteController->getUnique($comment['auteur'])['username'];?>" src="/demo/kathy.jpg" class="avatar" />
-								</a>
+								<img alt="<?php echo ucfirst($comment->auteur()->nom()).' '.ucfirst($comment->auteur()->prenom());?>" src="/images/avatars/default.png" class="avatar" />
 								<div class="comment-meta">
 									<span class="comment-author vcard">
 										<cite title="LinkURLofauthor">
-											<a href="#" title="Kathy" class="url" rel="external nofollow">
-												<?php echo ucfirst($byteController->getUnique($comment['auteur'])['username']);?>
-											</a>
+											<?php echo ucfirst($comment->auteur()->nom()).' '.ucfirst($comment->auteur()->prenom());?>
 										</cite>
 									</span>
 									<time class="published">
@@ -111,35 +112,14 @@
 					
 					<!-- Begin Comments Form -->
 					<div id="comment-form">
-						<?php
-						if($user->isAuthenticated()) {
-							$nameValue = $user->getAttribute('username');
-							$emailValue = $user->getAttribute('email');
-						?>
 						<h3>Laisser un commentaire</h3>
-						<p>Les champs marqués du signe <span class="text-error">*</span> sont obligatoires.</p>
 						<form class="comment_form" method="post">
-								<span class="inputwrapper name">
-									<label for="name"><span class="text-error">*</span> Votre nom ou pseudo:</label>
-									<input type="text" id="name" name="name" value="<?php echo $nameValue;?>" readonly />
-								</span>
-								<span class="inputwrapper email">
-									<label for="email"><span class="text-error">*</span> Email:</label>
-									<input type="email" id="email" name="email" value="<?php echo $emailValue;?>" readonly />
-								</span>
 								<span class="inputwrapper">
 									<label for="message">Message :</label>
 									<textarea name="message" id="message" rows="5" cols="30" ></textarea>
-									<input type="hidden" value="<?php echo $user->getAttribute('id');?>" name="byte" />
 								</span>
-
 							<input type="submit" value="Envoyer message" class="btn btn-primary" name="comment" />
 						</form>
-						<?php
-						} else {
-							echo "<h2 class='text-error'>Vous devez être connecté pour laisser un commentaire</h2>";
-						}
-						?>
 					</div>
 					<!-- End Comment Form -->
 					

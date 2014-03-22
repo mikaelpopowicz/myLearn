@@ -74,4 +74,13 @@ abstract class BackController extends ApplicationComponent
 		
 		$this->page->setContentFile(__DIR__.'/../Applications/'.$this->app->name().'/Modules/'.$this->module.'/Views/'.$this->view.'.php');
 	}
+	
+	public function updateUserAttribute($user)
+	{
+		$this->app->user()->setAttribute('id', $user->id());
+		$this->app->user()->setAttribute('username', $user->username());
+		$this->app->user()->setAttribute('nom', $user->nom());
+		$this->app->user()->setAttribute('prenom', $user->prenom());
+		$this->app->user()->setAttribute('email', $user->email());
+	}
 }

@@ -22,13 +22,13 @@
 			<div class="span3">
 				<ul class="nav nav-pills nav-stacked">
 					<li class="<?php echo isset($class_profil) ? $class_profil : "";?>">
-						<a href="/membre/mon-profil">Mes informations</a>
+						<a href="/mon-compte">Mes informations</a>
 					</li>
 					<li class="<?php echo isset($class_mes_cours) ? $class_mes_cours : "";?>">
-						<a href="/membre/mes-cours">Mes cours</a>
+						<a href="/mon-compte/mes-cours">Mes cours</a>
 					</li>
 					<li class="<?php echo isset($class_config) ? $class_config : "";?>">
-						<a href="/membre/ma-configuration">Configuration</a>
+						<a href="/mon-compte/configuration">Configuration</a>
 					</li>
 				</ul>
 			</div>
@@ -56,8 +56,11 @@
 						<th><input type="checkbox" name="checkAll" id="checkAll"></th>
 						<th width="300">Nom</th>
 						<th>Matière</th>
-						<th>Vues</th>
-						<th>Commentaires</th>
+						<th>Dernière modification</th>
+						<th><i class="fa fa-eye fa-lg"></i></th>
+						<th><i class="fa fa-comments-o fa-lg"></i></th>
+						<th>Classe</th>
+						<th>Session</th>
 					</tr>
 				</thead>
 				<tbody id="tabs">
@@ -65,13 +68,16 @@
 					if(isset($listeCours) && is_array($listeCours) && !empty($listeCours)) {
 						foreach($listeCours as $cours) {
 							echo "<tr>";
-							echo "<td><input type='checkbox' name='check[]' value='".$cours['id']."'></td>";
+							echo "<td><input type='checkbox' name='check[]' value='".$cours->id()."'></td>";
 							?>
-							<td id='click' onclick="document.location='/cours/<?php echo $cours['matiere'];?>/<?php echo $cours['id']?>'"><?php echo $cours['titre'];?></td>
+							<td id='click' onclick="document.location='/cours/<?php echo str_replace('/','-',$cours->classe()->session()->session())."/".urlencode(str_replace(' ','-',$cours->classe()->libelle()))."/".$key->uriEncode($cours->matiere()->libelle())."/".$key->uriEncode($cours->titre());?>'"><?php echo $cours->titre();?></td>
 							<?php
-							echo "<td>".$cours['matiere']."</td>";
-							echo "<td>".$count->getCount($cours['id'])['count_c']."</td>";
-							echo "<td>".$manC->getCountOf($cours['id'])."</td>";
+							echo "<td>".$cours->matiere()->libelle()."</td>";
+							echo "<td>".$cours->dateModif()->format('d/m/Y à H:i')."</td>";
+							echo "<td></td>";
+							echo "<td>".count($cours->commentaires())."</td>";
+							echo "<td>".$cours->classe()->libelle()."</td>";
+							echo "<td>".$cours->classe()->session()->session()."</td>";
 							echo "</tr>";
 						}
 					}

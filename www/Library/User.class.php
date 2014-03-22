@@ -30,6 +30,10 @@ class User extends ApplicationComponent
    
 	public function setAttribute($attr, $value)
 	{
+		if(isset($_SESSION[$attr]))
+		{
+			unset($_SESSION[$attr]);
+		}
 		$_SESSION[$attr] = $value;
 	}
    

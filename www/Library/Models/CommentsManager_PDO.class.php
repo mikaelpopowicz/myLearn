@@ -7,9 +7,9 @@ class CommentsManager_PDO extends CommentsManager
 {
 	public function add(Comment $comment)
 	{
-		$q = $this->dao->prepare('INSERT INTO comments SET id_c = :cours, id_u = :auteur, commentaire = :commentaire, dateCommentaire = NOW()');
-		$q->bindValue(':cours', $comment->cours());
-		$q->bindValue(':auteur', $comment->auteur());
+		$q = $this->dao->prepare('INSERT INTO commenter SET id_cours = :cours, id_u = :auteur, commentaire = :commentaire, dateCommentaire = sysdate()');
+		$q->bindValue(':cours', $comment->cours()->id());
+		$q->bindValue(':auteur', $comment->auteur()->id());
 		$q->bindValue(':commentaire', $comment->commentaire());
 		$q->execute();
 	}

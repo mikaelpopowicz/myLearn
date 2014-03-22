@@ -25,6 +25,10 @@ class ConnexionController extends \Library\BackController
 					$this->app->user()->setAuthenticated(true);
 					$this->app->user()->setAttribute('username', $user['user']['username']);
 					$this->app->user()->setAttribute('id', $user['user']['id']);
+					$this->app->user()->setAttribute('nom', $user['user']['nom']);
+					$this->app->user()->setAttribute('prenom', $user['user']['prenom']);
+					$this->app->user()->setAttribute('email', $user['user']['email']);
+					$this->app->user()->setAttribute('dateUser', base64_encode(serialize($user['user']['dateUser'])));
 					$this->app->user()->setAttribute('status', $user['statut']);
 					if(isset($user['classes']) && is_array($user['classes']))
 					{
@@ -34,6 +38,7 @@ class ConnexionController extends \Library\BackController
 				} else {
 					$this->page->addVar('erreurs', array($user['Type'], $user['Message']));
 				}
+				sleep(2);
 	 		}
 	 	}
 	}

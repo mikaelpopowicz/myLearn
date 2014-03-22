@@ -10,6 +10,7 @@ abstract class Application
 	protected $config;
 	protected $key;
 	protected $mail;
+	protected $message;
    
 	public function __construct($name = "")
 	{
@@ -19,6 +20,7 @@ abstract class Application
 		$this->user = new User($this);
 		$this->config = new Config($this);
 		$this->key = new Keygen($this);
+		$this->message = new Message($this);
 	}
    
 	public function getController()
@@ -102,5 +104,9 @@ abstract class Application
 
 	public function mail() {
 		return $this->mail;
+	}
+	
+	public function message() {
+		return $this->message;
 	}
 }

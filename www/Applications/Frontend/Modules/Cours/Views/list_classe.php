@@ -51,10 +51,6 @@
 			}
 		}
 	}
-	else
-	{
-		echo "<br/><br/><br/><br/><h3 class='text-warning'>Désole, il n'y a pas encore de matières sélectionnées pour votre classe</h3><br/><br/><br/><br/>";
-	}
 	?>
 	</div><!--/row-fluid-->
 </div>

@@ -7,7 +7,7 @@
 			if(isset($matieres) && is_array($matieres)) {
 				foreach($matieres as $mat) {
 					$active = $mat->id() == $matiere->id() ? "active" : "";
-					echo "<li class='".$active."'><a href='/cours/".str_replace('/','-',$classe->session()->session())."/".urlencode(str_replace(' ','-',$classe->libelle()))."/".str_replace(' ','-',$mat->libelle())."'>".$mat['libelle']."</a>";
+					echo "<li class='".$active."'><a href='/cours/".str_replace('/','-',$classe->session()->session())."/".urlencode(str_replace(' ','-',$classe->libelle()))."/".$key->uriEncode($mat->libelle())."'>".$mat['libelle']."</a>";
 				}
 			}
 			?>

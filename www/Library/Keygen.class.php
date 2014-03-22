@@ -98,4 +98,14 @@ class Keygen extends ApplicationComponent
 		return $decrypted;
 	}
 	
+	
+	public function uriEncode($str)
+	{
+		return urlencode(str_replace(' ','_',$str));
+	}
+	
+	public function uriDecode($str)
+	{
+		return str_replace('_',' ',urldecode($str));
+	}
 }

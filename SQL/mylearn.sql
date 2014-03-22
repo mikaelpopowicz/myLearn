@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS classe
 # -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS cours
  (
-   id_cours INTEGER(2) NOT NULL  ,
+   id_cours INTEGER(2) NOT NULL AUTO_INCREMENT ,
    id_m INTEGER(2) NOT NULL  ,
    id_classe INTEGER(2) NOT NULL  ,
    id_u INTEGER(2) NOT NULL  ,
@@ -846,7 +846,10 @@ END @@
 # -----------------------------------------------------------------------------
 #       PROCEDURE : select_classes()
 # -----------------------------------------------------------------------------
-
+/*
+	Cherche toutes les classes ou toutes les classes dans lesquelle est UN élève
+	et dont la session max est celle actuelle
+*/
 CREATE PROCEDURE select_classes(user INTEGER)
 BEGIN
 	# Déclaration
@@ -932,7 +935,8 @@ BEGIN
 	SELECT m.id_m AS id, m.libelle, m.icon
 	FROM matiere m
 	INNER JOIN assigner a ON m.id_m = a.id_m
-	WHERE a.id_classe = classe;
+	WHERE a.id_classe = classe
+	ORDER BY m.libelle;
 	
 	SELECT u.id_u AS id, u.nom, u.prenom
 	FROM user u
@@ -981,8 +985,87 @@ BEGIN
 		END IF;
 	ELSE
 		SELECT true AS "erreur";
-		SELECT "Vous ne pouvez accÃ©der Ã cette classe" AS "Message";
+		SELECT "Vous ne pouvez accÃ©der Ã  cette classe" AS "Message";
 	END IF;
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_cours()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE select_cours(cours INTEGER)
+BEGIN
+	Declare classe INTEGER;
+	Declare id INTEGER;
+	DECLARE no_cours CONDITION FOR 1329;
+	DECLARE EXIT HANDLER FOR no_cours
+	BEGIN
+		SELECT "Ce cours n'existe pas" AS "Message";
+	END;
+	
+	# Cours
+	SELECT id_cours INTO id
+	FROM cours
+	WHERE id_cours = cours;
+	
+	SELECT id_cours AS id, titre, contenu, dateAjout, dateModif
+	FROM cours
+	WHERE id_cours = cours;
+	
+	# Matière
+	SELECT m.id_m AS id, m.libelle
+	FROM matiere m
+	INNER JOIN cours c ON c.id_m = m.id_m
+	WHERE c.id_cours = cours;
+	
+	# Auteur
+	SELECT u.id_u AS id, u.username, u.nom, u.prenom, u.email, u.dateUser
+	FROM user u
+	INNER JOIN cours c ON c.id_u = u.id_u
+	WHERE c.id_cours = cours;
+	
+	# Classe
+	SELECT cl.id_classe INTO classe
+	FROM classe cl
+	INNER JOIN cours c ON c.id_classe = cl.id_classe
+	WHERE c.id_cours = cours;
+	CALL select_class(classe);	
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_cours_auteur()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE select_cours_auteur(user INTEGER)
+BEGIN
+	# Déclaration
+	Declare fini int default 0;
+	Declare id INTEGER;
+	
+	# Curseur
+	Declare cur1 CURSOR
+	FOR SELECT c.id_cours
+		FROM cours c
+		INNER JOIN user u ON u.id_u = c.id_u
+		WHERE u.id_u = user;
+		
+	# Gestionnaire d'erreur
+	Declare continue HANDLER
+		FOR NOT FOUND SET fini = 1;
+	
+	# Nombre de cours
+	SELECT COUNT(*) AS "Cours"
+	FROM cours
+	WHERE id_u = user;
+	
+	# Ouverture du curseur
+	Open cur1;
+	FETCH cur1 INTO id;
+	WHILE fini != 1	DO
+		CALL select_cours(id);
+		FETCH cur1 INTO id;
+	END WHILE;
+	Close cur1;
 END @@
 
 Delimiter ;
