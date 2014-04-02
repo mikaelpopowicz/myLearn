@@ -1,253 +1,59 @@
-drop procedure if exists select_cours;
-drop procedure if exists select_com;
-drop procedure if exists select_cours_com;
-drop procedure if exists select_cours_auteur;
-drop procedure if exists select_cours_classe_matiere;
-drop procedure if exists select_cours_unique_classe_matiere;
-drop procedure if exists select_class;
+drop procedure if exists activation;
+drop table if exists errors;
 
 #INSERT INTO cours SET id_m = 1, id_classe = 1, id_u = 2, titre = "Arithmétique", description = "Super cours de maths", contenu = "pas encore de contenu", dateAjout = curdate(), dateModif = curdate();
 
+# -----------------------------------------------------------------------------
+#       TABLE : errors
+# -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS errors
+ (
+   code VARCHAR(10) NOT NULL  ,
+   message VARCHAR(128) NOT NULL  ,
+   type VARCHAR(10) NOT NULL
+   , PRIMARY KEY (code) 
+ ) 
+ comment = "";
+ DELETE FROM errors;
+INSERT INTO errors VALUES("OP_S","Opération réussie","success"),
+("OP_F","Opération echouée","error"),
+("LOG_WP","Erreur de saisie identidiant/mot de passe","danger"),
+("LOG_NA","Votre compte n'est pas encore activÃ©","warning"),
+("ACT_WT","Une erreur s'est produite, veuillez recommencer la procÃ©dure d'activation","error"),
+("ACT_AA","Ce compte est dÃ©jà activÃ©","warning"),
+("ACT_S","Activation rÃ©ussie","success");
+
 Delimiter @@
 
+
 # -----------------------------------------------------------------------------
-#       PROCEDURE : select_cours()
+#       PROCEDURE : activation()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE select_cours(cours INTEGER)
+CREATE PROCEDURE activation(oldtk VARCHAR(40), newtk VARCHAR(40))
 BEGIN
-	Declare classe INTEGER;
 	Declare id INTEGER;
-	DECLARE no_cours CONDITION FOR 1329;
-	DECLARE EXIT HANDLER FOR no_cours
-	BEGIN
-		SELECT "Ce cours n'existe pas" AS "Message";
-	END;
-	
-	# Cours
-	SELECT id_cours INTO id
-	FROM cours
-	WHERE id_cours = cours;
-	
-	SELECT id_cours AS id, titre, description, contenu, dateAjout, dateModif
-	FROM cours
-	WHERE id_cours = cours;
-	
-	# Matière
-	SELECT m.id_m AS id, m.libelle
-	FROM matiere m
-	INNER JOIN cours c ON c.id_m = m.id_m
-	WHERE c.id_cours = cours;
-	
-	# Auteur
-	SELECT u.id_u AS id, u.username, u.nom, u.prenom, u.email, u.dateUser
-	FROM user u
-	INNER JOIN cours c ON c.id_u = u.id_u
-	WHERE c.id_cours = cours;
-	
-	# Classe
-	SELECT cl.id_classe INTO classe
-	FROM classe cl
-	INNER JOIN cours c ON c.id_classe = cl.id_classe
-	WHERE c.id_cours = cours;
-	CALL select_class(classe);
-	
-	# Commentaires
-	CALL select_cours_com(cours);
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : select_cours_com()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE select_cours_com(cours INTEGER)
-BEGIN
-	# Déclaration
-	Declare fini int default 0;
-	Declare user INTEGER;
-	Declare dateCom DATETIME;
-	
-	# Curseur
-	Declare cur1 CURSOR
-	FOR SELECT id_u, dateCommentaire
-		FROM commenter
-		WHERE id_cours = cours
-		ORDER BY dateCommentaire;
-		
-	# Gestionnaire d'erreur
-	Declare continue HANDLER
-		FOR NOT FOUND SET fini = 1;
-	
-	# Nombre de cours
-	SELECT COUNT(*) AS "Commentaires"
-	FROM commenter
-	WHERE id_cours = cours;
-	
-	# Ouverture du curseur
-	Open cur1;
-	FETCH cur1 INTO user,dateCom;
-	WHILE fini != 1	DO
-		CALL select_com(user,cours,dateCom);
-		FETCH cur1 INTO user,dateCom;
-	END WHILE;
-	Close cur1;
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : select_comm()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE select_com(user INTEGER, cours INTEGER, dateComm DATETIME)
-BEGIN
-	# Commentaire
-	SELECT id_cours AS cours, dateCommentaire, commentaire
-	FROM commenter
-	WHERE id_cours = cours
-	AND id_u = user
-	AND dateCommentaire = dateComm;
-	
-	# Auteur
-	SELECT id_u AS id, username, nom, prenom, email, dateUser
+	Declare actif INTEGER;
+	SELECT id_u, active INTO id,actif
 	FROM user
-	WHERE id_u = user;
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : select_cours_auteur()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE select_cours_auteur(user INTEGER)
-BEGIN
-	# Déclaration
-	Declare fini int default 0;
-	Declare id INTEGER;
+	WHERE token = oldtk;
 	
-	# Curseur
-	Declare cur1 CURSOR
-	FOR SELECT c.id_cours
-		FROM cours c
-		INNER JOIN user u ON u.id_u = c.id_u
-		WHERE u.id_u = user;
-		
-	# Gestionnaire d'erreur
-	Declare continue HANDLER
-		FOR NOT FOUND SET fini = 1;
-	
-	# Nombre de cours
-	SELECT COUNT(*) AS "Cours"
-	FROM cours
-	WHERE id_u = user;
-	
-	# Ouverture du curseur
-	Open cur1;
-	FETCH cur1 INTO id;
-	WHILE fini != 1	DO
-		CALL select_cours(id);
-		FETCH cur1 INTO id;
-	END WHILE;
-	Close cur1;
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : select_cours_unique_classe_matiere()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE select_cours_unique_classe_matiere(cours VARCHAR(1024), classe INTEGER, matiere INTEGER)
-BEGIN
-	# Déclaration
-	Declare id INTEGER;
-	Declare no_cours CONDITION FOR 1329;
-	Declare EXIT HANDLER FOR no_cours
-	BEGIN
+	IF id IS NULL OR id = 0 THEN
 		SELECT true AS "erreur";
-		SELECT "Cours inexistant" AS "Message";
-	END;
-	
-	SELECT id_cours INTO id
-	FROM cours
-	WHERE id_classe = classe
-	AND id_m = matiere
-	AND titre = cours;
-	
-	SELECT false AS "erreur";
-	
-	CALL select_cours(id);
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : select_cours_classe_matiere()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE select_cours_classe_matiere(classe INTEGER, matiere INTEGER)
-BEGIN
-	# Déclaration
-	Declare fini int default 0;
-	Declare id INTEGER;
-	
-	# Curseur
-	Declare cur1 CURSOR
-	FOR SELECT c.id_cours
-		FROM cours c
-		WHERE id_classe = classe
-		AND id_m = matiere;
-		
-	# Gestionnaire d'erreur
-	Declare continue HANDLER
-		FOR NOT FOUND SET fini = 1;
-	
-	# Nombre de cours
-	SELECT COUNT(*) AS "Cours"
-	FROM cours
-	WHERE id_classe = classe
-	AND id_m = matiere;
-	
-	# Ouverture du curseur
-	Open cur1;
-	FETCH cur1 INTO id;
-	WHILE fini != 1	DO
-		CALL select_cours(id);
-		FETCH cur1 INTO id;
-	END WHILE;
-	Close cur1;
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : select_class()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE select_class(classe INTEGER)
-BEGIN
-	SELECT id_classe AS id, libelle
-	FROM classe
-	WHERE id_classe = classe;
-	
-	SELECT s.id_session AS id, s.session
-	FROM session s
-	INNER JOIN classe c ON s.id_session = c.id_session
-	WHERE c.id_classe = classe;
-	
-	SELECT s.id_section AS id, s.id_u AS admin, s.libelle
-	FROM section s
-	INNER JOIN classe c ON s.id_section = c.id_section
-	WHERE c.id_classe = classe;
-	
-	SELECT m.id_m AS id, m.libelle, m.icon
-	FROM matiere m
-	INNER JOIN assigner a ON m.id_m = a.id_m
-	WHERE a.id_classe = classe
-	ORDER BY m.libelle;
-	
-	SELECT u.id_u AS id, u.nom, u.prenom
-	FROM user u
-	INNER JOIN charger c ON u.id_u = c.id_u
-	INNER JOIN professeur p ON u.id_u = p.id_u
-	WHERE c.id_classe = classe;
-	
-	SELECT u.id_u AS id, u.nom, u.prenom
-	FROM user u
-	INNER JOIN etre e ON u.id_u = e.id_u
-	INNER JOIN eleve p ON u.id_u = p.id_u
-	WHERE e.id_classe = classe;
+		SELECT * FROM errors WHERE code = "ACT_WT";
+	ELSE
+		IF actif = 0 THEN
+			SELECT false AS "erreur";
+			UPDATE user
+			SET active = 1,
+			token = newtk
+			WHERE id_u = id;
+			SELECT * FROM errors WHERE code = "ACT_S";
+		ELSE
+			SELECT true AS "erreur";
+			SELECT * FROM errors WHERE code = "ACT_AA";
+		END IF;
+	END IF;
 END @@
 
 Delimiter ;

@@ -1164,14 +1164,6 @@ Delimiter ;
 # Ajout d'un admin
 CALL ajouter_admin("admin", "admin", "admin", "admin@domain.tld","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "administrateur");
 
-# Ajout d'un professeur
-CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);
-
-# Ajout des élèves
-CALL ajouter_eleve("amenebhi", "Menebhi", "Adam", "adam.menebhi@gmail","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "0000-00-00");
-CALL ajouter_eleve("psoubrane", "Soubrane", "Paul", "paul.sourbane@gmail","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "0000-00-00");
-CALL ajouter_eleve("tdelgorge", "Delgorge", "Tony", "cours.tony@gmail","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "0000-00-00");
-
 # Matieres
 INSERT INTO matiere VALUES("","MathÃ©matiques","fa fa-superscript"),
 ("","SLAM 4","fa fa-code"),
@@ -1192,6 +1184,14 @@ INSERT INTO classe VALUES("",1,1,"SIO 1 LM"),
 ("",1,1,"SIO 1 JV"),
 ("",2,1,"SIO 2 LM"),
 ("",2,1,"SIO 2 JV");
+
+# Ajout d'un professeur
+CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);
+
+# Ajout des élèves
+CALL ajouter_eleve("amenebhi", "Menebhi", "Adam", "adam.menebhi@gmail","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "0000-00-00");
+CALL ajouter_eleve("psoubrane", "Soubrane", "Paul", "paul.sourbane@gmail","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "0000-00-00");
+CALL ajouter_eleve("tdelgorge", "Delgorge", "Tony", "cours.tony@gmail","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "0000-00-00");
 
 # Assignation des matières aux classes
 INSERT INTO assigner VALUES(1,1),

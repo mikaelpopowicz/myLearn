@@ -213,7 +213,7 @@ class CoursController extends \Library\BackController {
 			}		
 		} else {
 			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "'.$cours.'"});</script>');
-			$this->app->httpResponse()->redirect('/');
+			$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 		}
 	}
 

@@ -41,6 +41,13 @@ class Keygen extends ApplicationComponent
 	public function key() { return $this->key; }
 	public function iv() { return $this->iv; }
 	
+	
+	/**
+	* Méthode permettant de générer une chaine de caractère aléatoire alaphanumérique
+	* @param $length int Longueur souhaitée de la chaine
+	* @param $unique boolean Vérifie si l'on souhaite une chaine unique, valable pour les sel et token
+	* @return $salt string Chaine aléatoire
+	*/
 	public function getNewSalt($length = 12, $unique = true)
 	{
 		if($unique == true) {
@@ -50,31 +57,23 @@ class Keygen extends ApplicationComponent
 		} else {
 			$tokens = array();
 		}
-		
-	    // initialiser la variable $salt
 	    $salt = "";
-	
-		//Longueur de la variable contenant les caractère
-	    $longueurMax = strlen($this->chars);
-	
-	    // initialiser le compteur
+	    $maxlength = strlen($this->chars);
 	    $i = 0;
 		
 		do {
-			$permut = false;
-		    // ajouter un caractère aléatoire à $salt jusqu'à ce que $longueur soit atteint
+			$equal = false;
 		    while ($i < $length) {
-		        // prendre un caractère aléatoire
-		        $occurence = substr($this->chars, mt_rand(0, $longueurMax-1), 1);
-				$salt .= $occurence;
+		        $char = substr($this->chars, mt_rand(0, $maxlength-1), 1);
+				$salt .= $char;
 		 	   $i++;
 		    }
 			foreach($tokens as $token) {
 				if ($token == $salt) {
-					$permut = true;
+					$equal = true;
 				}
 			}
-		} while ($permut = false);
+		} while ($equal = false);
 		 
 	    return $salt;
 	}

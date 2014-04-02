@@ -281,7 +281,7 @@ class InstallationController extends \Library\BackController
 </definitions>';
 					$put = array();
 					$dir = array('Frontend', 'Admin', 'Prof','Json');
-					for($i = 0; $i < 3; $i++) {
+					for($i = 0; $i < 4; $i++) {
 						$put[$i] = fwrite($app[$i], "$str");
 						if ($put[$i]) {
 						    @chmod("../Applications/".$dir[$i]."/Config/app.xml", 0755);

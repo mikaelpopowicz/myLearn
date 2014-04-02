@@ -343,7 +343,7 @@ class CoursManager_PDO extends CoursManager
 			"Comment"
 		);
 		foreach ($entity as $key) {
-			if($key != "Classe" || $key == "Comment")
+			if($key != "Classe" && $key != "Comment")
 			{
 				$mode = "\Library\Entities\\".$key;
 				$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $mode);
@@ -357,7 +357,6 @@ class CoursManager_PDO extends CoursManager
 					}
 					$cours->setDateAjout(new \DateTime($cours->dateAjout()));
 					$cours->setDateModif(new \DateTime($cours->dateModif()));
-					//echo '<pre>Cours n: '.($i+1)."<br/>";print_r($cours[$i]);echo '</pre>';
 				}
 				else
 				{
@@ -415,7 +414,6 @@ class CoursManager_PDO extends CoursManager
 				$requete->nextRowset();
 				$nombre = $requete->fetch()['Commentaires'];
 				$comments = array();
-				echo '<pre><br/><br/><br/><br/><br/>'.$nombre.'</pre>';
 				if($nombre > 0)
 				{
 					for ($i=0; $i < $nombre; $i++) { 
@@ -432,6 +430,7 @@ class CoursManager_PDO extends CoursManager
 				$cours->setCommentaires($comments);
 			}
 		}
+		//echo '<pre><br/>';print_r($cours);echo '</pre>';
 		return $cours;
 	}
 	
