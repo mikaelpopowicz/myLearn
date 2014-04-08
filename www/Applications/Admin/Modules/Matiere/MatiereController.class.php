@@ -38,6 +38,9 @@ class MatiereController extends \Library\BackController
 			} else {
 				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins une matière pour la supprimer"});</script>');
 			}
+		} else if ($request->postExists('volume')) {
+			$this->managers->getManagerOf('Matiere')->addVolume();
+			$this->app->httpResponse()->redirect('/admin/matieres');
 		}
 	}
 

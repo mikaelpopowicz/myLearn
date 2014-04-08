@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS matiere
  (
    id_m INTEGER(2) NOT NULL AUTO_INCREMENT ,
    libelle VARCHAR(128) NULL  ,
+   uri VARCHAR(128) NULL  ,
    icon VARCHAR(32)
    , PRIMARY KEY (id_m) 
  ) 
@@ -164,7 +165,8 @@ CREATE TABLE IF NOT EXISTS classe
    id_classe INTEGER(2) NOT NULL AUTO_INCREMENT ,
    id_session INTEGER NOT NULL  ,
    id_section INTEGER(2) NOT NULL  ,
-   libelle VARCHAR(128) NOT NULL  
+   libelle VARCHAR(128) NOT NULL  ,
+   uri VARCHAR(128) NOT NULL  
    , PRIMARY KEY (id_classe) 
  ) 
  comment = "";
@@ -178,6 +180,7 @@ CREATE TABLE IF NOT EXISTS cours
    id_classe INTEGER(2) NOT NULL  ,
    id_u INTEGER(2) NOT NULL  ,
    titre VARCHAR(128) NULL  ,
+   uri VARCHAR(128) NULL  ,
    description VARCHAR(128) NULL  ,
    contenu TEXT NULL  ,
    dateAjout DATETIME NULL  ,
@@ -197,25 +200,6 @@ CREATE TABLE IF NOT EXISTS vers_cours
    contenu TEXT NULL  ,
    dateModif DATETIME NULL  
    , PRIMARY KEY (id_cours,dateModif) 
- ) 
-comment = "";
-# -----------------------------------------------------------------------------
-#       TABLE : histo_cours
-# -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS histo_cours
- (
-   id_cours INTEGER(2) NOT NULL  ,
-   id_m INTEGER(2) NOT NULL  ,
-   id_classe INTEGER(2) NOT NULL  ,
-   id_u INTEGER(2) NOT NULL  ,
-   titre VARCHAR(128) NULL  ,
-   description VARCHAR(128) NULL  ,
-   contenu TEXT NULL  ,
-   dateAjout DATETIME NULL  ,
-   dateModif DATETIME NULL  ,
-   vues INTEGER  ,
-   dateHisto DATETIME NULL
-   , PRIMARY KEY (id_cours) 
  ) 
 comment = "";
 # -----------------------------------------------------------------------------
@@ -251,6 +235,17 @@ CREATE TABLE IF NOT EXISTS avoir
    dateRendu DATE NULL  ,
    note DECIMAL(10,2) NULL  
    , PRIMARY KEY (id_d,id_u) 
+ ) 
+ comment = "";
+# -----------------------------------------------------------------------------
+#       TABLE : errors
+# -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS errors
+ (
+   code VARCHAR(10) NOT NULL  ,
+   message VARCHAR(128) NOT NULL  ,
+   type VARCHAR(10) NOT NULL
+   , PRIMARY KEY (code) 
  ) 
  comment = "";
 
@@ -363,7 +358,7 @@ ALTER TABLE charger
 # /////////////////////////////////////////////////////////////////////////////
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 #
-#       REFERENCES DES TABLES
+#       PROCEDURES, FONCTIONS ET TRIGGERS
 #
 # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 # /////////////////////////////////////////////////////////////////////////////
@@ -725,20 +720,21 @@ CREATE PROCEDURE auto_class(prev INTEGER, next INTEGER)
 BEGIN
 	Declare fini int default 0;
 	Declare c_section INTEGER(2);
-	Declare c_libelle VARCHAR(128); 
+	Declare c_libelle VARCHAR(128);
+	Declare c_uri VARCHAR(128); 
 	Declare curc CURSOR
-	FOR SELECT id_section, libelle
+	FOR SELECT id_section, libelle, uri
 		FROM classe c
 		INNER JOIN session s ON c.id_session = s.id_session
 		WHERE s.id_session = prev;
 	Declare continue HANDLER
 		FOR NOT FOUND SET fini = 1;
 	Open curc;
-	FETCH curc INTO c_section, c_libelle;
+	FETCH curc INTO c_section, c_libelle, c_uri;
 	While fini != 1
 		DO
-			INSERT INTO classe VALUES("", next, c_section, c_libelle);
-			FETCH curc INTO c_section, c_libelle;
+			INSERT INTO classe VALUES("", next, c_section, c_libelle, c_uri);
+			FETCH curc INTO c_section, c_libelle, c_uri;
 	END While;
 	Close curc;
 END @@
@@ -873,7 +869,7 @@ END @@
 
 CREATE PROCEDURE select_class(classe INTEGER)
 BEGIN
-	SELECT id_classe AS id, libelle
+	SELECT id_classe AS id, libelle, uri
 	FROM classe
 	WHERE id_classe = classe;
 	
@@ -887,7 +883,7 @@ BEGIN
 	INNER JOIN classe c ON s.id_section = c.id_section
 	WHERE c.id_classe = classe;
 	
-	SELECT m.id_m AS id, m.libelle, m.icon
+	SELECT m.id_m AS id, m.libelle, m.uri, m.icon
 	FROM matiere m
 	INNER JOIN assigner a ON m.id_m = a.id_m
 	WHERE a.id_classe = classe
@@ -962,12 +958,12 @@ BEGIN
 	FROM cours
 	WHERE id_cours = cours;
 	
-	SELECT id_cours AS id, titre, description, contenu, dateAjout, dateModif
+	SELECT id_cours AS id, titre, uri, description, contenu, dateAjout, dateModif
 	FROM cours
 	WHERE id_cours = cours;
 	
 	# Matière
-	SELECT m.id_m AS id, m.libelle
+	SELECT m.id_m AS id, m.libelle, m.uri
 	FROM matiere m
 	INNER JOIN cours c ON c.id_m = m.id_m
 	WHERE c.id_cours = cours;
@@ -1144,6 +1140,89 @@ BEGIN
 	Close cur1;
 END @@
 
+# -----------------------------------------------------------------------------
+#       PROCEDURE : activation()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE activation(oldtk VARCHAR(40), newtk VARCHAR(40))
+BEGIN
+	Declare id INTEGER;
+	Declare actif INTEGER;
+	SELECT id_u, active INTO id,actif
+	FROM user
+	WHERE token = oldtk;
+	
+	IF id IS NULL OR id = 0 THEN
+		SELECT * FROM errors WHERE code = "ACT_WT";
+	ELSE
+		IF actif = 0 THEN
+			UPDATE user
+			SET active = 1,
+			token = newtk
+			WHERE id_u = id;
+			SELECT * FROM errors WHERE code = "ACT_S";
+		ELSE
+			SELECT * FROM errors WHERE code = "ACT_AA";
+		END IF;
+	END IF;
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : activation_request()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE activation_request(mail VARCHAR(128))
+BEGIN
+	Declare id INTEGER;
+	Declare actif INTEGER;
+	Declare tk VARCHAR(40);
+	SELECT id_u, active,token INTO id,actif,tk
+	FROM user
+	WHERE email = mail;
+	
+	IF id IS NULL OR id = 0 THEN
+		SELECT true AS "erreur";
+		SELECT * FROM errors WHERE code = "ACT_WM";
+	ELSE
+		IF actif = 0 THEN
+			SELECT false AS "erreur";
+			SELECT * FROM crypt WHERE token = tk;
+			SELECT * FROM errors WHERE code = "ACT_RS";
+		ELSE
+			SELECT true AS "erreur";
+			SELECT * FROM errors WHERE code = "ACT_AA";
+		END IF;
+	END IF;
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : password_request()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE password_request(mail VARCHAR(128))
+BEGIN
+	Declare id INTEGER;
+	Declare actif INTEGER;
+	Declare tk VARCHAR(40);
+	SELECT id_u, active,token INTO id,actif,tk
+	FROM user
+	WHERE email = mail;
+	
+	IF id IS NULL OR id = 0 THEN
+		SELECT true AS "erreur";
+		SELECT * FROM errors WHERE code = "ACT_WM";
+	ELSE
+		IF actif = 1 THEN
+			SELECT false AS "erreur";
+			SELECT tk AS "token";
+			SELECT * FROM errors WHERE code = "ACT_RS";
+		ELSE
+			SELECT true AS "erreur";
+			SELECT * FROM errors WHERE code = "LOG_NA";
+		END IF;
+	END IF;
+END @@
+
 Delimiter ;
 
 
@@ -1164,26 +1243,37 @@ Delimiter ;
 # Ajout d'un admin
 CALL ajouter_admin("admin", "admin", "admin", "admin@domain.tld","7a53be99a2d39e90884249a0260f753e24033947", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenadministrateur')), "administrateur");
 
+# Erreurs ou code
+INSERT INTO errors VALUES("OP_S","Opération réussie","success"),
+("OP_F","Opération echouée","error"),
+("LOG_WP","Erreur de saisie identidiant/mot de passe","danger"),
+("LOG_NA","Votre compte n'est pas encore activÃ©","warning"),
+("ACT_WT","Une erreur s'est produite, veuillez recommencer la procÃ©dure d'activation","error"),
+("ACT_WM","Aucun compte ne correspond à cet email","danger"),
+("ACT_AA","Ce compte est dÃ©jà activÃ©","warning"),
+("ACT_RS","Mail envoyé","success"),
+("ACT_S","Activation rÃ©ussie","success");
+
 # Matieres
-INSERT INTO matiere VALUES("","MathÃ©matiques","fa fa-superscript"),
-("","SLAM 4","fa fa-code"),
-("","SLAM 3","fa fa-cogs"),
-("","Droit","fa fa-gavel"),
-("","FranÃ§ais","fa fa-book"),
-("","SI7","fa fa-sitemap");
+INSERT INTO matiere VALUES("","MathÃ©matiques","mathematiques","fa fa-superscript"),
+("","SLAM 4","slam-4","fa fa-code"),
+("","SLAM 3","slam-3","fa fa-cogs"),
+("","Droit","droit","fa fa-gavel"),
+("","FranÃ§ais","francais","fa fa-book"),
+("","SI7","si7","fa fa-sitemap");
 
 # Ajout automatique de la première session
 CALL ajouter_session("2012/2013");
-CALL ajouter_session("2013/2012");
+CALL ajouter_session("2013/2014");
 
 # Ajout de section
 INSERT INTO section values("",1,"BTS SIO");
 
 # Ajout de classe
-INSERT INTO classe VALUES("",1,1,"SIO 1 LM"),
-("",1,1,"SIO 1 JV"),
-("",2,1,"SIO 2 LM"),
-("",2,1,"SIO 2 JV");
+INSERT INTO classe VALUES("",1,1,"SIO 1 LM","sio-1-lm"),
+("",1,1,"SIO 1 JV","sio-1-jv"),
+("",2,1,"SIO 2 LM","sio-2-lm"),
+("",2,1,"SIO 2 JV","sio-2-jv");
 
 # Ajout d'un professeur
 CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);

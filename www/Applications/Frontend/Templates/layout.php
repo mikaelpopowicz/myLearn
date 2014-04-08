@@ -249,6 +249,11 @@
 					<li><a href="#">Conditions d'utilisation</a></li>
 					<li><a href="#">Politique de confidentialité</a></li>
 					<li><a href="#">Plus d'informations</a></li>
+					<li>Page executée en 
+						<?php
+						echo $load->load()." ms";
+						?>
+					</li>
 				</ul>
 			</div>
 			<!--close footer-credits container--> 

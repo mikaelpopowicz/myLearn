@@ -13,16 +13,10 @@ abstract class BackController extends ApplicationComponent
 	{
 		parent::__construct($app);
      	
-		$this->managers = new Managers('PDO', PDOFactory::getMysqlConnexion($this->app->config(), $this->app->key()));
+		$this->managers = new Managers('PDO', PDOFactory::getMysqlConnexion($this->app->config()));
 		$this->page = new Page($app);
 		$this->page->addVar("js", array());
-		$this->page->addVar("includes", array());
-		if($app->name() == "Frontend") {
-			$this->page->addVar("classes", $this->app->user()->getAttribute("classes"));
-			$this->page->addVar("config", $this->app->config());
-		}
-		
-     
+		$this->page->addVar("includes", array());    
 		$this->setModule($module);
 		$this->setAction($action);
 		$this->setView($action);
@@ -36,7 +30,6 @@ abstract class BackController extends ApplicationComponent
 		{
 			throw new \RuntimeException('L\'action "'.$this->action.'" n\'est pas définie sur ce module');
 		}
-     
 		$this->$method($this->app->httpRequest());
 	}
    

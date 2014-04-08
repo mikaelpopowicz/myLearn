@@ -259,42 +259,34 @@ class InstallationController extends \Library\BackController
 					$cle_taille = mcrypt_module_get_algo_key_size(MCRYPT_3DES);
 					$iv_taille = mcrypt_get_iv_size(MCRYPT_3DES, MCRYPT_MODE_NOFB);
 					$iv = mcrypt_create_iv($iv_taille, MCRYPT_RAND);
-					$app = array();
-					$app[] = fopen('../Applications/Frontend/Config/app.xml', 'w+');
-					$app[] = fopen('../Applications/Admin/Config/app.xml', 'w+');
-					$app[] = fopen('../Applications/Prof/Config/app.xml', 'w+');
-					$app[] = fopen('../Applications/Json/Config/app.xml', 'w+');
-					$str = '<?xml version="1.0" encoding="utf-8" ?>
-<definitions>
-	<define var="db_host" value="'.$this->app->key()->encode($bdd['hote'], $this->app->key()->key())['crypted'].'" />
-	<define var="db_name" value="'.$this->app->key()->encode($bdd['base'], $this->app->key()->key())['crypted'].'" />
-	<define var="db_user" value="'.$this->app->key()->encode($bdd['user'], $this->app->key()->key())['crypted'].'" />
-	<define var="db_user_pass" value="'.$this->app->key()->encode($bdd['password'], $this->app->key()->key())['crypted'].'" />
-	<define var="conf_nom" value="'.$infos['nom'].'" />
-	<define var="conf_description" value="'.$infos['description'].'" />
-	<define var="conf_email" value="'.$infos['email'].'" />
-	<define var="conf_contact" value="'.$infos['contact'].'" />
-	<define var="conf_date" value="'.$date->format('d/m/Y').'" />
-	<define var="cryp_iv" value="'.base64_encode($this->app->key()->iv()).'" />
-	<define var="cryp_key" value="'.base64_encode($this->app->key()->key()).'" />
-	<define var="installed" value="true" />
-</definitions>';
-					$put = array();
+					
+					// Génération de la configuration
+					$this->app->config()->setVar('db_host', $this->app->key()->encode($bdd['hote'], $this->app->key()->key())['crypted']);
+					$this->app->config()->setVar('db_name', $this->app->key()->encode($bdd['base'], $this->app->key()->key())['crypted']);
+					$this->app->config()->setVar('db_user', $this->app->key()->encode($bdd['user'], $this->app->key()->key())['crypted']);
+					$this->app->config()->setVar('db_user_pass', $this->app->key()->encode($bdd['password'], $this->app->key()->key())['crypted']);
+					$this->app->config()->setVar('conf_nom', $infos['nom']);
+					$this->app->config()->setVar('conf_description', $infos['description']);
+					$this->app->config()->setVar('conf_email', $infos['email']);
+					$this->app->config()->setVar('conf_contact', $infos['contact']);
+					$this->app->config()->setVar('conf_date', $date->format('d/m/Y'));
+					$this->app->config()->setVar('cryp_iv', base64_encode($this->app->key()->iv()));
+					$this->app->config()->setVar('cryp_key', base64_encode($this->app->key()->key()));
+					$this->app->config()->setVar('installed', 'true');
 					$dir = array('Frontend', 'Admin', 'Prof','Json');
-					for($i = 0; $i < 4; $i++) {
-						$put[$i] = fwrite($app[$i], "$str");
-						if ($put[$i]) {
-						    @chmod("../Applications/".$dir[$i]."/Config/app.xml", 0755);
-						} else {
+					foreach ($dir as $key) {
+						$write = $this->app->config()->save($key);
+						if($write == false)
+						{
 							$erreur[] = "infos";
 						}
-						fclose($app[$i]);
-						rename("../Applications/".$dir[$i]."/".$dir[$i]."Application.back.class.php", "../Applications/".$dir[$i]."/".$dir[$i]."Application.class.php");
+						rename("../Applications/".$key."/".$key."Application.back.class.php", "../Applications/".$key."/".$key."Application.class.php");
 					}
-					$str1 = "";
+					
+					$sql = "";
 					$pdo1 = fopen('../Applications/Install/Modules/Installation/mylearn.sql', 'r');
 					while (!feof($pdo1)) {
-						$str1 .= fgets($pdo1, 12040);
+						$sql .= fgets($pdo1, 12040);
 					}
 					fclose($pdo1);
 					/*
@@ -304,8 +296,8 @@ class InstallationController extends \Library\BackController
 					*/
 					$dbh = new \PDO('mysql:host='.$bdd['hote'].';dbname='.$bdd['base'], $bdd['user'], $bdd['password']);
 					$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_WARNING);
-					$sql1 = $dbh->exec($str1);
-					if(!isset($sql1)) {
+					$query = $dbh->exec($sql);
+					if(!isset($query)) {
 						$erreur[] = "bdd";
 					}
 					//echo '<pre>';print_r($str2);echo '</pre>';
@@ -336,7 +328,7 @@ class InstallationController extends \Library\BackController
 		} else {
 			$this->app->httpresponse()->redirect('/install-1');
 		}
-		$this->page->addVar('title', 'myLearn - Installation terminiée');
+		$this->page->addVar('title', 'myLearn - Installation terminée');
 	}
 }
 ?>

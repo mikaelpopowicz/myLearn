@@ -4,6 +4,7 @@ namespace Library\Entities;
 class Matiere extends \Library\Entity {
 
 	protected $libelle,							// Nom de la matière
+	$uri,										// URI de la matière
 	$icon;										// Icone choisie pour la matière
 
 	const LIBELLE_INVALIDE = 1;
@@ -28,6 +29,11 @@ class Matiere extends \Library\Entity {
 		}
 	}
 	
+	public function setUri($uri)
+	{
+		$this->uri = $uri;
+	}
+	
 	public function setIcon($icon)
 	{
 		if (!is_string($icon) || empty($icon))
@@ -43,5 +49,6 @@ class Matiere extends \Library\Entity {
 	// GETTERS //
    
 	public function libelle() { return $this->libelle; }
+	public function uri() { return $this->uri; }
 	public function icon() { return $this->icon; }
 }

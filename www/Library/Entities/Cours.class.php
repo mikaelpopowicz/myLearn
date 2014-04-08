@@ -5,6 +5,7 @@ class Cours extends \Library\Entity {
 	
 	protected $auteur,						// Identifiant de l'utilisateur qui a ecrit le cours (clé étrangère)
 	$titre,									// Titre du cours
+	$uri,									// URI du cours
 	$description,							// Description du cours
 	$contenu,								// Contenu du cours
 	$dateAjout,								// Date de création du cours
@@ -40,6 +41,11 @@ class Cours extends \Library\Entity {
 		{
 			$this->titre = $titre;
 		}
+	}
+	
+	public function setUri($uri)
+	{
+		$this->uri = $uri;
 	}
 	
 	public function setDescription($description)
@@ -97,6 +103,7 @@ class Cours extends \Library\Entity {
    
 	public function auteur() { return $this->auteur; }
     public function titre() { return $this->titre; }
+	public function uri() { return $this->uri; }
 	public function description() { return $this->description; }
 	public function contenu() { return $this->contenu; }
 	public function dateAjout() { return $this->dateAjout; }

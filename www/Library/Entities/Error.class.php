@@ -19,7 +19,7 @@ class Error extends \Library\Entity
 	
 	public function type()
 	{
-		return $this->type
+		return $this->type;
 	}
 }
 ?>

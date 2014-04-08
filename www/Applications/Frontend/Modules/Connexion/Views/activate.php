@@ -35,13 +35,10 @@
 					<button class="btn btn-lg btn-primary btn-block" name="go" type="submit">Envoyer</button>
 				</form>
 				<p class="text-center">
+					<a href="/connexion">Connexion</a>
+					/
 					<a href="/connexion/mot-de-passe-perdu">Mot de passe oublié ?</a>
 				</p>
 			</div>
 		</div>
 	</div>
-	
-	<footer class="footer">
-		<p class="text-muted">© 2014 . myLearn</p>
-	</footer>
-</div> <!-- /container -->

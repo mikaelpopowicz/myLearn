@@ -81,12 +81,12 @@ class MatiereManager_PDO extends MatiereManager
 	
 	public function getByName($libelle,$classe) {
 		
-		$requete = $this->dao->prepare('SELECT m.id_m AS id, m.libelle, m.icon 
+		$requete = $this->dao->prepare('SELECT m.id_m AS id, m.libelle, m.uri, m.icon 
 										FROM matiere m
 										INNER JOIN assigner a ON m.id_m = a.id_m
-										WHERE libelle = :libelle
+										WHERE uri = :uri
 										AND a.id_classe = :classe');
-		$requete->bindValue(':libelle', $libelle, \PDO::PARAM_STR);
+		$requete->bindValue(':uri', $libelle, \PDO::PARAM_STR);
 		$requete->bindValue(':classe', $classe, \PDO::PARAM_INT);
 		$requete->execute();
  
@@ -98,6 +98,22 @@ class MatiereManager_PDO extends MatiereManager
 		}
  
 		return null;
+	}
+	
+	public function addVolume($number = 10000)
+	{
+		$matiere = new \Library\Entities\Matiere(array(
+			"libelle" => "Test",
+			"uri" => "test",
+			"icon" => "fa fa-code"
+		));
+		for ($i=0; $i < $number; $i++) { 
+			$requete = $this->dao->prepare('INSERT INTO matiere SET libelle = :libelle, uri = :uri, icon = :icon');
+			$requete->bindValue(':libelle', $matiere->libelle());
+			$requete->bindValue(':uri', $matiere->uri());
+			$requete->bindValue(':icon', $matiere->icon());
+			$requete->execute();
+		}
 	}
 	
 	protected function add(Matiere $matiere)

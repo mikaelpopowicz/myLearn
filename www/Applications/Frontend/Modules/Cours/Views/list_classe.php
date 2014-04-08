@@ -30,7 +30,7 @@
 	?>
 	
 	<div class="span3">
-		<a class="innershadows btn btn-block btn-primary" href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()));?>"><h2> <?php echo $classe->libelle();?> <small><span class="muted"><?php echo $classe->session()->session();?></span></small></h2></a>
+		<a class="innershadows btn btn-block btn-primary" href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.$classe->uri();?>"><h2> <?php echo $classe->libelle();?> <small><span class="muted"><?php echo $classe->session()->session();?></span></small></h2></a>
 		<div class="content">
 			<p class="text-center">
 				<?php 

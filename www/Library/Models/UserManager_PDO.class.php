@@ -98,6 +98,41 @@ class UserManager_PDO extends UserManager
 		return $result;
 	}
 	
+	public function activation($oldTk,$newTk)
+	{
+		$requete = $this->dao->prepare('CALL activation(:old, :new)');
+		$requete->bindValue(':old', $oldTk);
+		$requete->bindValue(':new', $newTk);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+		$result = $requete->fetch();
+		return $result;
+	}
+	
+	public function activationRequest($mail)
+	{
+		$requete = $this->dao->prepare('CALL activation_request(:mail)');
+		$requete->bindValue(':mail', $mail);
+		$requete->execute();
+		$erreur = $requete->fetch();
+		$result = array();
+		$requete->nextRowset();
+		if($erreur['erreur'] == 0)
+		{
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Crypt');
+			$result['mail'] = $requete->fetch();
+			$requete->nextRowset();
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result['message'] = $requete->fetch();
+		}
+		else
+		{
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result['message'] = $requete->fetch();
+		}
+		return $result;
+	}
+	
 	public function getUnique($id)
 	{
 		$requete = $this->dao->prepare('SELECT id_u AS id, username, nom, prenom, email, password, salt, token, active, dateUser

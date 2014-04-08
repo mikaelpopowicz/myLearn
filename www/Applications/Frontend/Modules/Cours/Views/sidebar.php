@@ -7,7 +7,7 @@
 			if(isset($matieres) && is_array($matieres)) {
 				foreach($matieres as $mat) {
 					$active = $mat->id() == $matiere->id() ? "active" : "";
-					echo "<li class='".$active."'><a href='/cours/".str_replace('/','-',$classe->session()->session())."/".urlencode(str_replace(' ','-',$classe->libelle()))."/".$key->uriEncode($mat->libelle())."'>".$mat['libelle']."</a>";
+					echo "<li class='".$active."'><a href='/cours/".str_replace('/','-',$classe->session()->session())."/".urlencode(str_replace(' ','-',$classe->libelle()))."/".$mat->uri()."'>".$mat['libelle']."</a>";
 				}
 			}
 			?>
@@ -26,7 +26,7 @@
 					<div id="latest" class="tab-pane active">
 						<ul class="blogposts clearfix">
 							<?php
-							if(is_array($coursLast) && !empty($coursLast)) {
+							if(isset($coursLast) && is_array($coursLast) && !empty($coursLast)) {
 								foreach($coursLast as $last) {
 									
 							?>
@@ -53,7 +53,7 @@
 					<div id="popular" class="tab-pane">
 						<ul class="blogposts clearfix">
 							<?php
-							if(is_array($coursPop) && !empty($coursPop)) {
+							if(isset($coursPop) && is_array($coursPop) && !empty($coursPop)) {
 								foreach($coursPop as $pop) {
 							?>
 							<!--required class-->

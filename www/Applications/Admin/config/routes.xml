@@ -41,6 +41,10 @@
 	<route url="/admin/eleves/supprimer" module="Eleve" action="delete" />
 	
 	<route url="/admin/parametres(/?)" module="Param" action="index" />
+	<route url="/admin/parametres/modifier-informations" module="Param" action="infos" />
+	
+	<route url="/admin/parametres/modifier-user" module="Param" action="user" />
+	
 	<route url="/admin/cours/supprimer" module="Cours" action="delete" />
 	<route url="/admin/cours/ajouter" module="Cours" action="add" />
 	<route url="/admin/cours/modifier-([0-9]+)" module="Cours" action="update" vars="id"/>

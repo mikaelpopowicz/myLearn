@@ -122,7 +122,9 @@
 		<?php
 		echo $content;
 		?>
-
+	  	<footer class="footer">
+	  		<p class="text-muted">© 2014 . myLearn - Page executée en <?php echo $load->load()." ms";?></p>
+	  	</footer>
 	</div> <!-- /container -->
 	
 	<!--=== Includes modal ===-->
