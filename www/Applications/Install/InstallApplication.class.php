@@ -3,8 +3,8 @@ namespace Applications\Install;
 
 class InstallApplication extends \Library\Application {
 	
-	public function __construct() {
-		parent::__construct('Install');
+	public function __construct($start) {
+		parent::__construct('Install',$start);
 	}
 	
 	public function run() {
