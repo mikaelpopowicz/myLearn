@@ -63,7 +63,7 @@ class MembreController extends \Library\BackController
 			$this->page->addVar('class_mes_cours', 'active');
 		
 			$this->page->addVar('profil', $user);
-			$this->page->addVar('listeCours', $this->managers->getManagerOf('Cours')->getListByAuthor($user->id()));
+			$this->page->addVar('listeCours', $this->managers->getManagerOf('Cours')->getListByAuthor($user->id())['cours']);
 			$this->page->addVar('key', $this->app->key());
 		}
 		

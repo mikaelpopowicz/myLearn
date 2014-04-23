@@ -70,11 +70,11 @@
 							echo "<tr>";
 							echo "<td><input type='checkbox' name='check[]' value='".$cours->id()."'></td>";
 							?>
-							<td id='click' onclick="document.location='/cours/<?php echo str_replace('/','-',$cours->classe()->session()->session())."/".urlencode(str_replace(' ','-',$cours->classe()->libelle()))."/".$key->uriEncode($cours->matiere()->libelle())."/".$key->uriEncode($cours->titre());?>'"><?php echo $cours->titre();?></td>
+							<td id='click' onclick="document.location='/cours/<?php echo str_replace('/','-',$cours->classe()->session()->session())."/".$cours->classe()->uri()."/".$cours->matiere()->uri()."/".$cours->uri();?>'"><?php echo $cours->titre();?></td>
 							<?php
 							echo "<td>".$cours->matiere()->libelle()."</td>";
 							echo "<td>".$cours->dateModif()->format('d/m/Y à H:i')."</td>";
-							echo "<td></td>";
+							echo "<td>".count($cours->vues())."</td>";
 							echo "<td>".count($cours->commentaires())."</td>";
 							echo "<td>".$cours->classe()->libelle()."</td>";
 							echo "<td>".$cours->classe()->session()->session()."</td>";

@@ -59,6 +59,7 @@ class MatiereController extends \Library\BackController
 			
 			$matiere = new \Library\Entities\Matiere(array(
 				"libelle" => $request->postData('libelle'),
+				"uri" => \Library\Cleaner::getUri($request->postData('libelle')),
 				"icon" => $request->postData('icon')
 			));
 			

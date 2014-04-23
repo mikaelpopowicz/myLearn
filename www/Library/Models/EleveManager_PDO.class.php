@@ -5,6 +5,35 @@ use \Library\Entities\Eleve;
  
 class EleveManager_PDO extends EleveManager
 {
+	public static function getObj($requete, $mode = 'Alone')
+	{
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Eleve');
+		
+		if($mode == 'Alone')
+		{
+			$result = $requete->fetch();
+			$result->setDateUser(new \DateTime($result->dateUser()));
+			if($result->dateNaissance() != '0000-00-00')
+			{
+				$result->setDateNaissance(new \DateTime($result->dateNaissance()));
+			}
+		}
+		else if ($mode == 'Groups')
+		{
+			$result = $requete->fetchAll();
+			foreach ($result as $eleve)
+			{
+				$eleve->setDateUser(new \DateTime($eleve->dateUser()));
+				if($eleve->dateNaissance() != '0000-00-00')
+				{
+					$eleve->setDateNaissance(new \DateTime($eleve->dateNaissance()));
+				}
+			}
+		}
+		
+		return $result;
+	}
+	
 	public function getList()
 	{
 		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.nom, u.prenom, e.dateNaissance, u.dateUser, u.active

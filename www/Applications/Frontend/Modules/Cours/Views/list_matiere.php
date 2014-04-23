@@ -36,11 +36,11 @@
 		foreach ($listeMatiere as $matiere) {
 	?>
 	<div class="span3">
-		<a class="innershadows btn btn-block btn-primary" href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()))."/".$matiere->uri();?>"><h2><i class="<?php echo $matiere->icon();?>"></i> <?php echo $matiere->libelle();?></h2></a>
+		<a class="innershadows btn btn-block btn-primary" href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.$classe->uri()."/".$matiere->uri();?>"><h2><i class="<?php echo $matiere->icon();?>"></i> <?php echo $matiere->libelle();?></h2></a>
 		<div class="content">
 			<p class="text-center">
 				<?php 
-				//echo $controller->getCountCours($matiere['id']);
+				echo $matiere->cours();
 				?> cours dans cette section
 			</p>
 		</div>          

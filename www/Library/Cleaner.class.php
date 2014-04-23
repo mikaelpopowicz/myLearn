@@ -3,11 +3,11 @@ namespace Library;
 
 class Cleaner
 {
-	public static function getUri($str, $replace=array(), $delimiter='-')
+	public static function getUri($str, $replace=array("'"), $delimiter='-')
 	{
 		if( !empty($replace) )
 		{
-			$str = str_replace((array)$replace, ' ', $str);
+			$str = str_replace($replace, ' ', $str);
 		}
 		$clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
 		$clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);

@@ -44,6 +44,7 @@
 	<route url="/admin/parametres/modifier-informations" module="Param" action="infos" />
 	
 	<route url="/admin/parametres/modifier-user" module="Param" action="user" />
+	<route url="/admin/parametres/modifier-password" module="Param" action="password" />
 	
 	<route url="/admin/cours/supprimer" module="Cours" action="delete" />
 	<route url="/admin/cours/ajouter" module="Cours" action="add" />

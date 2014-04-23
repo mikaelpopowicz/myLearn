@@ -5,7 +5,8 @@ class Matiere extends \Library\Entity {
 
 	protected $libelle,							// Nom de la matière
 	$uri,										// URI de la matière
-	$icon;										// Icone choisie pour la matière
+	$icon,										// Icone choisie pour la matière
+	$cours;
 
 	const LIBELLE_INVALIDE = 1;
 	const ICON_INVALIDE = 2;
@@ -46,9 +47,15 @@ class Matiere extends \Library\Entity {
 		}
 	}
 	
+	public function setCours($cours)
+	{
+		$this->cours = $cours;
+	}
+	
 	// GETTERS //
    
 	public function libelle() { return $this->libelle; }
 	public function uri() { return $this->uri; }
 	public function icon() { return $this->icon; }
+	public function cours() { return $this->cours; }
 }

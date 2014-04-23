@@ -5,6 +5,100 @@ use \Library\Entities\Cours;
  
 class CoursManager_PDO extends CoursManager
 {
+	public static function getObj($requete)
+	{
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Cours');
+		$result = $requete->fetch();
+		$result->setDateAjout(new \DateTime($result->dateAjout()));
+		$result->setDateModif(new \DateTime($result->dateModif()));
+		$entities = array(
+			"Eleve",
+			"Comments",
+			"Vue"
+		);
+		
+		foreach ($entities as $key) {
+			$requete->nextRowset();
+			$static = '\Library\Models\\'.$key.'Manager_PDO';
+
+			if ($key == "Eleve")
+			{
+				$value = $static::getObj($requete);
+				$methode = 'setAuteur';
+				$result->$methode($value);
+			}
+			else
+			{
+				$nb = $key == "Comments" ? $requete->fetch(\PDO::FETCH_ASSOC)['Commentaires'] : $requete->fetch(\PDO::FETCH_ASSOC)['Vues'];
+				if($nb > 0)
+				{
+					$value = array();
+					for ($i=0; $i < $nb; $i++) {
+						$requete->nextRowset();
+						$value[$i] = $static::getObj($requete);
+					}
+					$methode = $key == "Comments" ? 'setCommentaires' : 'setVues';
+					$result->$methode($value);
+				}
+			}
+			
+		}
+		
+		return $result;
+	}
+	
+	public function getByName($libelle,$id,$mat,$titre) {
+		
+		$libelle = explode('/',$libelle);
+		$libelle[0] = str_replace('-','/',$libelle[0]);
+		$requete = $this->dao->prepare('CALL select_variable_result(:util, :session, :classe, :mat, NULL, NULL, :titre)');
+		$requete->bindValue(':util', $id);
+		$requete->bindValue(':classe', $libelle[1]);
+		$requete->bindValue(':session', $libelle[0]);
+		$requete->bindValue(':mat', $mat);
+		$requete->bindValue(':titre', $titre);
+		$requete->execute();
+		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+		$requete->nextRowset();
+
+		if($erreur == 0)
+		{
+			$result['classe'] = \Library\Models\ClasseManager_PDO::getObj($requete);
+			$requete->nextRowset();
+			$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+			$requete->nextRowset();
+			if($erreur == 0)
+			{
+				$result['matiere'] = \Library\Models\MatiereManager_PDO::getObj($requete);
+				$requete->nextRowset();
+				$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+				$requete->nextRowset();
+				if($erreur == 0)
+				{
+					$result['cours'] = \Library\Models\CoursManager_PDO::getObj($requete);
+				}
+				else
+				{
+					$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+					$result['cours'] = $requete->fetch();
+				}
+			}
+			else
+			{
+				$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+				$result['matiere'] = $requete->fetch();
+			}
+		}
+		else
+		{
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result['classe'] = $requete->fetch();
+		}
+		$requete->closeCursor();
+		//echo '<pre>';print_r($result);echo '</pre>';
+		return $result;
+	}
+	
 	public function getList()
 	{
 		$sql = 'SELECT c.id_c as id, b.username AS auteur, c.id_m AS matiere, c.titre, c.description, c.contenu, c.dateAjout, c.dateModif, c.count_c
@@ -27,222 +121,29 @@ class CoursManager_PDO extends CoursManager
      
 		return $listeCours;
 	}
-	
-	public function getListByClasseMatiere($classe,$matiere)
-	{
-		$requete = $this->dao->prepare('CALL select_cours_classe_matiere(:classe,:matiere)');
-		$requete->bindValue(':classe', $classe);
-		$requete->bindValue(':matiere', $matiere);
-		//echo "<pre><br/><br/><br/><br/><br/>Classe : ".$classe." - matiere : ".$matiere."</pre>";
-		$requete->execute();
-		$nombre = $requete->fetch()['Cours'];
-		$cours = array();
-		if($nombre > 0)
-		{
-			//echo '<pre>Nombre de cours => '.$nombre.'</pre>';
-			for ($i=0; $i < $nombre; $i++) { 
-				$requete->nextRowset();
-				$entity = array(
-					"Cours",
-					"Matiere",
-					"User",
-					"Classe",
-					"Comment"
-				);
-				foreach ($entity as $key) {
-					if($key != "Classe" && $key != "Comment")
-					{
-						$mode = "\Library\Entities\\".$key;
-						$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $mode);
-						if($key == "Cours")
-						{
-							$cours[$i] = $requete->fetch();
-							$cours[$i]->setDateAjout(new \DateTime($cours[$i]->dateAjout()));
-							$cours[$i]->setDateModif(new \DateTime($cours[$i]->dateModif()));
-							//echo '<pre>Cours n: '.($i+1)."<br/>";print_r($cours[$i]);echo '</pre>';
-						}
-						else
-						{
-							$requete->nextRowset();
-							$value = $requete->fetch();
-							//echo '<pre>Objet : '.$key.' - mode : '.$mode.'</pre><pre>';print_r($value);echo '</pre>';				
-							$methode = "set".$key;
-							if($key == "User")
-							{
-								$methode = "setAuteur";
-							}
-							//echo '<pre>Méthode appelée :'.$methode.'</pre>';
-							$cours[$i]->$methode($value);
-							//echo '<pre>Cours n: '.($i+1)."<br/>";print_r($cours[$i]);echo '</pre>';
-						}
-					}
-					else if($key == "Classe")
-					{
-						$entities = array(
-							"Classe",
-							"Session",
-							"Section",
-							"Matiere",
-							"Professeur",
-							"Eleve"
-						);
-						foreach ($entities as $cle) {
-							$requete->nextRowset();
-							$mode = "\Library\Entities\\".$cle;
-							$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $mode);
-							if($cle == "Classe")
-							{
-								$classe = $requete->fetch();
-							}
-							else
-							{
-								if ($cle == "Session" || $cle == "Section")
-								{
-									$value = $requete->fetch();
-									$methode = 'set'.$cle;
-									$classe->$methode($value);
-								}
-								else
-								{
-									$values = $requete->fetchAll();
-									$methode = 'set'.$cle.'s';
-									$classe->$methode($values);
-								}
-							}
-						}
-						$cours[$i]->setClasse($classe);
-					}
-					else if($key == "Comment")
-					{
-						$requete->nextRowset();
-						$nb = $requete->fetch(\PDO::FETCH_ASSOC)['Commentaires'];
-						$comments = array();
-						if($nombre > 0)
-						{
-							for ($j=0; $j < $nb; $j++) { 
-								$requete->nextRowset();
-								$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, "\Library\Entities\Comment");
-								$comments[$j] = $requete->fetch();
-								$comments[$j]->setDateCommentaire(new \DateTime($comments[$j]->dateCommentaire()));
-								$requete->nextRowset();
-								$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, "\Library\Entities\User");
-								$auteur = $requete->fetch();
-								$comments[$j]->setAuteur($auteur);
-							}
-						}
-						$cours[$i]->setCommentaires($comments);
-					}
-				}
-			}
-		}
-		$requete->closeCursor();
-		//echo '<pre><br/><br/><br/><br/>';print_r($cours);echo '</pre>';
-		return $cours;
-		
-	}
 
 	public function getListByAuthor($auteur)
 	{
 		$requete = $this->dao->prepare('CALL select_cours_auteur(:id)');
 		$requete->bindValue(':id', $auteur);
 		$requete->execute();
-		$nombre = $requete->fetch()['Cours'];
-		$cours = array();
-		if($nombre > 0)
-		{
-			for ($i=0; $i < $nombre; $i++) {
-				$requete->nextRowset();
-				$entity = array(
-					"Cours",
-					"Matiere",
-					"User",
-					"Classe",
-					"Comment"
-				);
-				foreach ($entity as $key) {
-					if($key != "Classe" && $key != "Comment")
-					{
-						$mode = "\Library\Entities\\".$key;
-						$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $mode);
-						if($key == "Cours")
-						{
-							$cours[$i] = $requete->fetch();
-							$cours[$i]->setDateAjout(new \DateTime($cours[$i]->dateAjout()));
-							$cours[$i]->setDateModif(new \DateTime($cours[$i]->dateModif()));
-						}
-						else
-						{
-							$requete->nextRowset();
-							$value = $requete->fetch();			
-							$methode = "set".$key;
-							if($key == "User")
-							{
-								$methode = "setAuteur";
-							}
-							$cours[$i]->$methode($value);
-						}
-					}
-					else if($key == "Classe")
-					{
-						$entities = array(
-							"Classe",
-							"Session",
-							"Section",
-							"Matiere",
-							"Professeur",
-							"Eleve"
-						);
-						foreach ($entities as $cle) {
-							$requete->nextRowset();
-							$mode = "\Library\Entities\\".$cle;
-							$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $mode);
-							if($cle == "Classe")
-							{
-								$classe = $requete->fetch();
-							}
-							else
-							{
-								if ($cle == "Session" || $cle == "Section")
-								{
-									$value = $requete->fetch();
-									$methode = 'set'.$cle;
-									$classe->$methode($value);
-								}
-								else
-								{
-									$values = $requete->fetchAll();
-									$methode = 'set'.$cle.'s';
-									$classe->$methode($values);
-								}
-							}
-						}
-						$cours[$i]->setClasse($classe);
-					}
-					else if($key == "Comment")
-					{
-						$requete->nextRowset();
-						$nb = $requete->fetch(\PDO::FETCH_ASSOC)['Commentaires'];
-						$comments = array();
-						if($nombre > 0)
-						{
-							for ($j=0; $j < $nb; $j++) { 
-								$requete->nextRowset();
-								$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, "\Library\Entities\Comment");
-								$comments[$j] = $requete->fetch();
-								$comments[$j]->setDateCommentaire(new \DateTime($comments[$j]->dateCommentaire()));
-								$requete->nextRowset();
-								$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, "\Library\Entities\User");
-								$auteur = $requete->fetch();
-								$comments[$j]->setAuteur($auteur);
-							}
-						}
-						$cours[$i]->setCommentaires($comments);
-					}
-				}
-			}
+		$nb = $requete->fetch(\PDO::FETCH_ASSOC)['Cours'];
+		for ($i=0; $i < $nb; $i++) {
+			$requete->nextRowset();
+			$result['classe'] = \Library\Models\ClasseManager_PDO::getObj($requete);
+			$requete->nextRowset();
+			$result['matiere'] = \Library\Models\MatiereManager_PDO::getObj($requete);
+			$requete->nextRowset();
+			$result['cours'][$i] = \Library\Models\CoursManager_PDO::getObj($requete);
+			$result['cours'][$i]->setClasse($result['classe']);
+			$result['cours'][$i]->setMatiere($result['matiere']);
+			
 		}
+		unset($result['classe']);
+		unset($result['matiere']);
+		//echo '<pre>';print_r($result);echo '</pre>';die();
 		$requete->closeCursor();
-		return $cours;
+		return $result;
 	}
 	
 	public function getListOf($matiere)
@@ -450,10 +351,11 @@ class CoursManager_PDO extends CoursManager
 				"Matiere",
 				"User",
 				"Classe",
-				"Comment"
+				"Comment",
+				"Vue"
 			);
 			foreach ($entity as $key) {
-				if($key != "Classe" && $key != "Comment")
+				if($key != "Classe" && $key != "Comment" && $key != "Vue")
 				{
 					$mode = "\Library\Entities\\".$key;
 					$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $mode);
@@ -541,6 +443,26 @@ class CoursManager_PDO extends CoursManager
 					}
 					$cours->setCommentaires($comments);
 				}
+				else if($key == "Vue")
+				{
+					$requete->nextRowset();
+					$nombre = $requete->fetch(\PDO::FETCH_ASSOC)['Vues'];
+					$vues = array();
+					if($nombre > 0)
+					{
+						for ($i=0; $i < $nombre; $i++) { 
+							$requete->nextRowset();
+							$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, "\Library\Entities\Vue");
+							$vues[$i] = $requete->fetch();
+							$vues[$i]->setDateVue(new \DateTime($vues[$i]->dateVue()));
+							$requete->nextRowset();
+							$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, "\Library\Entities\User");
+							$visiteur = $requete->fetch();
+							$vues[$i]->setVisiteur($visiteur);
+						}
+					}
+					$cours->setVues($vues);
+				}
 			}
 		}
 		else
@@ -573,12 +495,13 @@ class CoursManager_PDO extends CoursManager
 	
 	protected function add(Cours $cours)
 	{
-		$requete = $this->dao->prepare('INSERT INTO cours SET id_u = :auteur, id_classe = :classe, id_m = :matiere, titre = :titre, description = :description, contenu = :contenu, dateAjout = sysdate(), dateModif = sysdate()');
+		$requete = $this->dao->prepare('INSERT INTO cours SET id_u = :auteur, id_classe = :classe, id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateAjout = sysdate(), dateModif = sysdate()');
 		
 	    $requete->bindValue(':auteur', $cours->auteur()->id());
 		$requete->bindValue(':classe', $cours->classe()->id());
 		$requete->bindValue(':matiere', $cours->matiere()->id());
 	    $requete->bindValue(':titre', $cours->titre());
+		$requete->bindValue(':uri', $cours->uri());
 		$requete->bindValue(':description', $cours->description());
 	    $requete->bindValue(':contenu', $cours->contenu());
  
@@ -587,9 +510,10 @@ class CoursManager_PDO extends CoursManager
 	
 	protected function modify(Cours $cours)
 	{
-	    $requete = $this->dao->prepare('UPDATE cours SET id_m = :matiere, titre = :titre, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
+	    $requete = $this->dao->prepare('UPDATE cours SET id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
 	    $requete->bindValue(':matiere', $cours->matiere()->id());
 		$requete->bindValue(':titre', $cours->titre());
+		$requete->bindValue(':uri', $cours->uri());
 		$requete->bindValue(':description', $cours->description());
 		$requete->bindValue(':contenu', $cours->contenu());
 		$requete->bindValue(':id', $cours->id());

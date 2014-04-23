@@ -51,57 +51,59 @@ class ClasseManager_PDO extends ClasseManager
 	{
 		$name = explode('/',$name);
 		$name[0] = str_replace('-','/',$name[0]);
-		$name[1] = str_replace('-',' ',$name[1]);
 		//echo "<pre>";print_r($name);echo "</pre>";
-		$requete = $this->dao->prepare('CALL select_class_session_user(:name, :session, :id)');
-		$requete->bindValue(':name', $name[1]);
+		$requete = $this->dao->prepare('CALL select_variable_result(:util, :session, :classe, NULL, NULL, NULL, NULL)');
+		$requete->bindValue(':classe', $name[1]);
 		$requete->bindValue(':session', $name[0]);
-		$requete->bindValue(':id', $id);
+		$requete->bindValue(':util', $id);
 		$requete->execute();
 		$erreur = $requete->fetch()['erreur'];
 		$requete->nextRowset();
+		
 		if($erreur == 0)
 		{
-			$entity = array(
-				"Classe",
-				"Session",
-				"Section",
-				"Matiere",
-				"Professeur",
-				"Eleve"
-			);
-		
-			foreach ($entity as $key) {
-				$mode = "\Library\Entities\\".$key;
-				$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $mode);
-				if($key == "Classe")
-				{
-					$classe = $requete->fetch();
-				}
-				else
-				{
-					$requete->nextRowset();
-					if ($key == "Session" || $key == "Section")
-					{
-						$value = $requete->fetch();
-						$methode = 'set'.$key;
-						$classe->$methode($value);
-					}
-					else
-					{
-						$values = $requete->fetchAll();
-						$methode = 'set'.$key.'s';
-						$classe->$methode($values);
-					}
-				}
-			}
+			$result['classe'] = \Library\Models\ClasseManager_PDO::getObj($requete);
 		}
 		else
 		{
-			$classe = $requete->fetch()['Message'];
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result['erreur'] = $requete->fetch();
+		}
+		return $result;
+	}
+	
+	public static function getObj($requete, $mode = 'Alone')
+	{		
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Classe');
+		$result = $requete->fetch();
+		
+		$entities = array(
+			"Session",
+			"Section",
+			"Matiere",
+			"Professeur",
+			"Eleve"
+		);
+	
+		foreach ($entities as $key) {
+			$requete->nextRowset();
+			$static = '\Library\Models\\'.$key.'Manager_PDO';
+			
+			if ($key == "Session" || $key == "Section")
+			{
+				$value = $static::getObj($requete);
+				$methode = 'set'.$key;
+				$result->$methode($value);
+			}
+			else
+			{
+				$values = $static::getObj($requete, 'Groups');
+				$methode = 'set'.$key.'s';
+				$result->$methode($values);
+			}
 		}
 		
-		return $classe;
+		return $result;
 	}
 	
 	public function getList($id)

@@ -5,8 +5,33 @@ use \Library\Entities\Professeur;
  
 class ProfesseurManager_PDO extends ProfesseurManager
 {
+	public static function getObj($requete, $mode = 'Alone')
+	{
+		$result = array();
+		
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
+		
+		if($mode == 'Alone')
+		{
+			$result['professeur'] = $requete->fetch();
+			$result['professeur']->setDateUser(new \DateTime($result['professeur']->dateUser()));
+		}
+		else if ($mode == 'Groups')
+		{
+			$result['professeurs'] = $requete->fetchAll();
+			foreach ($result['professeurs'] as $professeur)
+			{
+				$professeur->setDateUser(new \DateTime($professeur->dateUser()));
+			}
+		}
+		
+		return $result;
+	}
+	
 	public function getList()
 	{
+		
+		
 		$requete = $this->dao->prepare('SELECT p.id_u AS id, p.id_m AS matiere, u.nom, u.prenom, u.active, u.dateUser
 										FROM professeur p
 										INNER JOIN user u ON u.id_u = p.id_u');

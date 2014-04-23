@@ -17,13 +17,13 @@
 				/
 			</li>
 			<li>
-				<a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()));?>" class="primary-color"><?php echo $cours->classe()->libelle()." - Session ".$cours->classe()->session()->session();?></a>
+				<a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.$classe->uri();?>" class="primary-color"><?php echo $classe->libelle()." - Session ".$classe->session()->session();?></a>
 			</li>
 			<li class="primary-color">
 				/
 			</li>
 			<li>
-				<a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()))."/".$key->uriEncode($cours->matiere()->libelle());?>" class="primary-color"><?php echo $cours->matiere()->libelle();?></a>
+				<a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.$classe->uri()."/".$matiere->uri();?>" class="primary-color"><?php echo $matiere->libelle();?></a>
 			</li>
 			<li class="primary-color">
 				/
@@ -43,10 +43,10 @@
 					<header class="entry-header">
 						<h1 class="primary-color"><?php echo $cours->titre();?></h1>
 						<div class="byline">
-							<i class="e-icon-pencil"></i> <?php echo ucfirst($cours->auteur()->nom()).' '.ucfirst($cours->auteur()->prenom());?> &nbsp;&nbsp; <i class="e-icon-clock"></i> <abbr class="published" title="<?php echo "Le ".$cours['dateAjout']->format('d/m/Y à H\hi');?>"><?php echo $cours['dateAjout']->format('d/m/Y');?></abbr> &nbsp;&nbsp; <a href="#view-comments" class="scrollto"><i class="e-icon-chat"></i> <?php echo count($cours->commentaires())?> commentaire<?php echo count($cours->commentaires()) > 1 ? "s" : "";?></a>
+							<i class="e-icon-pencil"></i> <?php echo ucfirst($cours->auteur()->nom()).' '.ucfirst($cours->auteur()->prenom());?> &nbsp;&nbsp; <i class="e-icon-clock"></i> <abbr class="published" title="<?php echo "Le ".$cours['dateAjout']->format('d/m/Y à H\hi');?>"><?php echo $cours['dateAjout']->format('d/m/Y');?></abbr> &nbsp;&nbsp; <a href="#view-comments" class="scrollto"><i class="e-icon-chat"></i> <?php echo count($cours->commentaires())?> commentaire<?php echo count($cours->commentaires()) > 1 ? "s" : "";?></a> &nbsp;&nbsp; <i class="e-icon-eye"></i> <?php echo count($cours->vues())?> visite<?php echo count($cours->vues()) > 1 ? "s" : "";?>
 						</div>
 						<div class="entry-meta">
-							<i class="e-icon-folder"></i> <a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()))."/".$key->uriEncode($cours->matiere()->libelle());?>"><?php echo $cours->matiere()->libelle();?></a>
+							<i class="e-icon-folder"></i> <a href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.$classe->uri()."/".$matiere->uri();?>"><?php echo $matiere->libelle();?></a>
 						</div>
 					</header>
 					<!--end entry-header-->
@@ -83,16 +83,19 @@
 						<!--grand parent-->
 						<li id="comment-1"><!--parent-->
 							<footer class="comment-meta">
-								<img alt="<?php echo ucfirst($comment->auteur()->nom()).' '.ucfirst($comment->auteur()->prenom());?>" src="/images/avatars/default.png" class="avatar" />
 								<div class="comment-meta">
-									<span class="comment-author vcard">
-										<cite title="LinkURLofauthor">
+									<span class="comment-author">
+										<cite>
 											<?php echo ucfirst($comment->auteur()->nom()).' '.ucfirst($comment->auteur()->prenom());?>
 										</cite>
 									</span>
 									<time class="published">
 										<?php echo $comment['dateCommentaire']->format('\L\e d/m/Y à H\hi')?>
 									</time>
+									
+								</div>
+								<div class="pull-right">
+									<a href="/cours/supprimer-commentaire-<?php echo $comment->auteur()->id()?>" class="btn btn-danger"><i class="fa fa-trash-o"></i> </a>
 								</div>
 							</footer>
 							<div class="text">

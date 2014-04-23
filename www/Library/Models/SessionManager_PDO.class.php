@@ -5,6 +5,22 @@ use \Library\Entities\Session;
  
 class SessionManager_PDO extends SessionManager
 {
+	public static function getObj($requete, $mode = 'Alone')
+	{
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Session');
+		
+		if($mode == 'Alone')
+		{
+			$result = $requete->fetch();
+		}
+		else if ($mode == 'Groups')
+		{
+			$result = $requete->fetchAll();
+		}
+		
+		return $result;
+	}
+	
 	public function getUnique($id)
 	{
 		$requete = $this->dao->prepare('SELECT id_session AS id, session

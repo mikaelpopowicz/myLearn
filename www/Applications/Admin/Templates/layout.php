@@ -92,7 +92,7 @@
 						</li>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
-						<li class=""><a href="/admin/parametres">Paramètres</a></li>
+						<li class="<?php echo isset($class_param) ? $class_param : "";?>"><a href="/admin/parametres">Paramètres</a></li>
 						<li class=""><a href="/connexion/logout//">Déconnexion</a></li>
 					</ul>
 				</div><!--/.nav-collapse -->

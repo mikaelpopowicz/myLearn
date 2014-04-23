@@ -17,38 +17,66 @@ class CoursController extends \Library\BackController {
 	
 	public function executeList_cours(\Library\HTTPRequest $request)
 	{
-		$classe = $this->managers->getManagerOf('Classe')->getByName(urldecode($request->getData('libelle')), $this->app->user()->getAttribute('id'));
-		if($classe instanceof \Library\Entities\Classe)
+		$result = $this->managers->getManagerOf('Matiere')->getByName($request->getData('libelle'), $this->app->user()->getAttribute('id'), $request->getData('matiere'),$this->app->config()->get('cours_page'), $request->getData('page'));
+
+		if(isset($result['classe']) && ($result['classe'] instanceof \Library\Entities\Classe))
 		{
-			$matiere = $this->managers->getManagerOf('Matiere')->getByName($this->app->key()->uriDecode($request->getData('matiere')),$classe->id());
-			if($matiere != NULL)
+			$classe = $result['classe'];
+			
+			if(isset($result['matiere']) && ($result['matiere'] instanceof \Library\Entities\Matiere))
 			{
+				$matiere = $result['matiere'];
+				
 				$this->page->addVar('title', 'MyLearn - '.$classe->libelle().' - '.$matiere->libelle());
 				$this->page->addVar('class_cours', 'active');
 				$this->page->addVar('class_'.$classe->id().'_cl', 'active');
 				$this->page->addVar('classe', $classe);
 				$this->page->addVar('matiere', $matiere);
-				$cours = $this->managers->getManagerOf('Cours')->getListByClasseMatiere($classe->id(),$matiere->id());
-				$this->page->addVar('lesCours', $cours);
-				$this->page->addVar('key', $this->app->key());
+				
+				if(isset($result['cours']) && is_array($result['cours']))
+				{
+					$cours = $result['cours'];
+					
+					$this->page->addVar('lesCours', $cours);
+				}
+				else if(isset($result['cours']) && ($result['cours'] instanceof \Library\Entities\Error))
+				{
+					$erreur = $result['cours'];
+					
+					if($erreur->code() == "CR_NOC")
+					{
+						$this->page->addVar('erreur', $erreur);
+					}
+					else
+					{
+						$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+						$this->app->httpResponse()->redirect("/cours/".str_replace('/','-',$classe->session()->session()).'/'.$classe->uri().'/'.$matiere->uri());
+					}
+				}
 			}
-			else
+			else if(isset($result['matiere']) && ($result['matiere'] instanceof \Library\Entities\Error))
 			{
-				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "warning", layout: "top", text: "<strong>Cette matière n\'existe pas dans cette classe</strong>"});</script>');
-				$this->app->httpResponse()->redirect('/cours/'.str_replace('/','-',$classe->session()->session()).'/'.str_replace(' ','-',$classe->libelle()));
+				$erreur = $result['matiere'];
+			
+				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+				$this->app->httpResponse()->redirect("/cours/".str_replace('/','-',$classe->session()->session()).'/'.$classe->uri());
 			}
 		}
-		else
+		else if(isset($result['classe']) && ($result['classe'] instanceof \Library\Entities\Error))
 		{
-			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "warning", layout: "top", text: "<strong>'.$classe.'</strong>"});</script>');
+			$erreur = $result['classe'];
+			
+			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
 			$this->app->httpResponse()->redirect("/cours");
 		}
 	}
 	
 	public function executeList_matiere(\Library\HTTPRequest $request) {
-		$classe = $this->managers->getManagerOf('Classe')->getByName(urldecode($request->getData('libelle')), $this->app->user()->getAttribute('id'));
-		if($classe instanceof \Library\Entities\Classe)
+		$result = $this->managers->getManagerOf('Classe')->getByName($request->getData('libelle'), $this->app->user()->getAttribute('id'));
+		if(isset($result['classe']) && ($result['classe'] instanceof \Library\Entities\Classe))
 		{
+			$classe = $result['classe'];
+			
 			$this->page->addVar('title', 'MyLearn - '.$classe->libelle());
 			$this->page->addVar('class_cours', 'active');
 			$this->page->addVar('class_'.$classe->id().'_cl', 'active');
@@ -56,7 +84,6 @@ class CoursController extends \Library\BackController {
 			if(count($classe->matieres()) > 0)
 			{
 				$this->page->addVar('listeMatiere', $classe->matieres());
-				$this->page->addVar('key', $this->app->key());
 			}
 			else
 			{
@@ -66,36 +93,38 @@ class CoursController extends \Library\BackController {
 				$this->app->message()->setIcone(\Library\Message::ICO_CONF);
 				$this->page->addVar('message', $this->app->message()->toString());
 			}
-			
 		}
-		else
+		else if(isset($result['erreur']) && ($result['erreur'] instanceof \Library\Entities\Error))
 		{
-			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "warning", layout: "top", text: "<strong>'.$classe.'</strong>"});</script>');
+			$erreur = $result['erreur'];
+			
+			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
 			$this->app->httpResponse()->redirect("/cours");
 		}
-		
-		
 	}
 	
 	public function executeShow(\Library\HTTPRequest $request)
 	{
-		$classe = $this->managers->getManagerOf('Classe')->getByName(urldecode($request->getData('libelle')), $this->app->user()->getAttribute('id'));
-		if($classe instanceof \Library\Entities\Classe)
+		$result = $this->managers->getManagerOf('Cours')->getByName($request->getData('libelle'), $this->app->user()->getAttribute('id'), $request->getData('matiere'), $request->getData('cours'));
+
+		if(isset($result['classe']) && ($result['classe'] instanceof \Library\Entities\Classe))
 		{
-			$matiere = $this->managers->getManagerOf('Matiere')->getByName($this->app->key()->uriDecode($request->getData('matiere')),$classe->id());
-			if($matiere != NULL)
+			$classe = $result['classe'];
+			
+			if(isset($result['matiere']) && ($result['matiere'] instanceof \Library\Entities\Matiere))
 			{
-				$titre = $this->app->key()->uriDecode($request->getData('cours'));
-				$cours = $this->managers->getManagerOf('Cours')->getByNameClasseMatiere($titre,$classe->id(),$matiere->id());
-				if($cours instanceof \Library\Entities\Cours)
+				$matiere = $result['matiere'];
+				
+				$this->page->addVar('title', 'MyLearn - '.$classe->libelle().' - '.$matiere->libelle());
+				$this->page->addVar('class_cours', 'active');
+				$this->page->addVar('class_'.$classe->id().'_cl', 'active');
+				$this->page->addVar('classe', $classe);
+				$this->page->addVar('matiere', $matiere);
+				
+				if(isset($result['cours']) && ($result['cours'] instanceof \Library\Entities\Cours))
 				{
-					$this->page->addVar('title', 'MyLearn - '.$cours->titre());
-					$this->page->addVar('class_cours', 'active');
-					$this->page->addVar('class_'.$classe->id().'_cl', 'active');
-					$this->page->addVar('classe', $classe);
-					$this->page->addVar('matiere', $matiere);
+					$cours = $result['cours'];
 					$this->page->addVar('cours', $cours);
-					$this->page->addVar('key', $this->app->key());
 					
 					if($request->postExists('comment'))
 					{
@@ -110,31 +139,38 @@ class CoursController extends \Library\BackController {
 						{
 							$this->managers->getManagerOf('Comments')->save($comment);
 							$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "success", layout: "topCenter", text: "<strong>Commentaire enregistré</strong>"});</script>');
-							$this->app->httpResponse()->redirect('/cours/'.str_replace('/','-',$classe->session()->session()).'/'.str_replace(' ','-',$classe->libelle())."/".$this->app->key()->uriEncode($matiere->libelle()).'/'.$this->app->key()->uriEncode($cours->titre()));
+							$this->app->httpResponse()->redirect('/cours/'.str_replace('/','-',$classe->session()->session()).'/'.$classe->uri()."/".$matiere->uri().'/'.$cours->uri());
 						}
 						else
 						{
 							
 						}
 					}
+					
 				}
-				else
+				else if(isset($result['cours']) && ($result['cours'] instanceof \Library\Entities\Error))
 				{
-					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "warning", layout: "top", text: "<strong>'.$cours.'</strong>"});</script>');
-					$this->app->httpResponse()->redirect('/cours/'.str_replace('/','-',$classe->session()->session()).'/'.str_replace(' ','-',$classe->libelle())."/".$this->app->key()->uriEncode($matiere->libelle()));
+					$erreur = $result['cours'];
+
+					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+					$this->app->httpResponse()->redirect("/cours/".str_replace('/','-',$classe->session()->session()).'/'.$classe->uri().'/'.$matiere->uri());
 				}
 			}
-			else
+			else if(isset($result['matiere']) && ($result['matiere'] instanceof \Library\Entities\Error))
 			{
-				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "warning", layout: "top", text: "<strong>Cette matière n\'existe pas dans cette classe</strong>"});</script>');
-				$this->app->httpResponse()->redirect('/cours/'.str_replace('/','-',$classe->session()->session()).'/'.str_replace(' ','-',$classe->libelle()));
+				$erreur = $result['matiere'];
+			
+				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+				$this->app->httpResponse()->redirect("/cours/".str_replace('/','-',$classe->session()->session()).'/'.$classe->uri());
 			}
 		}
-		else
+		else if(isset($result['classe']) && ($result['classe'] instanceof \Library\Entities\Error))
 		{
-			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "warning", layout: "top", text: "<strong>'.$classe.'</strong>"});</script>');
+			$erreur = $result['classe'];
+			
+			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
 			$this->app->httpResponse()->redirect("/cours");
-		}	
+		}
 	}
 
 	public function getFav() {
@@ -157,7 +193,8 @@ class CoursController extends \Library\BackController {
 				'matiere' => unserialize(base64_decode($request->postData('matiere'))),
 				'titre' => $request->postData('titre'),
 				'description' => $request->postData('description'),
-				'contenu' => $request->postData('contenu')
+				'contenu' => $request->postData('contenu'),
+				'uri' => \Library\Cleaner::getUri($request->postData('titre'))
 			));
 		
 			if($cours->isValid()) {
@@ -192,7 +229,8 @@ class CoursController extends \Library\BackController {
 						'matiere' => unserialize(base64_decode($request->postData('matiere'))),
 						'titre' => $request->postData('titre'),
 						'description' => $request->postData('description'),
-						'contenu' => $request->postData('contenu')
+						'contenu' => $request->postData('contenu'),
+						'uri' => \Library\Cleaner::getUri($request->postData('titre'))
 					));
 				
 					if($cours->isValid()) {

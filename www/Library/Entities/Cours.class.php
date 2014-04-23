@@ -12,7 +12,8 @@ class Cours extends \Library\Entity {
 	$dateModif,								// Date de la dernière modification du cours
 	$matiere,								// Matière à laquelle le cours fait référence (clé étrangère)
 	$classe,								// Classe dans laquelle le cours a été donné (clé étrangère)
-	$commentaires;
+	$commentaires,
+	$vues;
 	
 	const AUTEUR_INVALIDE = 1;
 	const TITRE_INVALIDE = 2;
@@ -95,8 +96,8 @@ class Cours extends \Library\Entity {
 		$this->commentaires = $commentaires;
 	}
 
-	public function setCount_c($count) {
-		$this->count_c = $count;
+	public function setVues(array $vues) {
+		$this->vues = $vues;
 	}
 	
 	// GETTERS //
@@ -111,6 +112,7 @@ class Cours extends \Library\Entity {
 	public function matiere() { return $this->matiere; }
 	public function classe() { return $this->classe; }
 	public function commentaires() { return $this->commentaires; }
+	public function vues() { return $this->vues; }
 }
 
 ?>

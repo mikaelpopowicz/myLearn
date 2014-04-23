@@ -58,7 +58,8 @@
 					<dd><?php echo $user->getAttribute('email');?></dd>
 				</dl>
 				<p class="text-center">
-					<a href="/admin/parametres/modifier-user" class="btn btn-primary"><i class="fa fa-edit"></i> Modifier</a>
+					<a href="/admin/parametres/modifier-user" class="btn btn-primary"><i class="fa fa-edit"></i> Modifier profil</a>
+					<a href="/admin/parametres/modifier-password" class="btn btn-warning"><i class="fa fa-edit"></i> Modifier mot de passe</a>
 				</p>
 			</div>
 		</div>
