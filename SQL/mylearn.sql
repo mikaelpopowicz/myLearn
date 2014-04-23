@@ -424,10 +424,10 @@ BEGIN
   Declare id int;
   SET id = (SELECT autoincrement());
   
-  # Vérifions que l'admin n'est pas bête au point de faire des doublons
+  # Vérifions que l admin n est pas bête au point de faire des doublons
   IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON u.id_u = e.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND e.dateNaissance = a_dateNaissance) < 1
   THEN
-    # Insertion de l'élève dans la table USER
+    # Insertion de l élève dans la table USER
     INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
     INSERT INTO eleve VALUES(id, a_dateNaissance);
   END IF;
@@ -476,7 +476,7 @@ BEGIN
   # Récupération du nouvel id
   Declare id int;
   SET id = (SELECT autoincrement());
-  # Vérifions que l'admin n'est pas bête au point de faire des doublons
+  # Vérifions que l admin n est pas bête au point de faire des doublons
   IF (SELECT COUNT(*) FROM user u INNER JOIN professeur p ON p.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND p.id_m = matiere) < 1
   THEN
     # Insertion du professeur dans la table USER
@@ -528,7 +528,7 @@ BEGIN
   # Récupération du nouvel id
   Declare id int;
   SET id = (SELECT autoincrement());
-  # Vérifions que l'admin n'est pas bête au point de faire des doublons
+  # Vérifions que l admin n est pas bête au point de faire des doublons
   IF (SELECT COUNT(*) FROM user u INNER JOIN administrateur a ON a.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND a.poste = a_poste) < 1
   THEN
     # Insertion du professeur dans la table USER
@@ -714,7 +714,7 @@ BEGIN
   # Suppression de la plus vielle version si il y en déjà 5
   IF versions > 4
   THEN
-    # /!\ ATTENTION /!\ pour trouver le dateModif le plus petit, il faut utiliser une sous-requête avec un alias, car l'on cherche dans la table ou l'on veut supprimer cela bloque la table en question !!
+    # /!\ ATTENTION /!\ pour trouver le dateModif le plus petit, il faut utiliser une sous-requête avec un alias, car l on cherche dans la table ou l on veut supprimer cela bloque la table en question !!
     DELETE FROM vers_cours
     WHERE id_cours = new.id_cours
     AND dateModif in (
