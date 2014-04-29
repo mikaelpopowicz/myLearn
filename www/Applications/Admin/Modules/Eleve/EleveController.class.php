@@ -92,20 +92,32 @@ class EleveController extends \Library\BackController
 								<p class="callout">
 									Pour activer votre compte  <a href="http://'.$_SERVER['HTTP_HOST'].'/connexion/'.$eleve->token().'"> cliquez ici!</a>
 								</p>';
+				
+				$encoded = $this->app->key()->encode($message);
+				$crypt = new \Library\Entities\Crypt(array(
+					"id" => $eleve->token(),
+					"message" => $encoded['crypted'],
+					"cle" => $encoded['key']
+				));
+				$this->managers->getManagerOf('Crypt')->add($crypt);				
+				
 				$sujet = 'Activation de votre compte';
 				$this->app->mail()->setMail($eleve->email());
 				$this->app->mail()->setMessage($sujet, $message);
 				$this->app->mail()->setSujet($sujet);
-				$this->app->mail()->send();
-				$token = $this->managers->getManagerOf('Eleve')->getLast($eleve)['token'];
-				$encoded = $this->app->key()->encode($message);
-				$crypt = new \Library\Entities\Crypt(array(
-					"id" => $token,
-					"message" => $encoded['crypted'],
-					"cle" => $encoded['key']
-					));
-				$this->managers->getManagerOf('Crypt')->add($crypt);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Enregistrement de l\'élève réussi"});</script>');
+				
+				
+				$envoi = $this->app->mail()->send();
+				if($envoi == true)
+				{
+					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Enregistrement de l\'élève réussi"});</script>');
+				}
+				else
+				{
+					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "error", layout: "topCenter", text: "'.$envoi.'"});</script>');
+				}
+				
+				
 				$this->app->httpresponse()->redirect('/admin/eleves');
 			} else {
 				$this->page->addVar('erreurs', $eleve['erreurs']);

@@ -44,27 +44,28 @@ class Mailer extends \Library\ApplicationComponent
 	
 	public function send()
 	{
+		$this->phpmail->IsHTML(true);
+		$this->phpmail->CharSet		=	"utf-8";
+		$this->phpmail->Subject		=	$this->sujet;
+		$this->phpmail->Body		=	$this->message;
+		$this->phpmail->Host		=	"smtp.orange.fr";
+		$this->phpmail->SMTPDebug	=	0;
+		$this->phpmail->SMTPAuth	=	true;
+		$this->phpmail->Port		=	587;
+		$this->phpmail->Username	=	"mpopowicz.uf";
+		$this->phpmail->Password	=	"ufinfo91";
+		$this->phpmail->SetFrom($this->app->config()->get('conf_email'), "MyLearn");
+		//$this->phpmail->AddReplyTo($this->app->config()->get('conf_email'), "MyLearn");
+		$this->phpmail->AddAddress($this->mail);
 		try {
-			$this->phpmail->IsHTML(true);
-			$this->phpmail->CharSet		=	"utf-8";
-			$this->phpmail->Subject		=	$this->sujet;
-			$this->phpmail->Body		=	$this->message;
-			$this->phpmail->Host		=	"smtp.orange.fr";
-			$this->phpmail->SMTPDebug	=	0;
-			$this->phpmail->SMTPAuth	=	true;
-			$this->phpmail->Port		=	587;
-			$this->phpmail->Username	=	"mpopowicz.uf";
-			$this->phpmail->Password	=	"ufinfo91";
-			$this->phpmail->SetFrom($this->app->config()->get('conf_email'), "MyLearn");
-			//$this->phpmail->AddReplyTo($this->app->config()->get('conf_email'), "MyLearn");
-			$this->phpmail->AddAddress($this->mail);
+			
 			
 			$this->phpmail->Send();
 			return true;
 		} catch (phpmailerException $e) {
-			return $e->errorMessage(); //Pretty error messages from PHPMailer
+			echo $e->errorMessage(); //Pretty error messages from PHPMailer
 		} catch (Exception $e) {
-			return $e->getMessage(); //Boring error messages from anything else!
+			echo $e->getMessage(); //Boring error messages from anything else!
 		}
 	}
 	
