@@ -22,12 +22,33 @@ class HTTPResponse
 		exit;
 	}
 
-	public function redirect404()
+	public function redirect404($page = array())
 	{
 		$this->page = new Page($this->app);
+		if ($page instanceof \Library\Page)
+		{
+			$vars = $page->getVars();
+			if(is_array($vars))
+			{
+				foreach ($vars as $var => $value) {
+					$this->page->addVar($var,$value);
+				}
+			}
+		}
 		$this->page->setContentFile(__DIR__.'/../Errors/404.html');
 		$this->page->addVar('title', '404 Page non trouvée');
 		$this->addHeader('HTTP/1.0 404 Not Found');
+     
+		$this->send();
+	}
+	
+	public function redirect503()
+	{
+		$this->page = new Page($this->app);
+		$this->page->setContentFile(__DIR__.'/../Errors/503.html');
+		$this->page->addVar('title', '503 Service temporairement indisponible');
+		$this->addHeader('HTTP/1.1 503 Service Temporarily Unavailable');
+		$this->addHeader('Status: 503 Service Temporarily Unavailable');;
      
 		$this->send();
 	}

@@ -28,12 +28,6 @@ abstract class CoursManager extends \Library\Manager
 	abstract public function getUnique($id);
 	
 	/**
-	* Méthode renvoyant le nombre de news total.
-	* @return int
-	*/
-	abstract public function count();
-	
-	/**
 	* Méthode permettant d'ajouter une news.
 	* @param $news News La news à ajouter
 	* @return void

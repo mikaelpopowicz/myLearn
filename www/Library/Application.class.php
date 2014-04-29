@@ -9,21 +9,25 @@ abstract class Application
 	protected $user;
 	protected $config;
 	protected $key;
-   
-	public function __construct()
+	protected $mail;
+	protected $message;
+	protected $loading;
+	public function __construct($name = "", $start)
 	{
-		$this->httpRequest = new HTTPRequest($this);
-		$this->httpResponse = new HTTPResponse($this);
-		$this->user = new User($this);
-		$this->config = new Config($this);
-		$this->name = '';
-		$this->key = new Keygen($this);
+		$this->name			= $name;
+		$this->httpRequest	= new HTTPRequest($this);
+		$this->httpResponse	= new HTTPResponse($this);
+		$this->user			= new User($this);
+		$this->config		= new Config($this);
+		$this->key			= new Keygen($this);
+		$this->message		= new Message($this);
+		$this->loading		= new Loading($start);
+		setlocale(LC_ALL, 'en_US.UTF8');
 	}
    
 	public function getController()
 	{
 		$router = new \Library\Router;
-     
 		$xml = new \DOMDocument;
 		$xml->load(__DIR__.'/../Applications/'.$this->name.'/Config/routes.xml');
 		$routes = $xml->getElementsByTagName('route');
@@ -54,7 +58,11 @@ abstract class Application
 			if ($e->getCode() == \Library\Router::NO_ROUTE)
 			{
 				// Si aucune route ne correspond, c'est que la page demandée n'existe pas.
-				$this->httpResponse->redirect404();
+				if ($this->user->isAuthenticated()) {
+					$this->httpResponse->redirect404(new \Library\Page($this));
+				} else {
+					return false;
+				}
 			}
 		}
      
@@ -93,5 +101,17 @@ abstract class Application
 	
 	public function key() {
 		return $this->key;
+	}
+
+	public function mail() {
+		return $this->mail;
+	}
+	
+	public function message() {
+		return $this->message;
+	}
+	
+	public function loading() {
+		return $this->loading;
 	}
 }
