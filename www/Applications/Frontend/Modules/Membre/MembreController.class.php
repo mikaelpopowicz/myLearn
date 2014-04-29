@@ -49,7 +49,7 @@ class MembreController extends \Library\BackController
 					$check = $request->postData('check');
 					$delete = array();
 					for ($i = 0; $i < count($check); $i++) {
-						$delete[$i] = $this->managers->getManagerOf('Cours')->getUnique($check[$i]);
+						$delete[$i] = $this->managers->getManagerOf('Cours')->getUnique($check[$i])['cours'];
 					}
 					$this->page->addVar('delete', $delete);
 					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete.php');
@@ -58,12 +58,16 @@ class MembreController extends \Library\BackController
 					$this->app->user()->setFlash('<script>noty({type: "warning", layout: "topCenter", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un cours pour le supprimer"});</script>');
 				}
 			}
+			$result = $this->managers->getManagerOf('Cours')->getListByAuthor($user->id());
+			if(isset($result['cours']))
+			{
+				$this->page->addVar('listeCours', $result['cours']);
+			}
 
-			$this->page->addVar('title', 'Mika-p - Mes cours');
+			$this->page->addVar('title', 'MyLearn - Mes cours');
 			$this->page->addVar('class_mes_cours', 'active');
 		
 			$this->page->addVar('profil', $user);
-			$this->page->addVar('listeCours', $this->managers->getManagerOf('Cours')->getListByAuthor($user->id())['cours']);
 			$this->page->addVar('key', $this->app->key());
 		}
 		
@@ -137,10 +141,6 @@ class MembreController extends \Library\BackController
 			$this->page->addVar('class_profil', 'active');
 			$this->page->addVar('profil', $user);
 		}
-		else
-		{
-			
-		}
 	}
 
 	public function executeModifierPass(\Library\HTTPRequest $request)
@@ -151,14 +151,6 @@ class MembreController extends \Library\BackController
 			if($request->postExists('pass1') && $request->postExists('pass2')) {
 				$pass1 = $request->postData('pass1');
 				$pass2 = $request->postData('pass2');
-				$date = $request->postData('anniversaire');
-				if(!empty($date)) {
-					$date = explode('/', $date);
-					$date = $date[2].'-'.$date[1].'-'.$date[0];
-					$date = new \DateTime($date);
-				} else {
-					$date = new \DateTime('0000-00-00');
-				}
 
 				if($pass1 == $pass2) {
 					$user->setPassword(sha1(md5(sha1(md5($user['salt'])).sha1(md5($request->postData('pass1'))).sha1(md5($user['salt'])))));

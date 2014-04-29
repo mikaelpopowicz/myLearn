@@ -131,8 +131,9 @@ class MatiereManager_PDO extends MatiereManager
 					$result['pages'] = $requete->fetch(\PDO::FETCH_ASSOC)['Pages'];
 					$requete->nextRowset();
 					$nb = $requete->fetch(\PDO::FETCH_ASSOC)['Cours'];
-					$requete->nextRowset();
-					for ($i=0; $i < $nb; $i++) { 
+					for ($i=0; $i < $nb; $i++)
+					{
+						$requete->nextRowset();
 						$result['cours'][] = \Library\Models\CoursManager_PDO::getObj($requete);
 					}
 				}
@@ -154,7 +155,6 @@ class MatiereManager_PDO extends MatiereManager
 			$result['classe'] = $requete->fetch();
 		}
 		$requete->closeCursor();
-		//echo '<pre>';print_r($result);echo '</pre>';
 		return $result;
 	}
 	

@@ -113,11 +113,20 @@ class ConnexionController extends \Library\BackController
 				$crypt = $result['mail'];
 				$mail = $this->app->key()->decode($crypt->message(), $crypt->cle());
 				$sujet = 'Activation de votre compte';
-				$this->app->mail()->setMail($mail);
+				$this->app->mail()->setMail($request->postData('email'));
 				$this->app->mail()->setMessage($sujet, $mail);
 				$this->app->mail()->setSujet($sujet);
-				$this->app->mail()->send();
-				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$message->type().'", layout: "topCenter", text: "'.$message->message().'"});</script>');
+				$envoi = $this->app->mail()->send();
+				if($envoi != true)
+				{
+					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "error", layout: "topCenter", text: "'.$envoi.'"});</script>');
+				}
+				else
+				{
+					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$message->type().'", layout: "topCenter", text: "'.$message->message().'"});</script>');
+				}
+				
+				
 				$this->app->httpResponse()->redirect('/');
 			}
 			else if($message->code() == "ACT_WM")

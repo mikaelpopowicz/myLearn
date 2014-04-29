@@ -1,115 +1,63 @@
-drop procedure if exists activation;
-drop procedure if exists activation_request;
-drop table if exists errors;
+drop procedure if exists select_matiere_cours;
 
-#INSERT INTO cours SET id_m = 1, id_classe = 1, id_u = 2, titre = "Arithmétique", description = "Super cours de maths", contenu = "pas encore de contenu", dateAjout = curdate(), dateModif = curdate();
+DELIMITER @@
 
 # -----------------------------------------------------------------------------
-#       TABLE : errors
-# -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS errors
- (
-   code VARCHAR(10) NOT NULL  ,
-   message VARCHAR(128) NOT NULL  ,
-   type VARCHAR(10) NOT NULL
-   , PRIMARY KEY (code) 
- ) 
- comment = "";
- DELETE FROM errors;
-INSERT INTO errors VALUES("OP_S","Opération réussie","success"),
-("OP_F","Opération echouée","error"),
-("LOG_WP","Erreur de saisie identidiant/mot de passe","danger"),
-("LOG_NA","Votre compte n'est pas encore activÃ©","warning"),
-("ACT_WT","Une erreur s'est produite, veuillez recommencer la procÃ©dure d'activation","error"),
-("ACT_WM","Aucun compte ne correspond à cet email","danger"),
-("ACT_AA","Ce compte est dÃ©jà activÃ©","warning"),
-("ACT_RS","Mail envoyé","success"),
-("ACT_S","Activation rÃ©ussie","success");
-
-Delimiter @@
-
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : activation()
+#       PROCEDURE : select_matiere_cours()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE activation(oldtk VARCHAR(40), newtk VARCHAR(40))
+CREATE PROCEDURE select_matiere_cours(mat INTEGER, class INTEGER, qte INTEGER, debut INTEGER)
 BEGIN
-	Declare id INTEGER;
-	Declare actif INTEGER;
-	SELECT id_u, active INTO id,actif
-	FROM user
-	WHERE token = oldtk;
+	# Déclaration
+	Declare fini int default 0;
+	Declare id, page INTEGER;
 	
-	IF id IS NULL OR id = 0 THEN
-		SELECT * FROM errors WHERE code = "ACT_WT";
+	# Curseur 1
+	Declare cur1 CURSOR
+	FOR SELECT id_cours
+		FROM cours
+		WHERE id_m = mat
+		ORDER BY dateAjout DESC;
+		
+	# Curseur 2
+	Declare cur2 CURSOR
+	FOR SELECT id_cours
+		FROM cours
+		WHERE id_m = mat
+		AND id_classe = class
+		ORDER BY dateAjout DESC
+		LIMIT debut,qte;
+		
+	# Gestionnaire d'erreur
+	Declare continue HANDLER
+		FOR NOT FOUND SET fini = 1;
+	
+	# Nombre de cours
+	IF class IS NULL OR class = 0 THEN
+		SELECT COUNT(*) AS "Cours_1" FROM cours WHERE id_m = mat;
+		Open cur1;
+		FETCH cur1 INTO id;
+		WHILE fini != 1	DO
+			CALL select_cours(id, false);
+			FETCH cur1 INTO id;
+		END WHILE;
+		Close cur1;
 	ELSE
-		IF actif = 0 THEN
-			UPDATE user
-			SET active = 1,
-			token = newtk
-			WHERE id_u = id;
-			SELECT * FROM errors WHERE code = "ACT_S";
+		IF MOD((SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class),qte) = 0 THEN
+			SET page = (SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class)/qte;
 		ELSE
-			SELECT * FROM errors WHERE code = "ACT_AA";
+			SET page = FLOOR((SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class)/qte) + 1;
 		END IF;
+		SELECT page AS "Pages";
+		SELECT COUNT(*) AS "Cours" FROM (SELECT * FROM cours WHERE id_m = mat AND id_classe = class LIMIT debut,qte) AS test;
+		Open cur2;
+		FETCH cur2 INTO id;
+		WHILE fini != 1 DO
+			CALL select_cours(id, false);
+			FETCH cur2 INTO id;
+		END WHILE;
+		Close cur2;
 	END IF;
 END @@
 
-# -----------------------------------------------------------------------------
-#       PROCEDURE : activation_request()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE activation_request(mail VARCHAR(128))
-BEGIN
-	Declare id INTEGER;
-	Declare actif INTEGER;
-	Declare tk VARCHAR(40);
-	SELECT id_u, active,token INTO id,actif,tk
-	FROM user
-	WHERE email = mail;
-	
-	IF id IS NULL OR id = 0 THEN
-		SELECT true AS "erreur";
-		SELECT * FROM errors WHERE code = "ACT_WM";
-	ELSE
-		IF actif = 0 THEN
-			SELECT false AS "erreur";
-			SELECT * FROM crypt WHERE token = tk;
-			SELECT * FROM errors WHERE code = "ACT_RS";
-		ELSE
-			SELECT true AS "erreur";
-			SELECT * FROM errors WHERE code = "ACT_AA";
-		END IF;
-	END IF;
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : password_request()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE password_request(mail VARCHAR(128))
-BEGIN
-	Declare id INTEGER;
-	Declare actif INTEGER;
-	Declare tk VARCHAR(40);
-	SELECT id_u, active,token INTO id,actif,tk
-	FROM user
-	WHERE email = mail;
-	
-	IF id IS NULL OR id = 0 THEN
-		SELECT true AS "erreur";
-		SELECT * FROM errors WHERE code = "ACT_WM";
-	ELSE
-		IF actif = 1 THEN
-			SELECT false AS "erreur";
-			SELECT tk AS "token";
-			SELECT * FROM errors WHERE code = "ACT_RS";
-		ELSE
-			SELECT true AS "erreur";
-			SELECT * FROM errors WHERE code = "LOG_NA";
-		END IF;
-	END IF;
-END @@
-
-Delimiter ;
+DELIMITER ;

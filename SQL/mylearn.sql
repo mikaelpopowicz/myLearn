@@ -184,8 +184,7 @@ CREATE TABLE IF NOT EXISTS cours
    description VARCHAR(128) NULL  ,
    contenu TEXT NULL  ,
    dateAjout DATETIME NULL  ,
-   dateModif DATETIME NULL  ,
-   vues INTEGER
+   dateModif DATETIME NULL
    , PRIMARY KEY (id_cours) 
  ) 
  comment = "";
@@ -924,7 +923,7 @@ BEGIN
 								# Selection du cours
 								SELECT false AS "erreur";
 								INSERT INTO vue SET id_u = util, id_cours = idcr, dateVue = sysdate();
-								CALL select_cours(idcr);
+								CALL select_cours(idcr, false);
 							END IF;
 						ELSE
 							CALL select_matiere(idc,idm,qte,page);
@@ -941,7 +940,7 @@ BEGIN
 		END IF;
 	END IF;
 	SET fin = CURTIME(4);
-	SELECT debut,fin,TIMEDIFF(fin,debut) AS "Compteur";
+	#SELECT debut,fin,TIMEDIFF(fin,debut) AS "Compteur";
 END @@
 
 # -----------------------------------------------------------------------------
@@ -1025,7 +1024,7 @@ BEGIN
 		Open cur1;
 		FETCH cur1 INTO id;
 		WHILE fini != 1	DO
-			CALL select_cours(id);
+			CALL select_cours(id, false);
 			FETCH cur1 INTO id;
 		END WHILE;
 		Close cur1;
@@ -1033,14 +1032,95 @@ BEGIN
 		IF MOD((SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class),qte) = 0 THEN
 			SET page = (SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class)/qte;
 		ELSE
-			SET page = ((SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class)/qte) + 1;
+			SET page = FLOOR((SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class)/qte) + 1;
 		END IF;
 		SELECT page AS "Pages";
 		SELECT COUNT(*) AS "Cours" FROM (SELECT * FROM cours WHERE id_m = mat AND id_classe = class LIMIT debut,qte) AS test;
 		Open cur2;
 		FETCH cur2 INTO id;
 		WHILE fini != 1 DO
-			CALL select_cours(id);
+			CALL select_cours(id, false);
+			FETCH cur2 INTO id;
+		END WHILE;
+		Close cur2;
+	END IF;
+END @@
+
+# -----------------------------------------------------------------------------
+#       PROCEDURE : select_cours_lastfav()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE select_cours_lastfav(user INTEGER)
+BEGIN
+	# Déclaration
+	Declare fini INTEGER default 0;
+	Declare id, vues, fav, last INTEGER;
+	
+	# Curseur 1
+	Declare cur1 CURSOR
+	FOR SELECT c.id_cours AS 'Cours',COUNT(v.id_v) 
+		FROM cours c
+		INNER JOIN etre e ON e.id_classe = c.id_classe
+		INNER JOIN vue v ON c.id_cours = v.id_cours
+		AND c.id_u <> v.id_u
+		WHERE e.id_u = user
+		GROUP BY c.id_cours
+		ORDER BY COUNT(v.id_v) DESC
+		LIMIT 0,5;
+		
+	# Curseur 2
+	Declare cur2 CURSOR
+	FOR SELECT c.id_cours
+		FROM cours c
+		INNER JOIN etre e ON e.id_classe = c.id_classe
+		WHERE e.id_u = user
+		ORDER BY dateAjout DESC
+		LIMIT 0,5;
+		
+	# Gestionnaire d'erreur
+	Declare continue HANDLER
+		FOR NOT FOUND SET fini = 1;
+	
+	SELECT COUNT(*) INTO fav FROM (
+		SELECT c.id_cours
+		FROM cours c
+		INNER JOIN vue v ON c.id_cours = v.id_cours
+		AND c.id_u <> v.id_u
+		INNER JOIN etre e ON e.id_classe = c.id_classe
+		WHERE e.id_u = user
+		GROUP BY c.id_cours
+	) AS requete;
+	
+	SELECT fav AS 'Favorites';
+	
+	IF fav > 0 THEN
+		Open cur1;
+		FETCH cur1 INTO id, vues;
+		WHILE fini != 1	DO
+			CALL select_cours(id, true);
+			FETCH cur1 INTO id, vues;
+		END WHILE;
+		Close cur1;
+		SET fini = 0;
+	END IF;
+	
+	SELECT COUNT(*) INTO last
+	FROM (
+		SELECT c.id_cours
+		FROM cours c
+		INNER JOIN etre e ON e.id_classe = c.id_classe
+		WHERE e.id_u = user
+		ORDER BY dateAjout DESC
+		LIMIT 0,5
+	 ) AS requete;
+	
+	SELECT last AS 'Last';
+	
+	IF last > 0 THEN
+		Open cur2;
+		FETCH cur2 INTO id;
+		WHILE fini != 1	DO
+			CALL select_cours(id, true);
 			FETCH cur2 INTO id;
 		END WHILE;
 		Close cur2;
@@ -1051,15 +1131,23 @@ END @@
 #       PROCEDURE : select_cours()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE select_cours(cours INTEGER)
+CREATE PROCEDURE select_cours(cours INTEGER, complet BOOLEAN)
 BEGIN
 	Declare classe INTEGER;
-	Declare id INTEGER;
+	Declare id, idc, idm INTEGER;
 	DECLARE no_cours CONDITION FOR 1329;
 	DECLARE EXIT HANDLER FOR no_cours
 	BEGIN
 		SELECT "Ce cours n'existe pas" AS "Message";
 	END;
+	
+	IF complet = true THEN
+		SELECT id_classe, id_m INTO idc, idm
+		FROM cours
+		WHERE id_cours = cours;
+		CALL select_class(idc);
+		CALL select_matiere(idc,idm,NULL,NULL);
+	END IF;
 	
 	# Cours	
 	SELECT id_cours AS id, titre, uri, description, contenu, dateAjout, dateModif
@@ -1109,9 +1197,11 @@ BEGIN
 	
 	# Curseur
 	Declare cur1 CURSOR
-	FOR SELECT id_v
-		FROM vue
-		WHERE id_cours = cours;
+	FOR SELECT v.id_v
+		FROM vue v
+		INNER JOIN cours c ON c.id_cours = v.id_cours
+		WHERE v.id_cours = cours
+		AND c.id_u <> v.id_u;
 		
 	# Gestionnaire d'erreur
 	Declare continue HANDLER
@@ -1119,8 +1209,10 @@ BEGIN
 	
 	# Nombre de cours
 	SELECT COUNT(*) AS "Vues"
-	FROM vue
-	WHERE id_cours = cours;
+	FROM vue v
+	INNER JOIN cours c ON c.id_cours = v.id_cours
+	WHERE v.id_cours = cours
+	AND c.id_u <> v.id_u;
 	
 	# Ouverture du curseur
 	Open cur1;
@@ -1220,7 +1312,7 @@ BEGIN
 	WHILE fini != 1	DO
 		CALL select_class(idc);
 		CALL select_matiere(idc,idm,NULL,NULL);
-		CALL select_cours(id);
+		CALL select_cours(id, false);
 		FETCH cur1 INTO id, idc, idm;
 	END WHILE;
 	Close cur1;
@@ -1580,6 +1672,7 @@ CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba
 
 # Ajout des élèves
 CALL ajouter_eleve("miko", "Popowicz", "Mikael", "mikael.popowicz@gmail.com","6cab4ededffe060e7218b01d29c9e05437ea50b8", "MogaT0OEtu8KrKDpH4ZqIFTHVvpMHhz432Jb5OEg", "UpGTd7CJn6AcuNuqIGvyMtYWnyap9y6Crlh1CnJb", "0000-00-00");
+CALL ajouter_eleve("cam", "Docquier", "Camille", "docquier.camille@gmail.com","6cab4ededffe060e7218b01d29c9e05437ea50b8", "MogaT0OEtu8KrKDpH4ZqIFTHVvpMHhz432Jb5OEg", "MogaT0OEtu8KrKDpH4ZqIFTHVvpMHhz432Jb5OEg", "0000-00-00");
 UPDATE user SET active = 1;
 
 # Assignation des matières aux classes
@@ -1604,6 +1697,7 @@ INSERT INTO charger VALUES(1,2),
 
 # Assignation d'élève aux classes
 INSERT INTO etre VALUES(3,1);
+INSERT INTO etre VALUES(4,1);
 
 insert into cours set id_m = 1, id_classe = 1, id_u = 3, titre = "test", uri = "test", description = "test", contenu = "test", dateAjout = sysdate(), dateModif = sysdate();
 

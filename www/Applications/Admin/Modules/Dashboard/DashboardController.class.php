@@ -72,6 +72,12 @@ class DashboardController extends \Library\BackController
 		$this->page->addVar('admin', $this->managers->getManagerOf('Administrateur'));
 		$this->page->addVar('prof', $this->managers->getManagerOf('Professeur'));
 		$this->page->addVar('eleve', $this->managers->getManagerOf('Eleve'));
+		
+		if($request->postExists('addVolume'))
+		{
+			$this->managers->getManagerOf('Cours')->addVolume();
+			$this->app->httpresponse()->redirect('/admin');
+		}
 	}
 }
 ?>

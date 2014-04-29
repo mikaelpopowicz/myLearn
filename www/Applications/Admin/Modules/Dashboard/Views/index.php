@@ -112,3 +112,8 @@
 		</div>
 	</div>
 </div>
+<form method="post">
+	<button class="btn btn-primary" type="submit" name="addVolume">
+		Génération en masse
+	</button>
+</form>

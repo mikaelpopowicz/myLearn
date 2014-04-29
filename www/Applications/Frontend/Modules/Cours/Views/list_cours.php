@@ -33,6 +33,9 @@
 		<div class="row-fluid sidebar-right">
 			<div class="span9 blog-summary primary-column">
 				<?php
+				// Pagination
+				echo isset($pagination) ? $pagination : "";
+				
 				if (isset($lesCours)){
 					foreach ($lesCours as $cours) {
 				?>
@@ -67,7 +70,9 @@
 				}
 				?>
 				<!-- Pagination -->
-				
+				<?php
+				echo isset($pagination) ? $pagination : "";
+				?>
 				
 			</div>
 			<!-- / .span9 .blog-summary-->

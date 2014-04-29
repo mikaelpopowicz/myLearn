@@ -18,6 +18,7 @@ class CoursController extends \Library\BackController {
 	public function executeList_cours(\Library\HTTPRequest $request)
 	{
 		$result = $this->managers->getManagerOf('Matiere')->getByName($request->getData('libelle'), $this->app->user()->getAttribute('id'), $request->getData('matiere'),$this->app->config()->get('cours_page'), $request->getData('page'));
+		$this->page->addVar('special', $this->managers->getManagerOf('Cours')->getLastFav($this->app->user()->getAttribute('id')));
 
 		if(isset($result['classe']) && ($result['classe'] instanceof \Library\Entities\Classe))
 		{
@@ -36,6 +37,22 @@ class CoursController extends \Library\BackController {
 				if(isset($result['cours']) && is_array($result['cours']))
 				{
 					$cours = $result['cours'];
+					
+					$page = $request->getData('page');
+					$page = str_replace('_','',$page);
+					$page = !empty($page) && $page > 1 ? $page : 1;
+					
+					if(isset($result['pages']) && $result['pages'] > 1)
+					{
+						$paginate = \Library\Pagination::toString(array(
+							'delta' => 5,
+							'number' => $result['pages'],
+							'current' => $page,
+							'url' => '/cours/'.str_replace('/','-',$classe->session()->session()).'/'.$classe->uri().'/'.$matiere->uri()
+						));
+						$this->page->addVar('pagination', $paginate);
+					}
+					
 					
 					$this->page->addVar('lesCours', $cours);
 				}
@@ -106,7 +123,8 @@ class CoursController extends \Library\BackController {
 	public function executeShow(\Library\HTTPRequest $request)
 	{
 		$result = $this->managers->getManagerOf('Cours')->getByName($request->getData('libelle'), $this->app->user()->getAttribute('id'), $request->getData('matiere'), $request->getData('cours'));
-
+		$this->page->addVar('special', $this->managers->getManagerOf('Cours')->getLastFav($this->app->user()->getAttribute('id')));
+		
 		if(isset($result['classe']) && ($result['classe'] instanceof \Library\Entities\Classe))
 		{
 			$classe = $result['classe'];
@@ -199,7 +217,7 @@ class CoursController extends \Library\BackController {
 		
 			if($cours->isValid()) {
 				$this->managers->getManagerOf('Cours')->save($cours);
-				$this->app->user()->setFlash('<script>noty({type: "success", layout: "topCenter", text: "<strong>Cours enregistré !</strong>"});</script>');
+				$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "success", layout: "topCenter", text: "<strong>Cours enregistré !</strong>"});</script>');
 				$this->app->httpResponse()->redirect('/membre/mes-cours');
 			} else {
 				$this->page->addVar('cours', $cours);
@@ -207,16 +225,20 @@ class CoursController extends \Library\BackController {
 			}
 		}
 
-		$this->page->addVar('title', 'Mika-p - Ecrire un cours');
+		$this->page->addVar('title', 'MyLearn - Ecrire un cours');
 		
 		$this->page->addVar('matieres', unserialize(base64_decode($this->app->user()->getAttribute('classes')[0]))->matieres());
 	}
 
 	public function executeModifier(\Library\HTTPRequest $request)
 	{
-		$cours = $this->managers->getManagerOf('Cours')->getUnique($request->getData('id'));
-		if($cours instanceof \Library\Entities\Cours) {
-			if($cours->auteur()->id() == $this->app->user()->getAttribute('id')) {
+		$result = $this->managers->getManagerOf('Cours')->getUnique($request->getData('id'));
+		if(isset($result['cours']) && ($result['cours'] instanceof \Library\Entities\Cours))
+		{
+			$cours = $result['cours'];
+			
+			if($cours->auteur()->id() == $this->app->user()->getAttribute('id'))
+			{
 				$this->page->addVar('matieres', $cours->classe()->matieres());
 				
 				if($request->postExists('annuler')) {
@@ -243,7 +265,7 @@ class CoursController extends \Library\BackController {
 					}
 				}
 
-				$this->page->addVar('title', 'Mika-p - Modifier - '.$cours->titre());
+				$this->page->addVar('title', 'MyLearn - Modifier - '.$cours->titre());
 				$this->page->addVar('cours', $cours);
 			} else {
 				$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "Vous ne pouvez pas modifier ce cours car vous n\'en n\'êtes pas l\'auteur"});</script>');

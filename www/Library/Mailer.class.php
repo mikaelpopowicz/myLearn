@@ -7,44 +7,29 @@ class Mailer extends \Library\ApplicationComponent
 	private $sujet;
 	private $titre;
 	private $message;
-	private $headers;
-	private $ligne;
-	private $boundary;
 	private $team;
 	private $contact;
+	private $phpmail;
 	
 	
 	public function __construct($app) {
 		parent::__construct($app);
-		$this->setLigne("\n");
-		$this->boundary = "-----=".md5(rand());
-		$this->setHeaders($this->app->config()->get('conf_email'));
+		
 		$this->setTeam($app->config()->get('conf_nom'));
 		$this->setContact($app->config()->get('conf_contact'));
-		//echo $app->config()->get('conf_email');
+		
+		$this->phpmail = new \PHPMailer(true);
+		$this->phpmail->IsSMTP();
 	}
 	
 	public function setMail($mail) {
 		$this->mail = $mail;
-		
-		if (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $mail)) {
-			$this->setLigne("\r\n");
-		}
 	}
 	
 	public function setSujet($sujet) {
 		$this->sujet = $sujet;
 	}
-	
-	public function setHeaders($sender) {
-		$this->headers = "From: \"myLearn\"<".$sender.">".$this->ligne;
-		$this->headers.= "Reply-to: \"myLearn\" <".$sender.">".$this->ligne;
-		$this->headers.= "MIME-Version: 1.0".$this->ligne;
-		$this->headers.= "Content-Type: multipart/alternative;".$this->ligne." boundary=\"$this->boundary\"".$this->ligne;
-	}
 
-	public function headers() { return $this->headers; }
-	
 	public function setLigne($ligne) {
 		$this->ligne = $ligne;
 	}
@@ -57,22 +42,40 @@ class Mailer extends \Library\ApplicationComponent
 		$this->contact = $contact;
 	}
 	
-	public function send() {
-		do {
-			$envoi = mail($this->mail, $this->sujet, $this->message, $this->headers);
-		} while (!$envoi);
-		
+	public function send()
+	{
+		try {
+			$this->phpmail->IsHTML(true);
+			$this->phpmail->CharSet		=	"utf-8";
+			$this->phpmail->Subject		=	$this->sujet;
+			$this->phpmail->Body		=	$this->message;
+			$this->phpmail->Host		=	"smtp.orange.fr";
+			$this->phpmail->SMTPDebug	=	0;
+			$this->phpmail->SMTPAuth	=	true;
+			$this->phpmail->Port		=	587;
+			$this->phpmail->Username	=	"mpopowicz.uf";
+			$this->phpmail->Password	=	"ufinfo91";
+			$this->phpmail->SetFrom($this->app->config()->get('conf_email'), "MyLearn");
+			//$this->phpmail->AddReplyTo($this->app->config()->get('conf_email'), "MyLearn");
+			$this->phpmail->AddAddress($this->mail);
+			
+			$this->phpmail->Send();
+			return true;
+		} catch (phpmailerException $e) {
+			return $e->errorMessage(); //Pretty error messages from PHPMailer
+		} catch (Exception $e) {
+			return $e->getMessage(); //Boring error messages from anything else!
+		}
 	}
 	
 	public function setMessage($titre, $message) {
-		//$dir = '../'.__DIR__;
-		
+		/*
 		$this->message = $this->ligne."--".$this->boundary.$this->ligne;
 		
 		//=====Ajout du message au format HTML
 		$this->message.= "Content-Type: text/html; charset=\"UTF-8\"".$this->ligne;
 		$this->message.= "Content-Transfer-Encoding: 8bit".$this->ligne;
-		
+		*/
 		$string = '
 			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 			<html xmlns="http://www.w3.org/1999/xhtml">
@@ -435,10 +438,12 @@ class Mailer extends \Library\ApplicationComponent
 
 			</body>
 			</html>';
-		$this->message.= $this->ligne.$string.$this->ligne;
+		$this->message .= $string;
+		/*
 		//==========
 		$this->message.= $this->ligne."--".$this->boundary."--".$this->ligne;
 		$this->message.= $this->ligne."--".$this->boundary."--".$this->ligne;
+		*/
 	}
 }
 ?>

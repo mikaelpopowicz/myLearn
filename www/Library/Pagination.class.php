@@ -8,18 +8,32 @@ class Pagination
 		// Récupération des variables
 		$delta = $params['delta'];
 		$number = $params['number'];
-		$current = $params['current'];
+		$cur_page = $params['current'];
 		$url = $params['url'];
 		
-		// Début de la chaine
-		$str = "<ul>";
+		$pre = array(
+			"class" => $cur_page == 1 ? " unavailable" : "",
+			"uri" => $cur_page == 1 ? "" : " href='".$url."_".($cur_page-1)."'"
+		);
 		
-		if ($number < 11)
+		$sui = array(
+			"class" => $cur_page == $number ? " unavailable" : "",
+			"uri" => $cur_page == $number ? "" : " href='".$url."_".($cur_page+1)."'"
+		);
+		
+		// Début de la chaine
+		$str = "<div class='pagination-centered'>\n\t<ul class='pagination'>";
+		$str .= "\n\t\t<li class='arrow".$pre['class']."'>\n\t\t\t<a".$pre['uri'].">«</a>\n\t\t</li>";
+		
+		
+		if ($number <= 12)
 		{
+			
+			
 			for ($i=1; $i < $number+1; $i++) { 
-				$cur = $current == $i ? " class='current'" : "";
-				$uri = $current == $i ? "" : " href='".$url."_".$i."'";
-				$str .= "\n\t<li".$cur.">\n\t\t<a".$uri.">".$i."</a>\n\t</li>";
+				$current = $cur_page == $i ? " class='current'" : "";
+				$uri = $cur_page == $i ? "" : " href='".$url."_".$i."'";
+				$str .= "\n\t\t<li".$current.">\n\t\t\t<a".$uri.">".$i."</a>\n\t\t</li>";
 			}
 		}
 		else
@@ -27,9 +41,10 @@ class Pagination
 			
 		}
 		
-				
+		
 		// Fin de la chaine et retour
-		$str .= "\n</ul>";
+		$str .= "\n\t\t<li class='arrow".$sui['class']."'>\n\t\t\t<a".$sui['uri'].">»</a>\n\t\t</li>";
+		$str .= "\n\t</ul>\n</div>";
 		return $str;
 	}
 }
