@@ -26,7 +26,5 @@
 	<route url="/mon-compte/mes-cours" module="Membre" action="mesCours" />
 	<route url="/mon-compte/configuration" module="Membre" action="maConfiguration" />
 	
-	
-	<route url="/membre/mes-cours" module="Membre" action="mesCours" />
-	
+	<route url="/search" module="Query" action="index" />
 </routes>

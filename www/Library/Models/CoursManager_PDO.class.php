@@ -146,6 +146,32 @@ class CoursManager_PDO extends CoursManager
 		return $result;
 	}
 	
+	public function search($query)
+	{
+		$requete = $this->dao->prepare('CALL search_engine(:query)');
+		$requete->bindValue(':query', $query);
+		$requete->execute();
+		$nombre = $requete->fetch(\PDO::FETCH_ASSOC)['Cours'];
+		
+		if($nombre > 0)
+		{
+			for ($i=0; $i < $nombre; $i++) { 
+				$requete->nextRowset();
+				$result['classe'] = \Library\Models\ClasseManager_PDO::getObj($requete);
+				$requete->nextRowset();
+				$result['matiere'] = \Library\Models\MatiereManager_PDO::getObj($requete);
+				$requete->nextRowset();
+				$result[$i] = \Library\Models\CoursManager_PDO::getObj($requete);
+				$result[$i]->setClasse($result['classe']);
+				$result[$i]->setMatiere($result['matiere']);
+				unset($result['classe']);
+				unset($result['matiere']);
+			}
+			return $result;
+		}
+		return false;
+	}
+	
 	public function getList()
 	{
 		$sql = 'SELECT c.id_c as id, b.username AS auteur, c.id_m AS matiere, c.titre, c.description, c.contenu, c.dateAjout, c.dateModif, c.count_c

@@ -139,6 +139,15 @@ class ProfesseurManager_PDO extends ProfesseurManager
 	    $requete->bindValue(':token', $professeur->token());
 	    $requete->bindValue(':matiere', $professeur->matiere()->id());
 	    $requete->execute();
+		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+		if($erreur != 0)
+		{
+			$requete->nextRowset();
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result = $requete->fetch();
+			return $result;
+		}
+		return false;
 	}
 	
 	protected function modify(Professeur $professeur)

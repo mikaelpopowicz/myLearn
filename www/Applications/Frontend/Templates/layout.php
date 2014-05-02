@@ -26,7 +26,9 @@
 		<link href="/assets/css/style.css" rel="stylesheet" type="text/css"/>
 		<link rel="stylesheet" type="text/css" href="/js/sh/styles/shCoreDjango.css">
 		<link type="text/css" rel="stylesheet" href="/js/sh/styles/shThemeDjango.css"/>
-		<link rel="stylesheet" type="text/css" media="print" href="/assets/css/print.css" />		
+		<link rel="stylesheet" type="text/css" media="print" href="/assets/css/print.css" />
+		<link rel="stylesheet" type="text/css" media="print" href="/css/dataTables.bootstrap.css" />
+		<link rel="stylesheet" type="text/css" media="print" href="/css/DT_bootstrap.css" />
 		<link rel="shortcut icon" href="/images/favicon.png">
 
 		<script>window.jQuery || document.write('<script src="/assets/js/jquery-1.9.1.min.js"><\/script>')</script>
@@ -101,11 +103,11 @@
 								<li class="divider-vertical"></li>
 										
 								<li class="search-wrapper">
-									<form action="someaction.php" method="post">
+									<form action="/search" method="post">
 										<div id="search-trigger">
 											<i class="e-icon-search"></i>
 										</div>
-										<input placeholder="Rechercher" type="text">
+										<input placeholder="Rechercher" name=query type="text">
 									</form>
 								</li>
 							</ul><!-- close nav accordmobile-->
@@ -309,7 +311,12 @@
 		extended_valid_elements: "hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style],img[href|src|name|title|onclick|align|alt|title|width|height|vspace|hspace],iframe[id|class|width|size|noshade|src|height|frameborder|border|marginwidth|marginheight|target|scrolling|allowtransparency],style[type]"
 	 }); 
 	</script>
-
+	
+	<!-- DataTables ================ -->
+	<script src="/js/datatables/jquery.dataTables.js"></script>
+	<script src="/js/datatables/dataTables.bootstrap.js"></script>
+	
+	
 	<!--initialize scripts / custom scripts--> 
 	<script src='/assets/js/custom.js'></script>
 	
