@@ -1,63 +1,79 @@
-drop procedure if exists select_matiere_cours;
+drop procedure if exists search_engine;
 
 DELIMITER @@
 
 # -----------------------------------------------------------------------------
-#       PROCEDURE : select_matiere_cours()
+#       PROCEDURE : search_engine()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE select_matiere_cours(mat INTEGER, class INTEGER, qte INTEGER, debut INTEGER)
+CREATE PROCEDURE search_engine(chaine TEXT)
 BEGIN
-	# Déclaration
-	Declare fini int default 0;
-	Declare id, page INTEGER;
+	Declare it, nb, id, done INTEGER default 0;
+	Declare pre INTEGER default 1;
+	Declare clause,query TEXT default "";
 	
-	# Curseur 1
+	# Curseur
 	Declare cur1 CURSOR
 	FOR SELECT id_cours
-		FROM cours
-		WHERE id_m = mat
-		ORDER BY dateAjout DESC;
-		
-	# Curseur 2
-	Declare cur2 CURSOR
-	FOR SELECT id_cours
-		FROM cours
-		WHERE id_m = mat
-		AND id_classe = class
-		ORDER BY dateAjout DESC
-		LIMIT debut,qte;
+		FROM search_results;
 		
 	# Gestionnaire d'erreur
 	Declare continue HANDLER
-		FOR NOT FOUND SET fini = 1;
+		FOR NOT FOUND SET done = 1;
 	
-	# Nombre de cours
-	IF class IS NULL OR class = 0 THEN
-		SELECT COUNT(*) AS "Cours_1" FROM cours WHERE id_m = mat;
-		Open cur1;
+	# Suppression de la table temporaire si elle existe
+	DROP TABLE IF EXISTS search_results;
+	
+	# Création de la requete avec la clause LIKE
+	SET query = 'SELECT id_cours FROM cours WHERE ';
+	SET clause = '\"%';
+	IF LENGTH(chaine) > 0 THEN
+		SET nb = nb + 1;
+		IF  LOCATE('+',chaine) > 0 THEN
+			SET it = LOCATE('+',chaine);
+			SET clause = CONCAT(clause,SUBSTR(chaine, pre, it-1),'%');
+			SET pre = it + 1;
+			
+			WHILE it != 0	DO
+				SET nb = nb + 1;
+				SET it = LOCATE('+',chaine, pre);
+				
+					IF it > 0 THEN
+						SET clause = CONCAT(clause,SUBSTR(chaine, pre, it-pre),'%');
+					ELSE
+						SET clause = CONCAT(clause,SUBSTR(chaine, pre),'%');
+					END IF;
+				SET pre = it + 1;
+			END WHILE;
+		ELSE
+			SET clause = CONCAT(clause,chaine,'%');
+		END IF;
+		SET clause = CONCAT(clause,'\"');
+	END IF;
+	SET query = CONCAT(query, 'titre LIKE ',clause, ' OR description LIKE ',clause, ' OR contenu LIKE ',clause, ' ORDER BY dateAjout DESC');
+	SET query = CONCAT('CREATE TEMPORARY TABLE IF NOT EXISTS search_results AS (', query,');');
+	# SELECT query, nb;
+	SET @query = query;
+	# Création de la table temporaire
+	PREPARE requete FROM @query;
+	EXECUTE requete;
+	DEALLOCATE PREPARE requete;
+	
+	# Compte du nombre de résultat
+	SELECT COUNT(*) AS "Cours" FROM search_results;
+	
+	IF (SELECT COUNT(*) FROM search_results) > 0 THEN
+		# Ouverture du curseur
+		OPEN cur1;
 		FETCH cur1 INTO id;
-		WHILE fini != 1	DO
-			CALL select_cours(id, false);
+		WHILE done != 1	DO
+			CALL select_cours(id, true);
 			FETCH cur1 INTO id;
 		END WHILE;
 		Close cur1;
-	ELSE
-		IF MOD((SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class),qte) = 0 THEN
-			SET page = (SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class)/qte;
-		ELSE
-			SET page = FLOOR((SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class)/qte) + 1;
-		END IF;
-		SELECT page AS "Pages";
-		SELECT COUNT(*) AS "Cours" FROM (SELECT * FROM cours WHERE id_m = mat AND id_classe = class LIMIT debut,qte) AS test;
-		Open cur2;
-		FETCH cur2 INTO id;
-		WHILE fini != 1 DO
-			CALL select_cours(id, false);
-			FETCH cur2 INTO id;
-		END WHILE;
-		Close cur2;
+		SET done = 0;
 	END IF;
 END @@
+
 
 DELIMITER ;

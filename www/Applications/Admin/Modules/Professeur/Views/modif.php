@@ -30,13 +30,7 @@
 						<div class="col-lg-9">
 							<div class="row">
 								<div class="col-lg-8">
-									<input type="text" id="username" name="username" class="form-control" value="<?php echo (isset($professeur) ? $professeur->username() :  "");?>">
-									<?php
-									if (isset($erreurs) && in_array(\Library\Entities\Professeur::USER_INVALIDE, $erreurs))
-									{
-										echo '<span class="help-block erreur">Ne peut être vide</span>';
-									}
-									?>
+									<input type="text" id="username" name="username" class="form-control" value="<?php echo (isset($professeur) ? $professeur->username() :  "");?>" readonly>
 								</div>
 							</div>
 						</div>
@@ -97,8 +91,8 @@
 									<select id="matiere" name="matiere" class="form-control selectpicker">
 										<?php
 										foreach ($listeMatiere as $matiere) {
-											$selected = isset($professeur) && $professeur->matiere()->id() == $matiere['id'] ? "selected" : "";
-											echo '<option value="'.base64_encode(serialize($matiere)).'" '.$selected.'>'.$matiere['libelle'].'</option>';
+											$selected = isset($professeur) && $professeur->matiere()->id() == $matiere->id() ? "selected" : "";
+											echo '<option value="'.base64_encode(serialize($matiere)).'" '.$selected.'>'.$matiere->libelle().'</option>';
 										}
 										?>
 									</select>

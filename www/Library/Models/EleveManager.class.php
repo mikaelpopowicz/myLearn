@@ -54,6 +54,7 @@ abstract class EleveManager extends \Library\Manager
 	*/
 	public function save(Eleve $eleve)
 	{
-		$eleve->isNew() ? $this->add($eleve) : $this->modify($eleve);
+		$result = $eleve->isNew() ? $this->add($eleve) : $this->modify($eleve);
+		return $result;
 	}
 }

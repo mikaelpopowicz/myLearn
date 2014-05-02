@@ -141,6 +141,15 @@ class EleveManager_PDO extends EleveManager
 	    $requete->bindValue(':token', $eleve->token());
 	    $requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
 	    $requete->execute();
+		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+		if($erreur == 1)
+		{
+			$requete->nextRowset();
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result = $requete->fetch();
+			return $result;
+		}
+		return false;
 	}
 	
 	protected function modify(Eleve $eleve)
@@ -155,7 +164,15 @@ class EleveManager_PDO extends EleveManager
 		$requete->bindValue(':active', $eleve->active());
 	    $requete->bindValue(':salt', $eleve->salt());
 	    $requete->bindValue(':token', $eleve->token());
-	    $requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
+		if($eleve->dateNaissance() instanceof \DateTime)
+		{
+			$requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
+		}
+		else
+		{
+			$requete->bindValue(':dateNaissance', $eleve->dateNaissance());
+		}
+	    
 	    $requete->execute();
 	  }
 

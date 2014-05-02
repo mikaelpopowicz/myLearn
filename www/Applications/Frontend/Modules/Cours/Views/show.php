@@ -94,9 +94,17 @@
 									</time>
 									
 								</div>
+								<?php
+								if($comment->auteur()->id() == $user->getAttribute('id'))
+								{
+								?>
 								<div class="pull-right">
-									<a href="/cours/supprimer-commentaire-<?php echo $comment->auteur()->id()?>" class="btn btn-danger"><i class="fa fa-trash-o"></i> </a>
+									<a href="/cours/supprimer-commentaire-<?php echo $comment->id()?>" class="btn btn-danger"><i class="fa fa-trash-o"></i> </a>
 								</div>
+								<?php
+								}
+								?>
+								
 							</footer>
 							<div class="text">
 								<?php echo $comment['commentaire'];?>

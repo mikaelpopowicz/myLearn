@@ -54,6 +54,7 @@ abstract class ProfesseurManager extends \Library\Manager
 	*/
 	public function save(Professeur $professeur)
 	{
-		$professeur->isNew() ? $this->add($professeur) : $this->modify($professeur);
+		$result = $professeur->isNew() ? $this->add($professeur) : $this->modify($professeur);
+		return $result;
 	}
 }

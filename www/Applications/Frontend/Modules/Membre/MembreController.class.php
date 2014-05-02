@@ -155,7 +155,6 @@ class MembreController extends \Library\BackController
 				if($pass1 == $pass2) {
 					$user->setPassword(sha1(md5(sha1(md5($user['salt'])).sha1(md5($request->postData('pass1'))).sha1(md5($user['salt'])))));
 					$user->setToken($this->app->key()->getNewSalt(40));
-					$user->setDateNaissance($date);
 					$this->managers->getManagerOf('Eleve')->save($user);
 					$this->app->user()->setFlash('<script>noty({type: "success", layout: "topCenter", text: "Mot de passe modifié"});</script>');
 					$this->app->httpResponse()->redirect('/mon-compte');

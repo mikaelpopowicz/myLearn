@@ -218,7 +218,7 @@ class CoursController extends \Library\BackController {
 			if($cours->isValid()) {
 				$this->managers->getManagerOf('Cours')->save($cours);
 				$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "success", layout: "topCenter", text: "<strong>Cours enregistré !</strong>"});</script>');
-				$this->app->httpResponse()->redirect('/membre/mes-cours');
+				$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 			} else {
 				$this->page->addVar('cours', $cours);
 				$this->page->addVar('erreurs', $cours['erreurs']);
