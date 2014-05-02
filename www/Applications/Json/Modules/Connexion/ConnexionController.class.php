@@ -12,7 +12,7 @@ class ConnexionController extends \Library\BackController
 		$pass = $request->getData('pass');
 		if (!empty($login) && !empty($pass))
 		{
-			$user = $this->managers->getManagerOf('User')->connexion($login,MD5($pass));
+			$user = $this->managers->getManagerOf('User')->connexion($login,$pass);
 			
 			if(isset($user['user']) && ($user['user'] instanceof \Library\Entities\User))
 			{
@@ -48,5 +48,9 @@ class ConnexionController extends \Library\BackController
 				$this->page->addVar('json', $reponse);
 			}
 		}		
+	}
+	public function executeIndex(\Library\HTTPRequest $request)
+	{
+		
 	}
 }
