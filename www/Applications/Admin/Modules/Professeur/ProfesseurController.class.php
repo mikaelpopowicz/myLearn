@@ -57,8 +57,10 @@ class ProfesseurController extends \Library\BackController
 			$mdp = $this->app->key()->getNewSalt(8);
 			$salt = $this->app->key()->getNewSalt(40);
 			
+			$username = strtolower(substr($request->postData('prenom'),0,1).$request->postData('nom'));
+			
 			$professeur = new \Library\Entities\Professeur(array(
-				"username" => $request->postData('username'),
+				"username" => $username,
 				"nom" => $request->postData('nom'),
 				"prenom" => $request->postData('prenom'),
 				"email" => $request->postData('email'),
@@ -69,31 +71,51 @@ class ProfesseurController extends \Library\BackController
 			));
 			
 			if($professeur->isValid()) {
-				$this->managers->getManagerOf('Professeur')->save($professeur);
-				$message = '<h3>Bonjour, '.$professeur->nom().' '.$professeur->prenom().'</h3>
-								<p class="lead">Nous vous souhaitons la bienvenue sur myLearn</p>
-								<p>Votre compte a été créé, vous pouvez maintenant activer votre compte en suivant le lien ci-dessous, pour pourrez vous connecter avec les identifiants suivants :
-								<ul><li><strong>Username :</strong> '.$professeur->username().'</li>
-								<li><strong>Mot de passe :</strong> '.$mdp.'</li></ul>
-								</p>
-								<p class="callout">
-									Pour activer votre compte  <a href="http://'.$_SERVER['HTTP_HOST'].'/connexion/'.$professeur->token().'"> cliquez ici!</a>
-								</p>';
-				$sujet = 'Activation de votre compte';
-				$this->app->mail()->setMail($professeur->email());
-				$this->app->mail()->setMessage($sujet, $message);
-				$this->app->mail()->setSujet($sujet);
-				$this->app->mail()->send();
-				$token = $this->managers->getManagerOf('Professeur')->getLast($professeur)['token'];
-				$encoded = $this->app->key()->encode($message);
-				$crypt = new \Library\Entities\Crypt(array(
-					"id" => $token,
-					"message" => $encoded['crypted'],
-					"cle" => $encoded['key']
-					));
-				$this->managers->getManagerOf('Crypt')->add($crypt);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Enregistrement du professeur réussi"});</script>');
-				$this->app->httpresponse()->redirect('/admin/professeurs');
+				$record = $this->managers->getManagerOf('Professeur')->save($professeur);
+				if($record == false)
+				{
+					$message = '<h3>Bonjour, '.$professeur->nom().' '.$professeur->prenom().'</h3>
+									<p class="lead">Nous vous souhaitons la bienvenue sur myLearn</p>
+									<p>Votre compte a été créé, vous pouvez maintenant activer votre compte en suivant le lien ci-dessous, pour pourrez vous connecter avec les identifiants suivants :
+									<ul><li><strong>Username :</strong> '.$professeur->username().'</li>
+									<li><strong>Mot de passe :</strong> '.$mdp.'</li></ul>
+									</p>
+									<p class="callout">
+										Pour activer votre compte  <a href="http://'.$_SERVER['HTTP_HOST'].'/connexion/'.$professeur->token().'"> cliquez ici!</a>
+									</p>';
+				
+					$encoded = $this->app->key()->encode($message);
+					$crypt = new \Library\Entities\Crypt(array(
+						"id" => $professeur->token(),
+						"message" => $encoded['crypted'],
+						"cle" => $encoded['key']
+						));
+					$this->managers->getManagerOf('Crypt')->add($crypt);
+				
+					$sujet = 'Activation de votre compte';
+					$this->app->mail()->setMail($professeur->email());
+					$this->app->mail()->setMessage($sujet, $message);
+					$this->app->mail()->setSujet($sujet);
+				
+				
+					$envoi = $this->app->mail()->send();
+					if($envoi == true)
+					{
+						$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Enregistrement du professeur réussi"});</script>');
+					}
+					else
+					{
+						$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "error", layout: "topCenter", text: "'.$envoi.'"});</script>');
+					}
+				
+					$this->app->httpresponse()->redirect('/admin/professeurs');
+				}
+				else
+				{
+					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "'.$record->type().'", layout: "topCenter", text: "'.$record->message().'"});</script>');
+					$this->page->addVar('professeur', $professeur);
+				}
+				
 			} else {
 				$this->page->addVar('erreurs', $professeur['erreurs']);
 				$this->page->addVar('professeur', $professeur);
@@ -117,29 +139,28 @@ class ProfesseurController extends \Library\BackController
 
 			if($request->postExists('modifier')) {
 			
-			$prof = new \Library\Entities\Professeur(array(
-				"id" => $professeur['id'],
-				"username" => $request->postData('username'),
-				"nom" => $request->postData('nom'),
-				"prenom" => $request->postData('prenom'),
-				"email" => $request->postData('email'),
-				"password" => $professeur['password'],
-				"salt" => $professeur['salt'],
-				"token" => $professeur['token'],
-				"active" => $professeur['active'],
-				"matiere" => unserialize(base64_decode($request->postData('matiere')))
-			));
+				$prof = new \Library\Entities\Professeur(array(
+					"id" => $professeur['id'],
+					"username" => strtolower($request->postData('username')),
+					"nom" => $request->postData('nom'),
+					"prenom" => $request->postData('prenom'),
+					"email" => $request->postData('email'),
+					"password" => $professeur['password'],
+					"salt" => $professeur['salt'],
+					"token" => $professeur['token'],
+					"active" => $professeur['active'],
+					"matiere" => unserialize(base64_decode($request->postData('matiere')))
+				));
 			
-			if($prof->isValid()) {
-				$this->managers->getManagerOf('Professeur')->save($prof);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification réussie"});</script>');
-				$this->app->httpresponse()->redirect('/admin/professeurs');
-			} else {
-				$this->page->addVar('erreurs', $prof['erreurs']);
-				$this->page->addVar('professeur', $prof);
+				if($prof->isValid()) {
+					$this->managers->getManagerOf('Professeur')->save($prof);
+					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification réussie"});</script>');
+					$this->app->httpresponse()->redirect('/admin/professeurs');
+				} else {
+					$this->page->addVar('erreurs', $prof['erreurs']);
+					$this->page->addVar('professeur', $prof);
+				}
 			}
-		}
-
 
 		} else {
 			$this->app->httpresponse()->redirect('/admin/professeurs');

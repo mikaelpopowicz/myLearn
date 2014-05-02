@@ -1,44 +1,51 @@
 <?php
-namespace Applications\JSON\Modules\Connexion;
+namespace Applications\Json\Modules\Connexion;
 
 class ConnexionController extends \Library\BackController
-{
+{	
 	public function executeConnexion(\Library\HTTPRequest $request)
 	{
 		$this->page->addVar('title', 'Connexion Json');
 		$this->page->addVar('no_layout', true);
 		$this->setView('index');
-		$password = $request->getData('pass');
-		$login =  $request->getData('login');
-		if (!empty($login) && !empty($password))
+		$login = $request->getData('login');
+		$pass = $request->getData('pass');
+		if (!empty($login) && !empty($pass))
 		{
-			// Vérification du login
-			$exists = $this->managers->getManagerOf('User')->getByName($login);
+			$user = $this->managers->getManagerOf('User')->connexion($login,MD5($pass));
 			
-			if ($exists != NULL )
+			if(isset($user['user']) && ($user['user'] instanceof \Library\Entities\User))
 			{
-				// On vérifie qu'il a le bon mot de passe
-				$match = $this->managers->getManagerOf('User')->getByNamePass($login, sha1(md5(sha1(md5($exists['salt'])).sha1(md5($password)).sha1(md5($exists['salt'])))));
-				
-				if ($match != NULL)
+				if($user['user']->active())
 				{
-					if ($match['active'] == 0 )
-					{
-						
-					}
-					else
-					{
-						$reponse = array(
-							"logged" => true,
-							"id" => $match['id'],
-							"nom" => $match['nom'],
-							"prenom" => $match['prenom'],
-							"email" => $match['email']
-						);
-						$reponse = json_encode($reponse);
-						$this->page->addVar('json', $reponse);
-					}
+					$reponse = array(
+						"logged" => true,
+						"id" => $user['user']['id'],
+						"nom" => $user['user']['nom'],
+						"prenom" => $user['user']['prenom'],
+						"email" => $user['user']['email']
+					);
+					$reponse = json_encode($reponse);
+					$this->page->addVar('json', $reponse);
 				}
+				else
+				{
+					$reponse = array(
+						"logged" => false,
+						"erreur" => $user['Message']
+					);
+					$reponse = json_encode($reponse);
+					$this->page->addVar('json', $reponse);
+				}
+			}
+			else
+			{
+				$reponse = array(
+					"logged" => false,
+					"erreur" => $user['Message']
+				);
+				$reponse = json_encode($reponse);
+				$this->page->addVar('json', $reponse);
 			}
 		}		
 	}

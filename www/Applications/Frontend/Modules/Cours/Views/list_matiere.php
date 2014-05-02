@@ -23,23 +23,24 @@
 	</div>
 </div>
 <div class="main-content container">
+	<?php
+	if(isset($listeMatiere) && is_array($listeMatiere))
+	{
+		?>
     <div class="headline">
 		<h3>Choisissez votre matière</h3>
 	</div>
 	<div class="row-fluid equal equal-style">
-	<?php
-	$i = 0;
-	$listeMatiere = $classe->matieres();
-	if(isset($listeMatiere) && is_array($listeMatiere))
-	{
+		<?php
+		$i = 0;
 		foreach ($listeMatiere as $matiere) {
 	?>
 	<div class="span3">
-		<a class="innershadows btn btn-block btn-primary" href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.urlencode(str_replace(' ','-',$classe->libelle()))."/".str_replace(' ','-',$matiere->libelle());?>"><h2><i class="<?php echo $matiere->icon();?>"></i> <?php echo $matiere->libelle();?></h2></a>
+		<a class="innershadows btn btn-block btn-primary" href="/cours/<?php echo str_replace('/','-',$classe->session()->session()).'/'.$classe->uri()."/".$matiere->uri();?>"><h2><i class="<?php echo $matiere->icon();?>"></i> <?php echo $matiere->libelle();?></h2></a>
 		<div class="content">
 			<p class="text-center">
 				<?php 
-				//echo $controller->getCountCours($matiere['id']);
+				echo $matiere->cours();
 				?> cours dans cette section
 			</p>
 		</div>          
@@ -56,9 +57,9 @@
 			}
 		}
 	}
-	else
+	else if (isset($message))
 	{
-		echo "<br/><br/><br/><br/><h3 class='text-warning'>Désole, il n'y a pas encore de matières sélectionnées pour votre classe</h3><br/><br/><br/><br/>";
+		echo $message;
 	}
 	?>
 	</div><!--/row-fluid-->

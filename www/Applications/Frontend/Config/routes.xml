@@ -2,26 +2,29 @@
 <routes>
 	<route url="/" module="Cours" action="index" />
 	<route url="/cours(\/?)" module="Cours" action="list_classe" />
-	<route url="/cours/([0-9]{4}-[0-9]{4}\/.[^/]+)/(.+)" module="Cours" action="list_cours" vars="libelle,matiere" />
-	<route url="/cours/([0-9]{4}-[0-9]{4}\/.+\/?)" module="Cours" action="list_matiere" vars="libelle" />
+	<route url="/cours/([0-9]{4}-[0-9]{4}\/.[^_/]+)/([^_/]+)/([^/]+)" module="Cours" action="show" vars="libelle,matiere,cours" />
+	<route url="/cours/([0-9]{4}-[0-9]{4}\/.[^_/]+)/([^_/]+)([_[0-9]*]?)" module="Cours" action="list_cours" vars="libelle,matiere,page" />
+	<route url="/cours/([0-9]{4}-[0-9]{4}\/[^_/]+\/?)" module="Cours" action="list_matiere" vars="libelle" />
 	<route url="/cours/ecrire-un-cours" module="Cours" action="ecrire" />
 	<route url="/cours/supprimer-un-cours" module="Cours" action="supprimer" />
 	<route url="/cours/modifier-([0-9]+)" module="Cours" action="modifier" vars="id" />
 	
-	<route url="/cours/(.+)/([0-9]+)" module="Cours" action="show" vars="libelle,id" />
+	<route url="/devoirs(\/?)" module="Devoir" action="index" />
+	
 	<route url="/contact" module="Contact" action="index" />
-	<route url="/travaux-slam" module="Travaux" action="index" />
-	<route url="/tutos" module="Tutos" action="index" />
-	<route url="/connexion" module="Connexion" action="index" />
+	
+	<route url="/connexion(\/?)" module="Connexion" action="index" />
 	<route url="/connexion/activer" module="Connexion" action="activate" />
 	<route url="/connexion/mot-de-passe-perdu" module="Connexion" action="passReload" />
 	<route url="/connexion/mot-de-passe-perdu/(.+)" module="Connexion" action="newPass" vars="token" />
 	<route url="/connexion/logout/(.*)" module="Connexion" action="logout" vars="request" />
 	<route url="/connexion/(.+)" module="Connexion" action="activate" vars="token" />
-	<route url="/inscription" module="Connexion" action="subscribe" />
-	<route url="/membre/mon-profil" module="Membre" action="index" />
-	<route url="/membre/mon-profil/modifier-profil" module="Membre" action="modifierProfil" />
-	<route url="/membre/mon-profil/modifier-mot-de-passe" module="Membre" action="modifierPass" />
-	<route url="/membre/mes-cours" module="Membre" action="mesCours" />
-	<route url="/membre/ma-configuration" module="Membre" action="maConfiguration" />
+	
+	<route url="/mon-compte(\/?)" module="Membre" action="index" />
+	<route url="/mon-compte/modifier-mes-informations(\/?)" module="Membre" action="modifierProfil" />
+	<route url="/mon-compte/modifier-mot-de-passe" module="Membre" action="modifierPass" />
+	<route url="/mon-compte/mes-cours" module="Membre" action="mesCours" />
+	<route url="/mon-compte/configuration" module="Membre" action="maConfiguration" />
+	
+	<route url="/search" module="Query" action="index" />
 </routes>

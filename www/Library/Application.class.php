@@ -10,21 +10,24 @@ abstract class Application
 	protected $config;
 	protected $key;
 	protected $mail;
-   
-	public function __construct($name = "")
+	protected $message;
+	protected $loading;
+	public function __construct($name = "", $start)
 	{
-		$this->name = $name;
-		$this->httpRequest = new HTTPRequest($this);
-		$this->httpResponse = new HTTPResponse($this);
-		$this->user = new User($this);
-		$this->config = new Config($this);
-		$this->key = new Keygen($this);
+		$this->name			= $name;
+		$this->httpRequest	= new HTTPRequest($this);
+		$this->httpResponse	= new HTTPResponse($this);
+		$this->user			= new User($this);
+		$this->config		= new Config($this);
+		$this->key			= new Keygen($this);
+		$this->message		= new Message($this);
+		$this->loading		= new Loading($start);
+		setlocale(LC_ALL, 'en_US.UTF8');
 	}
    
 	public function getController()
 	{
 		$router = new \Library\Router;
-     
 		$xml = new \DOMDocument;
 		$xml->load(__DIR__.'/../Applications/'.$this->name.'/Config/routes.xml');
 		$routes = $xml->getElementsByTagName('route');
@@ -102,5 +105,13 @@ abstract class Application
 
 	public function mail() {
 		return $this->mail;
+	}
+	
+	public function message() {
+		return $this->message;
+	}
+	
+	public function loading() {
+		return $this->loading;
 	}
 }

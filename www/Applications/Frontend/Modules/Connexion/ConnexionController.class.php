@@ -25,6 +25,10 @@ class ConnexionController extends \Library\BackController
 					$this->app->user()->setAuthenticated(true);
 					$this->app->user()->setAttribute('username', $user['user']['username']);
 					$this->app->user()->setAttribute('id', $user['user']['id']);
+					$this->app->user()->setAttribute('nom', $user['user']['nom']);
+					$this->app->user()->setAttribute('prenom', $user['user']['prenom']);
+					$this->app->user()->setAttribute('email', $user['user']['email']);
+					$this->app->user()->setAttribute('dateUser', base64_encode(serialize($user['user']['dateUser'])));
 					$this->app->user()->setAttribute('status', $user['statut']);
 					if(isset($user['classes']) && is_array($user['classes']))
 					{
@@ -33,89 +37,36 @@ class ConnexionController extends \Library\BackController
 					$this->app->httpResponse()->redirect('/');
 				} else {
 					$this->page->addVar('erreurs', array($user['Type'], $user['Message']));
+					sleep(1);
 				}
+				
 	 		}
 	 	}
+		
 	}
 	
 	public function executeLogout(\Library\HTTPRequest $request)
 	{
 		if($this->app->user()->isAuthenticated()) {
 			$this->app->user()->delUser();
-			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "information", layout: "top", text: "Vous êtes déconnecté"});</script>');
-			if($request->getExists('request')) {
-				$this->app->httpResponse()->redirect($request->getData('request'));
-			} else {
-				$this->app->httpResponse()->redirect('/');
-			}
-		} else {
-			$this->app->httpResponse()->redirect('/');
+			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "information", layout: "topCenter", text: "Vous êtes déconnecté"});</script>');
 		}
-	}
-	
-	public function executeSubscribe(\Library\HTTPRequest $request)
-	{
-		$this->page->addVar('title', 'Mika-p - Inscription');
-		
-		if($request->postExists('go')) {
-			
-			$mailList = $this->managers->getManagerOf('Byte')->getList();
-			//echo '<pre>';print_r($mailList);echo '</pre>';
-			$mail = $request->postData('email');
-			foreach($mailList as $list) {
-				if ($list['email'] == $mail) {
-					$mail = "";
-				}
-			}
-			
-			if($request->postData('pass1') == $request->postData('pass2')) {
-				$pass = $request->postData('pass1');
-			}
-			$salt = $this->app->key()->getNewSalt();
-			$name = $this->managers->getManagerOf('Byte')->getByName($request->postData('username')) != NULL ? "" : $request->postData('username');
-			
-			$user = new \Library\Entities\Byte(array(
-				'username' => $name,
-				'email' => $mail,
-				'nom' => $request->postData('nom'),
-				'password' => !empty($pass) ? sha1(md5(sha1(md5($salt)).sha1(md5($request->postData('pass1'))).sha1(md5($salt)))) : "",
-				'salt' => $salt,
-				'token' => $this->app->key()->getNewSalt(40)
-			));
-				
-			if ($user->isValid())
-			{
-				//echo '<script>alert("Coucou");</script>';
-				$this->managers->getManagerOf('Byte')->save($user);
-				
-				// Envoi du mail d'activation
-				$message = '<h3>Bonjour, '.$user->username().'</h3>
-							<p class="lead">Nous vous souhaitons la bienvenue sur Mika-p.fr</p>
-							<p>Une fois votre compte activé vous pourrez participer activement au site, de la cr√©ation de cours jusqu\'au simple commentaire des autres. Nous déterminerons dans quelle(s) matière(s) vous aurez le droit créer des cours. Une fois fait, vous accéderez à la création de cours directement depuis la barre de naviguation du site lorsque vous serrez connecté.</p>
-							<p class="callout">
-								Pour activer votre compte  <a href="http://poo/connexion/'.$user->token().'"> cliquez ici!</a>
-							</p>';
-				$load = new \Library\Mailer($user->email(), "Activation de votre compte", $message, "noreply@mika-p.fr");
-				
-				$this->app->user()->setFlash('<script>noty({type: "success", layout: "top", text: "<strong>Opération réussie !</strong> Votre compte à bien été enregistré</br>Un email d\'activation vous a été envoyé, veuillez suivre les instructions afin d\'activer votre compte."});</script>');
-				$this->app->httpResponse()->redirect('/connexion');
-			}
-			else
-			{
-				$this->page->addvar('byte', $user);
-				$this->page->addVar('erreurs', $user->erreurs());
-			}
-		}
+		$this->app->httpResponse()->redirect('/');
 	}
 	
 	public function executeActivate(\Library\HTTPRequest $request)
 	{
-		$this->page->addVar('title', 'Mika-p - Activation');
+		$this->page->addVar('title', 'MyLearn - Activation');
 		$this->page->addVar('no_layout', true);
 		$this->page->addVar('nom', $this->app->config()->get('conf_nom'));
 		$this->page->addVar('desc', $this->app->config()->get('conf_description'));
 		// Si le token est présent dans l'url
 		if($request->getExists('token')) {
+			$message = $this->managers->getManagerOf('User')->activation($request->getData('token'),$this->app->key()->getNewSalt(40));
+			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$message->type().'", layout: "topCenter", text: "'.$message->message().'"});</script>');
+			$this->app->httpResponse()->redirect('/');
+			
+			/* Ancienne méthode
 			
 			// Récupération du manager et de l'utilisateur qui a ce token
 			$manU = $this->managers->getManagerOf('User');
@@ -146,11 +97,51 @@ class ConnexionController extends \Library\BackController
 				$this->app->httpResponse()->redirect('/');
 			}
 			
+			*/
+			
 		// Le token n'est pas présent dans l'url
 		}
 		
 		// Si la demande d'envoi de lien d'activation a été faite
 		if($request->postExists('go')) {
+			
+			$result = $this->managers->getManagerOf('User')->activationRequest($request->postData('email'));
+			$message = is_array($result) && isset($result['message']) ? $result['message'] : array("message"=>"","type"=>"");
+			
+			if (isset($result['mail']) && ($result['mail'] instanceof \Library\Entities\Crypt))
+			{
+				$crypt = $result['mail'];
+				$mail = $this->app->key()->decode($crypt->message(), $crypt->cle());
+				$sujet = 'Activation de votre compte';
+				$this->app->mail()->setMail($request->postData('email'));
+				$this->app->mail()->setMessage($sujet, $mail);
+				$this->app->mail()->setSujet($sujet);
+				$envoi = $this->app->mail()->send();
+				if($envoi != true)
+				{
+					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "error", layout: "topCenter", text: "'.$envoi.'"});</script>');
+				}
+				else
+				{
+					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$message->type().'", layout: "topCenter", text: "'.$message->message().'"});</script>');
+				}
+				
+				
+				$this->app->httpResponse()->redirect('/');
+			}
+			else if($message->code() == "ACT_WM")
+			{
+				$this->page->addVar('erreurs', array($message->type(), $message->message()));
+			}
+			else
+			{
+				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$message->type().'", layout: "topCenter", text: "'.$message->message().'"});</script>');
+				$this->app->httpResponse()->redirect('/');
+			}
+			
+			
+			/* Ancienne méthode 
+			
 			// Récupération du manager et de l'utilisateur qui a ce token
 			$manU = $this->managers->getManagerOf('User');
 			$test = $manU->getByMail($request->postData('email'));
@@ -169,7 +160,7 @@ class ConnexionController extends \Library\BackController
 								<p class="callout">
 									Pour activer votre compte  <a href="http://ppe/connexion/'.$test->token().'"> cliquez ici!</a>
 								</p>';
-					*/
+					
 					$sujet = 'Activation de votre compte';
 					$this->app->mail()->setMail($test->email());
 					$this->app->mail()->setMessage($sujet, $message);
@@ -186,6 +177,8 @@ class ConnexionController extends \Library\BackController
 			} else {
 				$this->page->addVar('erreurs', array('danger', 'Aucun compte ne correspond à cet email'));
 			}
+			
+			*/
 		}
 	}
 	

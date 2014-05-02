@@ -3,10 +3,9 @@ namespace Applications\Admin;
  
 class AdminApplication extends \Library\Application
 {
-	public function __construct()
+	public function __construct($start)
 	{
-		parent::__construct('Admin');
-     
+		parent::__construct('Admin',$start);
 		$this->mail = new \Library\Mailer($this);
 	}
    

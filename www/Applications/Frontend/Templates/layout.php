@@ -26,20 +26,13 @@
 		<link href="/assets/css/style.css" rel="stylesheet" type="text/css"/>
 		<link rel="stylesheet" type="text/css" href="/js/sh/styles/shCoreDjango.css">
 		<link type="text/css" rel="stylesheet" href="/js/sh/styles/shThemeDjango.css"/>
-		
-		
-		<link rel="stylesheet" type="text/css" media="print" href="/assets/css/print.css" />		
-
-		<!-- Icons ================ put your icons and favicons below -->
-		<!--http://mathiasbynens.be/notes/touch-icons-->
+		<link rel="stylesheet" type="text/css" media="print" href="/assets/css/print.css" />
+		<link rel="stylesheet" type="text/css" media="print" href="/css/dataTables.bootstrap.css" />
+		<link rel="stylesheet" type="text/css" media="print" href="/css/DT_bootstrap.css" />
 		<link rel="shortcut icon" href="/images/favicon.png">
 
 		<script>window.jQuery || document.write('<script src="/assets/js/jquery-1.9.1.min.js"><\/script>')</script>
-
-		<!-- Add to HEAD after style sheet http://modernizr.com/docs/#installing  ================ -->
 		<script src="/assets/js/modernizr.custom.js?v=2.6.2"></script>
-
-		
 </head>
 <body>
 <!--[if lt IE 7]>
@@ -78,9 +71,9 @@
 								<li class="dropdown parent"> <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mon compte <i class="e-icon-cog"></i></a>
 									<ul class="dropdown-menu">
 										<li class="current-user">
-											<a href="/membre/mon-profil">
+											<a href="/mon-compte">
 												<?php
-												$img = is_file("/img/avatar/avatar-".$user->getAttribute('id').".jpeg") ? "/img/avatar/avatar-".$user->getAttribute('id') : "/img/avatar/default.png";
+												$img = is_file("/img/avatar/avatar-".$user->getAttribute('id').".jpeg") ? "/img/avatar/avatar-".$user->getAttribute('id') : "/images/avatars/default.png";
 												?>
 												<img class="avatar" src="<?php echo $img;?>" alt="<?php echo $user->getAttribute('username')?>">
 												<div class="name">
@@ -92,7 +85,7 @@
 										<li class="divider"></li>
 										<li><a href="/cours/ecrire-un-cours">Ecrire un cours</a></li>
 										<li class="divider"></li>
-										<li><a href="/membre/ma-configuration">Configuration</a></li>
+										<li><a href="/mon-compte/configuration">Configuration</a></li>
 										<li>
 											<a href="/connexion/logout/<?php echo $_SERVER['REQUEST_URI'];?>">Déconnexion</a>
 										</li>
@@ -110,11 +103,11 @@
 								<li class="divider-vertical"></li>
 										
 								<li class="search-wrapper">
-									<form action="someaction.php" method="post">
+									<form action="/search" method="post">
 										<div id="search-trigger">
 											<i class="e-icon-search"></i>
 										</div>
-										<input placeholder="Rechercher" type="text">
+										<input placeholder="Rechercher" name=query type="text">
 									</form>
 								</li>
 							</ul><!-- close nav accordmobile-->
@@ -160,7 +153,7 @@
 										?>
 									</ul>
 								</li>
-								<li class="<?php echo $class_devoirs;?>"><a href="/tutos">Devoirs</a></li>
+								<li class="<?php echo $class_devoirs;?>"><a href="/devoirs">Devoirs</a></li>
 								<li class="<?php echo $class_contact;?>"><a href="/contact">Contact</a></li>
 							</ul>
 						</div>
@@ -258,6 +251,11 @@
 					<li><a href="#">Conditions d'utilisation</a></li>
 					<li><a href="#">Politique de confidentialité</a></li>
 					<li><a href="#">Plus d'informations</a></li>
+					<li>Page executée en 
+						<?php
+						echo $load->load()." ms";
+						?>
+					</li>
 				</ul>
 			</div>
 			<!--close footer-credits container--> 
@@ -313,7 +311,12 @@
 		extended_valid_elements: "hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style],img[href|src|name|title|onclick|align|alt|title|width|height|vspace|hspace],iframe[id|class|width|size|noshade|src|height|frameborder|border|marginwidth|marginheight|target|scrolling|allowtransparency],style[type]"
 	 }); 
 	</script>
-
+	
+	<!-- DataTables ================ -->
+	<script src="/js/datatables/jquery.dataTables.js"></script>
+	<script src="/js/datatables/dataTables.bootstrap.js"></script>
+	
+	
 	<!--initialize scripts / custom scripts--> 
 	<script src='/assets/js/custom.js'></script>
 	

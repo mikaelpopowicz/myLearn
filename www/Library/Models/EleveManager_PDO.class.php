@@ -5,6 +5,35 @@ use \Library\Entities\Eleve;
  
 class EleveManager_PDO extends EleveManager
 {
+	public static function getObj($requete, $mode = 'Alone')
+	{
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Eleve');
+		
+		if($mode == 'Alone')
+		{
+			$result = $requete->fetch();
+			$result->setDateUser(new \DateTime($result->dateUser()));
+			if($result->dateNaissance() != '0000-00-00')
+			{
+				$result->setDateNaissance(new \DateTime($result->dateNaissance()));
+			}
+		}
+		else if ($mode == 'Groups')
+		{
+			$result = $requete->fetchAll();
+			foreach ($result as $eleve)
+			{
+				$eleve->setDateUser(new \DateTime($eleve->dateUser()));
+				if($eleve->dateNaissance() != '0000-00-00')
+				{
+					$eleve->setDateNaissance(new \DateTime($eleve->dateNaissance()));
+				}
+			}
+		}
+		
+		return $result;
+	}
+	
 	public function getList()
 	{
 		$requete = $this->dao->prepare('SELECT u.id_u AS id, u.nom, u.prenom, e.dateNaissance, u.dateUser, u.active
@@ -112,6 +141,15 @@ class EleveManager_PDO extends EleveManager
 	    $requete->bindValue(':token', $eleve->token());
 	    $requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
 	    $requete->execute();
+		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+		if($erreur == 1)
+		{
+			$requete->nextRowset();
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result = $requete->fetch();
+			return $result;
+		}
+		return false;
 	}
 	
 	protected function modify(Eleve $eleve)
@@ -126,7 +164,15 @@ class EleveManager_PDO extends EleveManager
 		$requete->bindValue(':active', $eleve->active());
 	    $requete->bindValue(':salt', $eleve->salt());
 	    $requete->bindValue(':token', $eleve->token());
-	    $requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
+		if($eleve->dateNaissance() instanceof \DateTime)
+		{
+			$requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
+		}
+		else
+		{
+			$requete->bindValue(':dateNaissance', $eleve->dateNaissance());
+		}
+	    
 	    $requete->execute();
 	  }
 

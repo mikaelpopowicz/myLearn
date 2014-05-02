@@ -44,8 +44,3 @@
 			</div>
 		</div>
 	</div>
-	
-	<footer class="footer">
-		<p class="text-muted">© 2014 . myLearn</p>
-	</footer>
-</div> <!-- /container -->

@@ -17,6 +17,9 @@
 				<button type="submit" name="supprimer"class="btn btn-warning">
 					<i class="fa fa-trash-o fa-fw"></i> Supprimer
 				</button>
+				<button type="submit" name="volume"class="btn btn-danger">
+					<i class="fa fa-pus-square-o fa-fw"></i> Ajout en masse
+				</button>
 				<div class="pull-right">
 					<a href="/admin/matieres/nouvelle-matiere" class="btn btn-success">
 						<i class="fa fa-plus-square-o"></i> Ajouter

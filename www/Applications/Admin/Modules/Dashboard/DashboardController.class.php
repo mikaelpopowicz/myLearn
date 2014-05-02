@@ -63,13 +63,6 @@ class DashboardController extends \Library\BackController
 		}
 
 		$this->page->addVar('etapes', $etapes);
-		$this->page->addVar('nom', $this->app->config()->get('conf_nom'));
-		$this->page->addVar('desc', $this->app->config()->get('conf_description'));
-		$this->page->addVar('mail', $this->app->config()->get('conf_email'));
-		$this->page->addVar('contact', $this->app->config()->get('conf_contact'));
-		$this->page->addVar('hote', $this->app->key()->decode($this->app->config()->get('db_host'), $this->app->config()->get('cryp_key')));
-		$this->page->addVar('base', $this->app->key()->decode($this->app->config()->get('db_name'), $this->app->config()->get('cryp_key')));
-		$this->page->addVar('db_user', $this->app->key()->decode($this->app->config()->get('db_user'), $this->app->config()->get('cryp_key')));
 		$this->page->addVar('section', $this->managers->getManagerOf('Section'));
 		$this->page->addVar('session', $this->managers->getManagerOf('Session'));
 		$this->page->addVar('classe', $this->managers->getManagerOf('Classe'));
@@ -79,6 +72,12 @@ class DashboardController extends \Library\BackController
 		$this->page->addVar('admin', $this->managers->getManagerOf('Administrateur'));
 		$this->page->addVar('prof', $this->managers->getManagerOf('Professeur'));
 		$this->page->addVar('eleve', $this->managers->getManagerOf('Eleve'));
+		
+		if($request->postExists('addVolume'))
+		{
+			$this->managers->getManagerOf('Cours')->addVolume();
+			$this->app->httpresponse()->redirect('/admin');
+		}
 	}
 }
 ?>

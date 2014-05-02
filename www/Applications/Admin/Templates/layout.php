@@ -92,7 +92,7 @@
 						</li>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
-						<li class=""><a href="/admin/parametres">Paramètres</a></li>
+						<li class="<?php echo isset($class_param) ? $class_param : "";?>"><a href="/admin/parametres">Paramètres</a></li>
 						<li class=""><a href="/connexion/logout//">Déconnexion</a></li>
 					</ul>
 				</div><!--/.nav-collapse -->
@@ -100,9 +100,31 @@
 		</div>
 		
 		<?php
-		echo $content;
+		$test = 0;
+		$alert = '<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><strong>Par mesure de sécurité, veuillez corriger le ou les points suivants</strong> :<ul>';
+		if($user->getAttribute('email') == "admin@domain.tld")
+		{
+			$alert .= "<li>l'adresse email de l'administrateur est <strong>admin@domain.tld</strong></li>";
+			$test++;
+		}
+		if($user->getAttribute('username') == "admin")
+		{
+			$alert .= "<li>le nom d'utilisateur de l'administrateur est <strong>admin</strong></li>";
+			$test++;
+		}
+		$alert .= "</ul></div>";
+		if($test > 0)
+		{
+			echo $alert;
+		}
 		?>
 
+		<?php
+		echo $content;
+		?>
+	  	<footer class="footer">
+	  		<p class="text-muted">© 2014 . myLearn - Page executée en <?php echo $load->load()." ms";?></p>
+	  	</footer>
 	</div> <!-- /container -->
 	
 	<!--=== Includes modal ===-->

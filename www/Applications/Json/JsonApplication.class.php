@@ -3,9 +3,9 @@ namespace Applications\Json;
  
 class JsonApplication extends \Library\Application
 {
-	public function __construct()
+	public function __construct($start)
 	{
-		parent::__construct('JSON');
+		parent::__construct('JSON',$start);
 	}
    
 	public function run()

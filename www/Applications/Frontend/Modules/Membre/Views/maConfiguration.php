@@ -22,13 +22,13 @@
 			<div class="span3">
 				<ul class="nav nav-pills nav-stacked">
 					<li class="<?php echo isset($class_profil) ? $class_profil : "";?>">
-						<a href="/membre/mon-profil">Mes informations</a>
+						<a href="/mon-compte">Mes informations</a>
 					</li>
 					<li class="<?php echo isset($class_mes_cours) ? $class_mes_cours : "";?>">
-						<a href="/membre/mes-cours">Mes cours</a>
+						<a href="/mon-compte/mes-cours">Mes cours</a>
 					</li>
 					<li class="<?php echo isset($class_config) ? $class_config : "";?>">
-						<a href="/membre/ma-configuration">Configuration</a>
+						<a href="/mon-compte/configuration">Configuration</a>
 					</li>
 				</ul>
 			</div>

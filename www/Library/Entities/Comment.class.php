@@ -17,12 +17,12 @@ class Comment extends \Library\Entity
    
 	// SETTERS
    
-	public function setCours($cours)
+	public function setCours(\Library\Entities\Cours $cours)
 	{
 		$this->cours = $cours;
 	}
    
-	public function setAuteur($auteur)
+	public function setAuteur(\Library\Entities\user $auteur)
 	{
 		$this->auteur = $auteur;
 	}

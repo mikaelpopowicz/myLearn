@@ -24,6 +24,12 @@
 	  echo $content;
 	  ?>
 	  
+	
+	  	<footer class="footer">
+	  		<p class="text-muted">© 2014 . myLearn - Page executée en <?php echo $load->load()." ms";?></p>
+	  	</footer>
+	</div> <!-- /container -->
+	
   	<!-- Bootstrap core JavaScript ================ -->
   	<!-- Placed at the end of the document so the pages load faster -->
   	<script src="/js/jquery-1.10.2.js"></script>

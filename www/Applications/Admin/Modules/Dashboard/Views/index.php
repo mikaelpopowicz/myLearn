@@ -112,54 +112,8 @@
 		</div>
 	</div>
 </div>
-<div>
-<div class="panel panel-primary">
-	<div class="panel-heading">
-		<div class="pull-right">
-			<a href="/admin/parametres" class="btn btn-primary btn-xs">
-				<i class="fa fa-edit fa-lg"></i> Editer
-			</a>
-		</div>
-		<h1 class="panel-title"><i class="fa fa-cog fa-lg"></i> Paramètres</h1>
-	</div>
-	<div class="panel-body">
-		<div class="row">
-			<div class="col-md-4">
-				<h4 class="text-primary">Informations</h4>
-				<hr>
-				<dl class="dl-horizontal">
-					<dt>Etablissement</dt>
-					<dd><?php echo $nom;?></dd>
-					<dt>Description</dt>
-					<dd><?php echo $desc;?></dd>
-					<dt>Email d'envoi</dt>
-					<dd><?php echo $mail;?></dd>
-					<dt>Email de contact</dt>
-					<dd><?php echo $mail;?></dd>
-				</dl>
-			</div>
-			<div class="col-md-4">
-				<h4 class="text-primary">Configuration base de donnée</h4>
-				<hr>
-				<dl class="dl-horizontal">
-					<dt>Hôte</dt>
-					<dd><?php echo $hote;?></dd>
-					<dt>Base</dt>
-					<dd><?php echo $base;?></dd>
-					<dt>Utilisateur</dt>
-					<dd><?php echo $db_user;?></dd>
-				</dl>
-			</div>
-			<div class="col-md-4">
-				<h4 class="text-primary">Connexion</h4>
-				<hr>
-				<dl class="dl-horizontal">
-					<dt>Login</dt>
-					<dd><?php echo $user->getAttribute('username');?></dd>
-					<dt>Email</dt>
-					<dd><?php echo $user->getAttribute('email');?></dd>
-				</dl>
-			</div>
-		</div>
-	</div>
-</div>
+<form method="post">
+	<button class="btn btn-primary" type="submit" name="addVolume">
+		Génération en masse
+	</button>
+</form>
