@@ -9,7 +9,7 @@ class Eleve extends \Library\Entities\User
 	{
 		$this->dateNaissance = $date;
 	}
-	
+
 	public function dateNaissance() { return $this->dateNaissance; }
 }
 ?>

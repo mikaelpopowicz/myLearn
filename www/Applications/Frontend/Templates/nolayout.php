@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+    <link rel="shortcut icon" href="/images/favicon.png">
 
     <title><?php echo isset($title) ? $title : "" ;?></title>
 
@@ -24,10 +24,18 @@
 	  echo $content;
 	  ?>
 	  
+	
+	  	<footer class="footer">
+	  		<p class="text-muted">© 2014 . myLearn - Page executée en <?php echo $load->load()." ms";?></p>
+	  	</footer>
+	</div> <!-- /container -->
+	
   	<!-- Bootstrap core JavaScript ================ -->
   	<!-- Placed at the end of the document so the pages load faster -->
-  	<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+  	<script src="/js/jquery-1.10.2.js"></script>
   	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/crypto.js"></script>
+	<script src="/js/login.js"></script>
   	<!-- Noty ================ -->
   	<script src='/assets/js/noty/packaged/jquery.noty.packaged.min.js'></script>
 	<!--=== JavaScript insert code ===-->

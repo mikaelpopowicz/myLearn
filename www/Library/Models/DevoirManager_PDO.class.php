@@ -21,7 +21,7 @@ class DevoirManager_PDO extends DevoirManager
 		return $listeDevoir;
 	}
 
-	public function getListByTeacher($professeur)
+	public function getListOfTeacher($professeur)
 	{
 		$requete = $this->dao->prepare('SELECT d.id_d AS id, d.dateDevoir, d.enonce, d.dateMax, p.id_p AS prof, c.id_classe AS classe
 			FROM devoir d
@@ -79,6 +79,11 @@ class DevoirManager_PDO extends DevoirManager
 			return $devoir;
 		}
 		return null;
+	}
+
+	public function count()
+	{
+		return $this->dao->query('SELECT COUNT(*) FROM devoir')->fetchColumn();
 	}
 
 	protected function add(Devoir $devoir)

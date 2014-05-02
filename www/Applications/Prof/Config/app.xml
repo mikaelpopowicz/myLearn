@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<definitions>
+	<define var="db_host" value="dEkILaAYKmv6" />
+	<define var="db_name" value="dV8HKa0CKw==" />
+	<define var="db_user" value="akkEOA==" />
+	<define var="db_user_pass" value="bEkEPg==" />
+	<define var="conf_nom" value="Super école" />
+	<define var="conf_description" value="Ici, vous êtes dans l'élite. La meilleure école" />
+	<define var="conf_email" value="noreply@ecole.fr" />
+	<define var="conf_contact" value="contact@ecole.fr" />
+	<define var="conf_date" value="01/01/2014" />
+	<define var="cryp_iv" value="PRdYDigOPvs=" />
+	<define var="cryp_key" value="bWJVMVkxMlUwaWs1OEdjOUxxU056bVFF" />
+	<define var="installed" value="true" />
+	<define var="version" value="1.0" />
+</definitions>

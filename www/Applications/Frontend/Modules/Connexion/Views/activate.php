@@ -1,20 +1,44 @@
-<div class="container main-content">
-	<div class="form-signin">
-		<h3 class="short_headline text-center"><span>Activation</span></h3>
-		<hr class="empty">
-		<p class="text-center">Adresse email à laquelle envoyer le lien d'activation</p>
-		<?php
-		echo isset($erreurs) ? $erreurs : "";
-		?>
-		<form method="post">
-			<fieldset>
-				<input type="email" class="input-block-level" name="email" placeholder="Email">
-				<button class="btn custom-btn btn-primary btn-large" name="send" type="submit"><i class="fa fa-lock"></i>&nbsp; Envoyer</button>
-			</fieldset>
-		</form>
-		<hr class="empty">
+<div class="jumbotron">
+	<div class="container">
+		<h1>Bienvenue sur <span class="text-info">myLearn</span></h1>
+		<p>Une plateforme éducative, pensée par des élèves pour des élèves. N'hésitez pas à nous soumettre vos demandes sur la plateforme sur notre site.</p>
+		<p>
+			<a href="http://mylearn.cpm-web.fr"class="btn btn-primary" role="button">En savoir plus »</a>
+		</p>
 	</div>
-	<p class="text-center">
-		<a href="/connexion/mot-de-passe-perdu">Mot de passe oublié ?</a> / Vous n'avez pas encore de compte ? <a href="/inscription">Inscrivez-vous</a>
-	</p>
 </div>
+<div class="container">
+	<div class="row">
+		<div class="col-md-6 text-center">
+			<br><br>
+			<h3>Demande d'activation du compte</h3>
+			<h3 class="text-primary"><a href='/'><?php echo isset($nom) ? $nom : "";?></a></h3>
+			<p><?php echo isset($desc) ? $desc : "";?></p>
+		</div>
+		<div class="col-md-6">
+			<div class="well">
+				<?php
+				if(isset($erreurs) && is_array($erreurs)) {
+					echo '<div class="alert alert-'.$erreurs[0].'">';
+					echo $erreurs[1];
+					echo '</div>';
+				} else {
+				?>
+				<div class="alert alert-info">
+					<span class="text-center">Adresse email à laquelle envoyer le lien d'activation</span>
+				</div>	
+				<?php
+				}
+				?>
+				<form class="form-signin" role="form" method="post">
+					<input type="text" class="form-control" placeholder="Email" name="email" required autofocus><br/>
+					<button class="btn btn-lg btn-primary btn-block" name="go" type="submit">Envoyer</button>
+				</form>
+				<p class="text-center">
+					<a href="/connexion">Connexion</a>
+					/
+					<a href="/connexion/mot-de-passe-perdu">Mot de passe oublié ?</a>
+				</p>
+			</div>
+		</div>
+	</div>

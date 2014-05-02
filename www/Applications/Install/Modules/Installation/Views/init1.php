@@ -16,9 +16,63 @@
 						</span>
 					</li>
 					<li>
+						Apache mod_rewrite
+						<span class="pull-right">
+							<?php echo $mod;?>
+						</span>
+					</li>
+					<li>
+						/Applications/Admin/ est accessible en éciture
+						<span class="pull-right">
+							<?php echo $dir['admin'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Frontend/ est accessible en éciture
+						<span class="pull-right">
+							<?php echo $dir['frontend'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Prof/ est accessible en éciture
+						<span class="pull-right">
+							<?php echo $dir['prof'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Admin/AdminApplication.back.class.php est accessible en éciture
+						<span class="pull-right">
+							<?php echo $app['admin'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Frontend/FrontendApplication.back.class.php est accessible en éciture
+						<span class="pull-right">
+							<?php echo $app['frontend'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Prof/ProfApplication.back.class.php est accessible en éciture
+						<span class="pull-right">
+							<?php echo $app['prof'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Admin/Config est accessible en éciture
+						<span class="pull-right">
+							<?php echo $conf['admin'];?>
+						</span>
+					</li>
+					<li>
 						/Applications/Frontend/Config est accessible en éciture
 						<span class="pull-right">
-							<?php echo $conf;?>
+							<?php echo $conf['frontend'];?>
+						</span>
+					</li>
+					<li>
+						/Applications/Prof/Config est accessible en éciture
+						<span class="pull-right">
+							<?php echo $conf['prof'];?>
 						</span>
 					</li>
 				</ul>

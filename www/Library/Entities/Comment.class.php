@@ -3,43 +3,28 @@ namespace Library\Entities;
  
 class Comment extends \Library\Entity
 {
-	protected $cours,
-	$auteur,
-	$dateCommentaire,
-	$commentaire;
-   
-	const AUTEUR_INVALIDE = 1;
-	const CONTENU_INVALIDE = 2;
+	protected $cours,							// Identifiant du cours commenté (clé étrangère)
+	$auteur,									// Identifiant de l'utilisateur qui a commenté (clé étrangère)
+	$dateCommentaire,							// Date à laquelle le commentaire a été fait (entité embarquée)
+	$commentaire;								// Contenu du commentaire
+
+	const CONTENU_INVALIDE = 1;
    
 	public function isValid()
 	{
-		return !(empty($this->auteur) || empty($this->commentaire) || !empty($this->erreurs));
+		return !(empty($this->commentaire));
 	}
    
 	// SETTERS
    
-	public function setCours($cours)
+	public function setCours(\Library\Entities\Cours $cours)
 	{
-		if(empty($cours))
-		{
-			$this->erreurs[] = self::COURS_INVALIDE;
-		}
-		else
-		{
-			$this->cours = $cours;
-		}
+		$this->cours = $cours;
 	}
    
-	public function setAuteur($auteur)
+	public function setAuteur(\Library\Entities\user $auteur)
 	{
-		if (!is_string($auteur) || empty($auteur))
-		{
-			$this->erreurs[] = self::AUTEUR_INVALIDE;
-		}
-		else
-		{
-			$this->auteur = $auteur;
-		}
+		$this->auteur = $auteur;
 	}
    
 	public function setCommentaire($contenu)

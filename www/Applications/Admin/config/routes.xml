@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<routes>
+	<route url="/admin(/?)" module="Dashboard" action="index" />
+	<route url="/admin/sections(/?)" module="Section" action="index" />
+	<route url="/admin/sections/nouvelle-section" module="Section" action="ajout" />
+	<route url="/admin/sections/modifier-([0-9]*)" module="Section" action="modif" vars="id" />
+	<route url="/admin/sections/supprimer" module="Section" action="delete" />
+	
+	<route url="/admin/sessions(/?)" module="Session" action="index" />
+	<route url="/admin/sessions/nouvelle-session" module="Session" action="ajout" />
+	<route url="/admin/sessions/modifier-([0-9]*)" module="Session" action="modif" vars="id" />
+	<route url="/admin/sessions/supprimer" module="Session" action="delete" />
+	<route url="/admin/sessions/([0-9]*)" module="Session" action="show" vars="id" />
+	
+	<route url="/admin/classes(/?)" module="Classe" action="index" />
+	<route url="/admin/classes/([0-9]*)" module="Classe" action="show" vars="id" />
+	<route url="/admin/classes/([0-9]*)/supprimer-eleve" module="Classe" action="delEleve" vars="id" />
+	<route url="/admin/classes/([0-9]*)/supprimer-professeur" module="Classe" action="delProfesseur" vars="id" />
+	<route url="/admin/classes/([0-9]*)/supprimer-matiere" module="Classe" action="delMatiere" vars="id" />
+	<route url="/admin/classes/nouvelle-classe" module="Classe" action="ajout" />
+	<route url="/admin/classes/modifier-([0-9]*)" module="Classe" action="modif" vars="id" />
+	<route url="/admin/classes/supprimer" module="Classe" action="delete" />
+	
+	<route url="/admin/cours(/?)" module="Cours" action="indexCours" />
+	
+	<route url="/admin/matieres(/?)" module="Matiere" action="index" />
+	<route url="/admin/matieres/nouvelle-matiere" module="Matiere" action="ajout" />
+	<route url="/admin/matieres/modifier-([0-9]*)" module="Matiere" action="modif" vars="id" />
+	<route url="/admin/matieres/supprimer" module="Matiere" action="delete" />
+
+	<route url="/admin/devoirs(/?)" module="Cours" action="indexDevoirs" />
+	
+	<route url="/admin/professeurs(/?)" module="Professeur" action="index" />
+	<route url="/admin/professeurs/nouveau-professeur" module="Professeur" action="ajout" />
+	<route url="/admin/professeurs/modifier-([0-9]*)" module="Professeur" action="modif" vars="id" />
+	<route url="/admin/professeurs/supprimer" module="Professeur" action="delete" />
+	
+	<route url="/admin/eleves(/?)" module="Eleve" action="index" />
+	<route url="/admin/eleves/nouvel-eleve" module="Eleve" action="ajout" />
+	<route url="/admin/eleves/modifier-([0-9]*)" module="Eleve" action="modif" vars="id" />
+	<route url="/admin/eleves/supprimer" module="Eleve" action="delete" />
+	
+	<route url="/admin/parametres(/?)" module="Param" action="index" />
+	<route url="/admin/parametres/modifier-informations" module="Param" action="infos" />
+	
+	<route url="/admin/parametres/modifier-user" module="Param" action="user" />
+	<route url="/admin/parametres/modifier-password" module="Param" action="password" />
+	
+	<route url="/admin/cours/supprimer" module="Cours" action="delete" />
+	<route url="/admin/cours/ajouter" module="Cours" action="add" />
+	<route url="/admin/cours/modifier-([0-9]+)" module="Cours" action="update" vars="id"/>
+</routes>

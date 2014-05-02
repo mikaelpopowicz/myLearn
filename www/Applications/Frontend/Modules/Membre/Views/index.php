@@ -1,5 +1,5 @@
 <div class="page-header">
-	<h1>Mon profil</h1>
+	<h1>Mon compte</h1>
 </div>
 <div class="strip primary">
 	<div class="container">
@@ -11,7 +11,7 @@
 				/
 			</li>
 			<li>
-				Mon profil
+				Mes informations
 			</li>
 		</ul>
 	</div>
@@ -22,13 +22,13 @@
 			<div class="span3">
 				<ul class="nav nav-pills nav-stacked">
 					<li class="<?php echo isset($class_profil) ? $class_profil : "";?>">
-						<a href="/membre/mon-profil">Mes informations</a>
+						<a href="/mon-compte">Mes informations</a>
 					</li>
 					<li class="<?php echo isset($class_mes_cours) ? $class_mes_cours : "";?>">
-						<a href="/membre/mes-cours">Mes cours</a>
+						<a href="/mon-compte/mes-cours">Mes cours</a>
 					</li>
 					<li class="<?php echo isset($class_config) ? $class_config : "";?>">
-						<a href="/membre/ma-configuration">Configuration</a>
+						<a href="/mon-compte/configuration">Configuration</a>
 					</li>
 				</ul>
 			</div>
@@ -44,33 +44,29 @@
 					<tbody>
 						<tr>
 							<td>Username</td>
-							<td><?php echo $profil['username']; ?></td>
+							<td><?php echo $user->getAttribute('username'); ?></td>
 						</tr>
 						<tr>
 							<td>Nom</td>
-							<td><?php echo $profil['nom']; ?></td>
+							<td><?php echo $user->getAttribute('nom'); ?></td>
 						</tr>
 						<tr>
 							<td>Prénom</td>
-							<td><?php echo $profil['prenom']; ?></td>
+							<td><?php echo $user->getAttribute('prenom'); ?></td>
 						</tr>
 						<tr>
 							<td>Email</td>
-							<td><?php echo $profil['email']; ?></td>
+							<td><?php echo $user->getAttribute('email'); ?></td>
 						</tr>
 						<tr>
-							<td>Actif</td>
-							<td><?php echo $profil['active'] == 1 ? "Oui" : "Non"; ?></td>
-						</tr>
-						<tr>
-							<td>Date d'inscription</td>
-							<td><?php echo $profil['dateByte']->format('d/m/Y'); ?></td>
+							<td>Date de naissance</td>
+							<td><?php echo $naissance; ?></td>
 						</tr>
 					</tbody>
 				</table>
 				<form class="form-inline" method="post">
-					<button type="submit" class="btn btn-primary" name="modifier_profil">Modifier mon profil</button>
-					<button type="submit" class="btn btn-info" name="modifier_pass">Modifier mon mot de passe</button>
+					<a class="btn btn-primary" href="/mon-compte/modifier-mes-informations">Modifier mon profil</a>
+					<a class="btn btn-info" href="/mon-compte/modifier-mot-de-passe">Modifier mon mot de passe</a>
 				</form>
 			</div>
 		</div>

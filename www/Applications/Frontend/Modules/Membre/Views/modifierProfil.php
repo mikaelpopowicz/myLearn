@@ -45,7 +45,7 @@
 					<div class="controls">
 						<input type="text" id="username" name="username" placeholder="Votre nom d'utilisateur" value="<?php echo isset($profil['username']) ? $profil['username'] : "";?>">
 						<?php
-						if (isset($erreurs) && in_array(\Library\Entities\Byte::USER_INVALIDE, $erreurs))
+						if (isset($erreurs) && in_array(\Library\Entities\Eleve::USER_INVALIDE, $erreurs))
 						{
 							echo '<span class="help-inline">Le pseudo est déjà utilisé</span>';
 						}
@@ -57,7 +57,7 @@
 					<div class="controls">
 						<input type="text" id="nom" name="nom" placeholder="Votre nom" value="<?php echo isset($profil['nom']) ? $profil['nom'] : "";?>">
 						<?php
-						if (isset($erreurs) && in_array(\Library\Entities\Byte::NOM_INVALIDE, $erreurs))
+						if (isset($erreurs) && in_array(\Library\Entities\Eleve::NOM_INVALIDE, $erreurs))
 						{
 							echo '<span class="help-inline">Le nom ne peut être vide</span>';
 						}
@@ -75,7 +75,7 @@
 					<div class="controls">
 						<input type="text" id="email" name="email" placeholder="Votre adresse email" value="<?php echo isset($profil['email']) ? $profil['email'] : "";?>">
 						<?php
-						if (isset($erreurs) && in_array(\Library\Entities\Byte::EMAIL_INVALIDE, $erreurs))
+						if (isset($erreurs) && in_array(\Library\Entities\Eleve::EMAIL_INVALIDE, $erreurs))
 						{
 							echo '<span class="help-inline">L\'email est invalide ou déja utilisé</span>';
 						}

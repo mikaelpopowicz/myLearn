@@ -19,6 +19,120 @@ class UserManager_PDO extends UserManager
 		return $listeByte;
 	}
 	
+	public function connexion($login, $pass)
+	{
+		$requete = $this->dao->prepare('CALL connexion(:login, :pass)');
+		$requete->bindValue(':login', $login);
+		$requete->bindValue(':pass', $pass);
+		$requete->execute();
+		$erreur = $requete->fetch();
+		$requete->nextRowset();
+		if($erreur['erreur'] == 0) {
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\User');
+			$user = $requete->fetch();
+			$user->setDateUser(new \DateTime($user['dateUser']));
+			$requete->nextRowset();
+			$statut = $requete->fetch(\PDO::FETCH_ASSOC);
+			$result = array(
+				"user" =>$user,
+				"statut" => $statut['Statut']
+			);
+			if($statut['Statut'] == "Eleve")
+			{
+				$requete->nextRowset();
+				$nombre = $requete->fetch(\PDO::FETCH_ASSOC)['Classes'];
+				$listeClasse = array();
+				if($nombre > 0)
+				{
+					$entity = array(
+						"Classe",
+						"Session",
+						"Section",
+						"Matiere",
+						"Professeur",
+						"Eleve"
+					);
+			
+					for($i = 0; $i < $nombre; $i++)
+					{
+						foreach ($entity as $key) {
+							$mode = "\Library\Entities\\".$key;
+							$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $mode);
+							$requete->nextRowset();
+							if($key == "Classe")
+							{
+								$classe = $requete->fetch();
+							}
+							else
+							{
+								if ($key == "Session" || $key == "Section")
+								{
+									$value = $requete->fetch();
+									$methode = 'set'.$key;
+									$classe->$methode($value);
+								}
+								else
+								{
+									$values = $requete->fetchAll();
+									$methode = 'set'.$key.'s';
+									$classe->$methode($values);
+								}
+							}
+						}
+						$listeClasse[] = $classe;
+					}
+				}
+				for ($i=0; $i < count($listeClasse); $i++) { 
+					$listeClasse[$i] = base64_encode(serialize($listeClasse[$i]));
+				}
+				$result['classes'] = $listeClasse;
+			}
+			
+		} else {
+			$result = $requete->fetch();
+			$result = array(
+				"Message" => $result['Message'],
+				"Type" => $result['Type']
+			);
+		}
+		return $result;
+	}
+	
+	public function activation($oldTk,$newTk)
+	{
+		$requete = $this->dao->prepare('CALL activation(:old, :new)');
+		$requete->bindValue(':old', $oldTk);
+		$requete->bindValue(':new', $newTk);
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+		$result = $requete->fetch();
+		return $result;
+	}
+	
+	public function activationRequest($mail)
+	{
+		$requete = $this->dao->prepare('CALL activation_request(:mail)');
+		$requete->bindValue(':mail', $mail);
+		$requete->execute();
+		$erreur = $requete->fetch();
+		$result = array();
+		$requete->nextRowset();
+		if($erreur['erreur'] == 0)
+		{
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Crypt');
+			$result['mail'] = $requete->fetch();
+			$requete->nextRowset();
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result['message'] = $requete->fetch();
+		}
+		else
+		{
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result['message'] = $requete->fetch();
+		}
+		return $result;
+	}
+	
 	public function getUnique($id)
 	{
 		$requete = $this->dao->prepare('SELECT id_u AS id, username, nom, prenom, email, password, salt, token, active, dateUser

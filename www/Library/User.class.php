@@ -17,6 +17,19 @@ class User extends ApplicationComponent
      
 		return $flash;
 	}
+	
+	public function getQuery()
+	{
+		$query = $_SESSION['query'];
+		unset($_SESSION['query']);
+     
+		return $query;
+	}
+	
+	public function hasQuery()
+	{
+		return isset($_SESSION['query']);
+	}
    
 	public function hasFlash()
 	{
@@ -30,6 +43,10 @@ class User extends ApplicationComponent
    
 	public function setAttribute($attr, $value)
 	{
+		if(isset($_SESSION[$attr]))
+		{
+			unset($_SESSION[$attr]);
+		}
 		$_SESSION[$attr] = $value;
 	}
    
@@ -48,12 +65,8 @@ class User extends ApplicationComponent
 		$_SESSION['flash'] = $value;
 	}
 	
-	public function setUser(Byte $byte, Acl $acl) {
-		$_SESSION['username'] = $byte->username();
-	}
-	
-	public function getUser() {
-		return $_SESSION['username'];
+	public function setQuery($query) {
+		$_SESSION['query'] = $query;
 	}
 	
 	public function delUser() {

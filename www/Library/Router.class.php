@@ -42,7 +42,6 @@ class Router
 					// On assigne ce tableau de variables à la route.
 					$route->setVars($listVars);
 				}
-         
 				return $route;
 			}
 		}

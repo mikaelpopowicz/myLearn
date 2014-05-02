@@ -1,28 +1,25 @@
 <?php
 namespace Library;
 
-class Mailer
+class Mailer extends \Library\ApplicationComponent
 {
 	private $mail;
 	private $sujet;
 	private $titre;
 	private $message;
-	private $headers;
-	private $ligne;
-	private $boundary;
+	private $team;
+	private $contact;
+	private $phpmail;
 	
-	public function __construct($mail, $sujet, $message, $headers) {
-		$this->boundary = "-----=".md5(rand());
-		if (!preg_match("#^[a-z0-9._-]+@(hotmail|live|msn).[a-z]{2,4}$#", $mail)) {
-			$this->setLigne("\r\n");
-		} else {
-			$this->setLigne("\n");
-		}
-		$this->setMail($mail);
-		$this->setSujet($sujet);
-		$this->setMessage($sujet, $message);
-		$this->setHeaders($headers);
-		$this->send();
+	
+	public function __construct($app) {
+		parent::__construct($app);
+		
+		$this->setTeam($app->config()->get('conf_nom'));
+		$this->setContact($app->config()->get('conf_contact'));
+		
+		$this->phpmail = new \PHPMailer(true);
+		$this->phpmail->IsSMTP();
 	}
 	
 	public function setMail($mail) {
@@ -32,31 +29,54 @@ class Mailer
 	public function setSujet($sujet) {
 		$this->sujet = $sujet;
 	}
-	
-	public function setHeaders($sender) {
-		$this->headers = "From: \"Mika-p.fr\"<".$sender.">".$this->ligne;
-		$this->headers.= "Reply-to: \"Mika-p.fr\" <".$sender.">".$this->ligne;
-		$this->headers.= "MIME-Version: 1.0".$this->ligne;
-		$this->headers.= "Content-Type: multipart/alternative;".$this->ligne." boundary=\"$this->boundary\"".$this->ligne;
-	}
-	
+
 	public function setLigne($ligne) {
 		$this->ligne = $ligne;
 	}
+
+	public function setTeam($team) {
+		$this->team = $team;
+	}
+
+	public function setContact($contact) {
+		$this->contact = $contact;
+	}
 	
-	public function send() {
-		mail($this->mail, $this->sujet, $this->message, $this->headers);
+	public function send()
+	{
+		$this->phpmail->IsHTML(true);
+		$this->phpmail->CharSet		=	"utf-8";
+		$this->phpmail->Subject		=	$this->sujet;
+		$this->phpmail->Body		=	$this->message;
+		$this->phpmail->Host		=	"smtp.orange.fr";
+		$this->phpmail->SMTPDebug	=	0;
+		$this->phpmail->SMTPAuth	=	true;
+		$this->phpmail->Port		=	587;
+		$this->phpmail->Username	=	"mpopowicz.uf";
+		$this->phpmail->Password	=	"ufinfo91";
+		$this->phpmail->SetFrom($this->app->config()->get('conf_email'), "MyLearn");
+		//$this->phpmail->AddReplyTo($this->app->config()->get('conf_email'), "MyLearn");
+		$this->phpmail->AddAddress($this->mail);
+		try {
+			
+			
+			$this->phpmail->Send();
+			return true;
+		} catch (phpmailerException $e) {
+			echo $e->errorMessage(); //Pretty error messages from PHPMailer
+		} catch (Exception $e) {
+			echo $e->getMessage(); //Boring error messages from anything else!
+		}
 	}
 	
 	public function setMessage($titre, $message) {
-		$dir = '../'.__DIR__;
-		
+		/*
 		$this->message = $this->ligne."--".$this->boundary.$this->ligne;
 		
 		//=====Ajout du message au format HTML
 		$this->message.= "Content-Type: text/html; charset=\"UTF-8\"".$this->ligne;
 		$this->message.= "Content-Transfer-Encoding: 8bit".$this->ligne;
-		
+		*/
 		$string = '
 			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 			<html xmlns="http://www.w3.org/1999/xhtml">
@@ -322,7 +342,7 @@ class Mailer
 									<tr>
 										<td>
 											<div id="logo" class="text-logo">
-												<h2><a href="http://poo/"><span>Mika</span>-p<span>.Fr</span></a></h2>
+												<h2><a href="http://ppe/"><span>my</span>Learn</a></h2>
 											</div>
 											</td>
 										<td align="right"><h6 class="collapse">'.$titre.'</h6></td>
@@ -371,7 +391,7 @@ class Mailer
 															<td>				
 																			
 																<h5 class="">Contacts:</h5>												
-																<p>Email: <strong><a href="mailto:webmaster@mika-p.fr">webmaster@mika-p.fr</a></strong></p>
+																<p>Email: <strong><a href="mailto:'.$this->contact.'">'.$this->contact.'</a></strong></p>
                 
 															</td>
 														</tr>
@@ -405,7 +425,7 @@ class Mailer
 								<tr>
 									<td align="center">
 										<p>
-											L\'équipe Mika-p.fr
+											L\'équipe '.$this->team.'
 										</p>
 									</td>
 								</tr>
@@ -419,10 +439,12 @@ class Mailer
 
 			</body>
 			</html>';
-		$this->message.= $this->ligne.$string.$this->ligne;
+		$this->message .= $string;
+		/*
 		//==========
 		$this->message.= $this->ligne."--".$this->boundary."--".$this->ligne;
 		$this->message.= $this->ligne."--".$this->boundary."--".$this->ligne;
+		*/
 	}
 }
 ?>

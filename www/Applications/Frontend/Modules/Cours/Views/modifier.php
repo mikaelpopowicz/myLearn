@@ -26,13 +26,10 @@
 	<form method="post" class="form-horizontal">
 		<div class="row-fluid sidebar-left">
 			<div class="span9 primary-column">
-				<div class="page-header">
-					<h1>Titre, matière, description et contenu</h1>
-				</div>
 				<div class="control-group">
 					<label class="control-label" for="titre">Titre</label>
 					<div class="controls">
-							<input type="text" class="input-block-level" id="titre" name="titre" placeholder="Titre du chapitre" value="<?php echo isset($cours['titre']) ? $cours['titre'] : "";?>">
+							<input type="text" class="input-block-level" id="titre" name="titre" placeholder="Titre du chapitre" value="<?php echo isset($cours) ? $cours->titre() : "";?>">
 							<?php
 							if (isset($erreurs) && in_array(\Library\Entities\Cours::TITRE_INVALIDE, $erreurs))
 								{
@@ -48,8 +45,8 @@
 							<?php
 							if(isset($matieres) && is_array($matieres)) {
 								foreach ($matieres as $matiere) {
-									$seleted = isset($cours['matiere']) && $cours['matiere'] == $matiere['id'] ? "selected" : "";
-									echo "<option value='".$matiere['id']."' ".$seleted.">".$matiere['libelle']."</option>";
+									$seleted = $cours->matiere()->id() == $matiere['id'] ? "selected" : "";
+									echo "<option value='".base64_encode(serialize($matiere))."' ".$seleted.">".$matiere->libelle()."</option>";
 								}
 							}
 							?>

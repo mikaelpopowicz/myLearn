@@ -5,13 +5,15 @@ class Cours extends \Library\Entity {
 	
 	protected $auteur,						// Identifiant de l'utilisateur qui a ecrit le cours (clé étrangère)
 	$titre,									// Titre du cours
+	$uri,									// URI du cours
 	$description,							// Description du cours
 	$contenu,								// Contenu du cours
 	$dateAjout,								// Date de création du cours
 	$dateModif,								// Date de la dernière modification du cours
 	$matiere,								// Matière à laquelle le cours fait référence (clé étrangère)
 	$classe,								// Classe dans laquelle le cours a été donné (clé étrangère)
-	$count_c;								// Nombre de fois que le cours a été vue par des élèves
+	$commentaires,
+	$vues;
 	
 	const AUTEUR_INVALIDE = 1;
 	const TITRE_INVALIDE = 2;
@@ -25,16 +27,9 @@ class Cours extends \Library\Entity {
 	
 	// SETTERS //
    
-	public function setAuteur($auteur)
+	public function setAuteur(\Library\Entities\User $auteur)
 	{
-		if (empty($auteur))
-		{
-			$this->erreurs[] = self::AUTEUR_INVALIDE;
-		}
-		else
-		{
-			$this->auteur = $auteur;
-		}
+		$this->auteur = $auteur;
 	}
    
 	public function setTitre($titre)
@@ -47,6 +42,11 @@ class Cours extends \Library\Entity {
 		{
 			$this->titre = $titre;
 		}
+	}
+	
+	public function setUri($uri)
+	{
+		$this->uri = $uri;
 	}
 	
 	public function setDescription($description)
@@ -83,53 +83,36 @@ class Cours extends \Library\Entity {
 		$this->dateModif = $dateModif;
 	}
 	
-	public function setMatiere($matiere) {
-		$this->matiere = (int)$matiere;
+	public function setMatiere(\Library\Entities\Matiere $matiere) {
+		$this->matiere = $matiere;
+	}
+	
+	public function setClasse(\Library\Entities\Classe $classe) {
+		$this->classe = $classe;
+	}
+	
+	public function setCommentaires(array $commentaires)
+	{
+		$this->commentaires = $commentaires;
 	}
 
-	public function setCount_c($count) {
-		$this->count_c = $count;
+	public function setVues(array $vues) {
+		$this->vues = $vues;
 	}
 	
 	// GETTERS //
    
-	public function auteur()
-	{
-		return $this->auteur;
-	}
-   
-	public function titre()
-	{
-		return $this->titre;
-	}
-	
-	public function description()
-	{
-		return $this->description;
-	}
-   
-	public function contenu()
-	{
-		return $this->contenu;
-	}
-   
-	public function dateAjout()
-	{
-		return $this->dateAjout;
-	}
-   
-	public function dateModif()
-	{
-		return $this->dateModif;
-	}
-	
-	public function matiere() {
-		return $this->matiere;
-	}
-
-	public function count_c() {
-		return $this->count_c;
-	}
+	public function auteur() { return $this->auteur; }
+    public function titre() { return $this->titre; }
+	public function uri() { return $this->uri; }
+	public function description() { return $this->description; }
+	public function contenu() { return $this->contenu; }
+	public function dateAjout() { return $this->dateAjout; }
+	public function dateModif() { return $this->dateModif; }
+	public function matiere() { return $this->matiere; }
+	public function classe() { return $this->classe; }
+	public function commentaires() { return $this->commentaires; }
+	public function vues() { return $this->vues; }
 }
 
 ?>

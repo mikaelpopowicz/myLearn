@@ -17,15 +17,6 @@
 	<!-- Bootstrap core CSS -->
 	<link href="/css/bootstrap.css" rel="stylesheet">
 	<link href="/css/font-awesome.min.css" rel="stylesheet">
-
-	<!-- Just for debugging purposes. Don't actually copy this line! -->
-	<!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-
-	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-	<!--[if lt IE 9]>
-		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-		<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-		<![endif]-->
 </head>
 <body>		
 	<div class="jumbotron">
@@ -55,14 +46,11 @@
 
 	<!-- Bootstrap core JavaScript ================ -->
 	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="/js/jquery-1.7.2.min.js"></script>
-	<script src="/js/jquery.uniform.min.js"></script>
+	<script src="/js/jquery-1.10.2.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
-	<script src="/js/holder.js"></script>
-	<!-- Noty ================ -->
-	<script src='/assets/js/noty/packaged/jquery.noty.packaged.min.js'></script>
 	<script src='/assets/js/jquery.dataTables.js'></script>
 	<script src='/assets/js/datatables.js'></script>
+	<script src='/js/bootstrap-select.js'></script>
 	<script src='/js/custom.js'></script>
 	
 	<!--=== JavaScript insert code ===-->
