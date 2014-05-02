@@ -6,7 +6,7 @@ if(file_exists('../Applications/Admin/AdminApplication.class.php') && file_exist
 	$app = new Applications\Admin\AdminApplication($start);
 	$app->run();
 } else {
-	$app = new Applications\Install\InstallApplication;
+	$app = new Applications\Install\InstallApplication($start);
 	$app->run();
 }
 ?>
