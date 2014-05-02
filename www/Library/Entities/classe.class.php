@@ -4,6 +4,7 @@ namespace Library\Entities;
 class Classe extends \Library\Entity
 {
 	private $libelle,
+	$uri,
 	$session,
 	$section,
 	$matieres,
@@ -27,6 +28,11 @@ class Classe extends \Library\Entity
 		{
 			$this->libelle = $libelle;
 		}
+	}
+	
+	public function setUri($uri)
+	{
+		$this->uri = $uri;
 	}
 	
 	public function setSession(\Library\Entities\Session $session)
@@ -55,6 +61,7 @@ class Classe extends \Library\Entity
 	}
 	
 	public function libelle() { return $this->libelle; }
+	public function uri() { return $this->uri; }
 	public function session() { return $this->session; }
 	public function section() { return $this->section; }
 	public function matieres() { return $this->matieres; }
