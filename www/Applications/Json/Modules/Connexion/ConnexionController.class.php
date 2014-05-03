@@ -1,5 +1,5 @@
 <?php
-namespace Applications\JSON\Modules\Connexion;
+namespace Applications\Json\Modules\Connexion;
 
 class ConnexionController extends \Library\BackController
 {	

@@ -352,3 +352,19 @@ $(document).ready(function () {
 		}
 	})
 });
+
+/*================================================================*/
+/*	CHECK ALL & DATATABLES (CUSTOM)
+/*================================================================*/
+$(document).ready(function () {
+	$('#check_all').click(function () {
+		var cases = $('#tabs').find('input[type=checkbox]');
+		$(cases).prop('checked', this.checked);
+	});
+	
+	$('.datatable').dataTable({
+		"aoColumnDefs": [
+		      { "bSortable": false, "aTargets": [ 0 ] }
+		]
+	});
+});

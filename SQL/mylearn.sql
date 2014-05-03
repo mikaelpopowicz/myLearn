@@ -419,16 +419,15 @@ END @@
 
 CREATE PROCEDURE ajouter_eleve(a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_salt VARCHAR(40), a_token VARCHAR(40), a_dateNaissance DATE)
 BEGIN
-  # Récupération du nouvel id
-  Declare id int;
-  SET id = (SELECT autoincrement());
-  
-  # Vérifions que l admin n est pas bête au point de faire des doublons
-  IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON u.id_u = e.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND e.dateNaissance = a_dateNaissance) < 1
-  THEN
-    # Insertion de l élève dans la table USER
-    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
-    INSERT INTO eleve VALUES(id, a_dateNaissance);
+	Declare id int;
+	SET id = (SELECT autoincrement());
+	IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON u.id_u = e.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND e.dateNaissance = a_dateNaissance) < 1 THEN
+	    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
+	    INSERT INTO eleve VALUES(id, a_dateNaissance);
+		SELECT false AS erreur;
+	ELSE
+		SELECT true AS erreur;
+		SELECT * from errors WHERE code = "USR_DB";
   END IF;
 END @@
 
@@ -448,7 +447,6 @@ BEGIN
   salt = a_salt,
   token = a_token
   WHERE id_u = id;
-
   UPDATE eleve SET
   dateNaissance = a_dateNaissance
   WHERE id_u = id;
@@ -472,15 +470,14 @@ END @@
 
 CREATE PROCEDURE ajouter_prof(a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_salt VARCHAR(40), a_token VARCHAR(40), matiere INTEGER(2))
 BEGIN
-  # Récupération du nouvel id
-  Declare id int;
-  SET id = (SELECT autoincrement());
-  # Vérifions que l admin n est pas bête au point de faire des doublons
-  IF (SELECT COUNT(*) FROM user u INNER JOIN professeur p ON p.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND p.id_m = matiere) < 1
-  THEN
-    # Insertion du professeur dans la table USER
-    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
-    INSERT INTO professeur VALUES(id, matiere);
+	Declare id int;
+	SET id = (SELECT autoincrement());
+	IF (SELECT COUNT(*) FROM user u INNER JOIN professeur p ON p.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND p.id_m = matiere) < 1 THEN
+	    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
+	    INSERT INTO professeur VALUES(id, matiere);
+	ELSE
+		SELECT true AS erreur;
+		SELECT * from errors WHERE code = "USR_DB";
   END IF;
 END @@
 
@@ -514,8 +511,8 @@ CREATE TRIGGER del_prof
 AFTER DELETE ON professeur
 FOR EACH ROW
 BEGIN
-  DELETE FROM user
-  WHERE id_u = old.id_u;
+	DELETE FROM user
+	WHERE id_u = old.id_u;
 END @@
 
 # -----------------------------------------------------------------------------
@@ -524,16 +521,12 @@ END @@
 
 CREATE PROCEDURE ajouter_admin(a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_salt VARCHAR(40), a_token VARCHAR(40), a_poste VARCHAR(80))
 BEGIN
-  # Récupération du nouvel id
-  Declare id int;
-  SET id = (SELECT autoincrement());
-  # Vérifions que l admin n est pas bête au point de faire des doublons
-  IF (SELECT COUNT(*) FROM user u INNER JOIN administrateur a ON a.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND a.poste = a_poste) < 1
-  THEN
-    # Insertion du professeur dans la table USER
-    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 1, a_salt, a_token, CURDATE());
-    INSERT INTO administrateur VALUES(id, a_poste);
-  END IF;
+	Declare id int;
+	SET id = (SELECT autoincrement());
+	IF (SELECT COUNT(*) FROM user u INNER JOIN administrateur a ON a.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND a.poste = a_poste) < 1 THEN
+		INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 1, a_salt, a_token, CURDATE());
+    	INSERT INTO administrateur VALUES(id, a_poste);
+	END IF;
 END @@
 
 # -----------------------------------------------------------------------------
@@ -542,20 +535,19 @@ END @@
 
 CREATE PROCEDURE up_admin(id INTEGER, a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_active BOOLEAN, a_salt VARCHAR(40), a_token VARCHAR(40), a_poste VARCHAR(80))
 BEGIN
-  UPDATE user SET
-  username = a_username,
-  nom = a_nom,
-  prenom = a_prenom,
-  email = a_email,
-  password = a_pass,
-  active = a_active,
-  salt = a_salt,
-  token = a_token
-  WHERE id_u = id;
-
-  UPDATE administrateur SET
-  poste = a_poste
-  WHERE id_u = id;
+	UPDATE user SET
+	username = a_username,
+	nom = a_nom,
+	prenom = a_prenom,
+	email = a_email,
+	password = a_pass,
+	active = a_active,
+	salt = a_salt,
+	token = a_token
+	WHERE id_u = id;
+	UPDATE administrateur SET
+	poste = a_poste
+	WHERE id_u = id;
 END @@
 
 # -----------------------------------------------------------------------------
@@ -566,8 +558,8 @@ CREATE TRIGGER del_admin
 AFTER DELETE ON administrateur
 FOR EACH ROW
 BEGIN
-  DELETE FROM user
-  WHERE id_u = old.id_u;
+	DELETE FROM user
+	WHERE id_u = old.id_u;
 END @@
 
 # -----------------------------------------------------------------------------
@@ -578,10 +570,9 @@ CREATE TRIGGER up_user
 BEFORE UPDATE ON user
 FOR EACH ROW
 BEGIN
-  IF old.token != new.token AND old.active = 0 AND new.active = 1
-  THEN
-    DELETE FROM crypt WHERE token = old.token;
-  END IF;
+	IF old.token != new.token AND old.active = 0 AND new.active = 1 THEN
+		DELETE FROM crypt WHERE token = old.token;
+	END IF;
 END @@
 
 # -----------------------------------------------------------------------------
@@ -592,10 +583,9 @@ CREATE TRIGGER del_user
 BEFORE DELETE ON user
 FOR EACH ROW
 BEGIN
-  IF old.active = 0 AND (SELECT COUNT(*) FROM crypt WHERE token = old.token) > 0
-  THEN
-    DELETE FROM crypt WHERE token = old.token;
-  END IF;
+	IF old.active = 0 AND (SELECT COUNT(*) FROM crypt WHERE token = old.token) > 0 THEN
+		DELETE FROM crypt WHERE token = old.token;
+	END IF;
 END ;
 
 ###############################################################################
@@ -1228,19 +1218,18 @@ END @@
 #       PROCEDURE : select_comm()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE select_com(user INTEGER, cours INTEGER, dateComm DATETIME)
+CREATE PROCEDURE select_com(com INTEGER)
 BEGIN
 	# Commentaire
-	SELECT id_cours AS cours, dateCommentaire, commentaire
+	SELECT id_com AS id, dateCommentaire, commentaire
 	FROM commenter
-	WHERE id_cours = cours
-	AND id_u = user
-	AND dateCommentaire = dateComm;
+	WHERE id_com = com;
 	
 	# Auteur
-	SELECT id_u AS id, username, nom, prenom, email, dateUser
-	FROM user
-	WHERE id_u = user;
+	SELECT u.id_u AS id, u.username, u.nom, u.prenom, u.email, u.dateUser
+	FROM user u
+	INNER JOIN commenter c ON c.id_u = u.id_u
+	WHERE id_com = com;
 END @@
 
 # -----------------------------------------------------------------------------
@@ -1251,12 +1240,11 @@ CREATE PROCEDURE select_cours_com(cours INTEGER)
 BEGIN
 	# Déclaration
 	Declare fini int default 0;
-	Declare user INTEGER;
-	Declare dateCom DATETIME;
+	Declare com INTEGER;
 	
 	# Curseur
 	Declare cur1 CURSOR
-	FOR SELECT id_u, dateCommentaire
+	FOR SELECT id_com
 		FROM commenter
 		WHERE id_cours = cours
 		ORDER BY dateCommentaire;
@@ -1272,10 +1260,10 @@ BEGIN
 	
 	# Ouverture du curseur
 	Open cur1;
-	FETCH cur1 INTO user,dateCom;
+	FETCH cur1 INTO com;
 	WHILE fini != 1	DO
-		CALL select_com(user,cours,dateCom);
-		FETCH cur1 INTO user,dateCom;
+		CALL select_com(com);
+		FETCH cur1 INTO com;
 	END WHILE;
 	Close cur1;
 END @@
@@ -1318,6 +1306,78 @@ BEGIN
 	Close cur1;
 END @@
 
+# -----------------------------------------------------------------------------
+#       PROCEDURE : search_engine()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE search_engine(chaine TEXT)
+BEGIN
+	Declare it, nb, id, done INTEGER default 0;
+	Declare pre INTEGER default 1;
+	Declare clause,query TEXT default "";
+	
+	# Curseur
+	Declare cur1 CURSOR
+	FOR SELECT id_cours
+		FROM search_results;
+		
+	# Gestionnaire d'erreur
+	Declare continue HANDLER
+		FOR NOT FOUND SET done = 1;
+	
+	# Suppression de la table temporaire si elle existe
+	DROP TABLE IF EXISTS search_results;
+	
+	# Création de la requete avec la clause LIKE
+	SET query = 'SELECT id_cours FROM cours WHERE ';
+	SET clause = '\"%';
+	IF LENGTH(chaine) > 0 THEN
+		SET nb = nb + 1;
+		IF  LOCATE('+',chaine) > 0 THEN
+			SET it = LOCATE('+',chaine);
+			SET clause = CONCAT(clause,SUBSTR(chaine, pre, it-1),'%');
+			SET pre = it + 1;
+			
+			WHILE it != 0	DO
+				SET nb = nb + 1;
+				SET it = LOCATE('+',chaine, pre);
+				
+					IF it > 0 THEN
+						SET clause = CONCAT(clause,SUBSTR(chaine, pre, it-pre),'%');
+					ELSE
+						SET clause = CONCAT(clause,SUBSTR(chaine, pre),'%');
+					END IF;
+				SET pre = it + 1;
+			END WHILE;
+		ELSE
+			SET clause = CONCAT(clause,chaine,'%');
+		END IF;
+		SET clause = CONCAT(clause,'\"');
+	END IF;
+	SET query = CONCAT(query, 'titre LIKE ',clause, ' OR description LIKE ',clause, ' OR contenu LIKE ',clause, ' ORDER BY dateAjout DESC');
+	SET query = CONCAT('CREATE TEMPORARY TABLE IF NOT EXISTS search_results AS (', query,');');
+	# SELECT query, nb;
+	SET @query = query;
+	# Création de la table temporaire
+	PREPARE requete FROM @query;
+	EXECUTE requete;
+	DEALLOCATE PREPARE requete;
+	
+	# Compte du nombre de résultat
+	SELECT COUNT(*) AS "Cours" FROM search_results;
+	
+	IF (SELECT COUNT(*) FROM search_results) > 0 THEN
+		# Ouverture du curseur
+		OPEN cur1;
+		FETCH cur1 INTO id;
+		WHILE done != 1	DO
+			CALL select_cours(id, true);
+			FETCH cur1 INTO id;
+		END WHILE;
+		Close cur1;
+		SET done = 0;
+	END IF;
+END @@
 
 ###############################################################################
 ###############################################################################
@@ -1632,26 +1692,27 @@ CALL ajouter_admin("admin", "admin", "admin", "admin@domain.tld","7a53be99a2d39e
 INSERT INTO errors VALUES("OP_S","Opération réussie","success"),
 ("OP_F","Opération echouée","error"),
 ("LOG_WP","Erreur de saisie identidiant/mot de passe","danger"),
-("LOG_NA","Votre compte n'est pas encore activÃ©","warning"),
-("ACT_WT","Une erreur s'est produite, veuillez recommencer la procÃ©dure d'activation","error"),
+("LOG_NA","Votre compte n'est pas encore activé","warning"),
+("ACT_WT","Une erreur s'est produite, veuillez recommencer la procédure d'activation","error"),
 ("ACT_WM","Aucun compte ne correspond à cet email","danger"),
-("ACT_AA","Ce compte est dÃ©jà activÃ©","warning"),
+("ACT_AA","Ce compte est déjà activé","warning"),
 ("ACT_RS","Mail envoyé","success"),
-("ACT_S","Activation rÃ©ussie","success"),
+("ACT_S","Activation réussie","success"),
 ("CL_NF","Classe inexistante","error"),
 ("CL_NA","Vous n'avez pas accès à cette classe","error"),
 ("CL_ND","Cette classe n'est pas encore disponnible","warning"),
 ("MT_NF","Matière inexistante","error"),
 ("CR_NF","Cours inexistant","error"),
 ("CR_PNF","Page non trouvée","error"),
-("CR_NOC","Aucun cours disponible","error");
+("CR_NOC","Aucun cours disponible","error"),
+("USR_DB","Création d'un doublon", "error");
 
 # Matieres
-INSERT INTO matiere VALUES("","MathÃ©matiques","mathematiques","fa fa-superscript"),
+INSERT INTO matiere VALUES("","Mathématiques","mathematiques","fa fa-superscript"),
 ("","SLAM 4","slam-4","fa fa-code"),
 ("","SLAM 3","slam-3","fa fa-cogs"),
 ("","Droit","droit","fa fa-gavel"),
-("","FranÃ§ais","francais","fa fa-book"),
+("","Français","francais","fa fa-book"),
 ("","SI7","si7","fa fa-sitemap");
 
 # Ajout automatique de la première session
