@@ -34,6 +34,10 @@ class ConnexionController extends \Library\BackController
 					{
 						$this->app->user()->setAttribute('classes', $user['classes']);
 					}
+					if(isset($user['matiere']))
+					{
+						$this->app->user()->setAttribute('matiere', $user['matiere']);
+					}
 					$this->app->httpResponse()->redirect('/');
 				} else {
 					$this->page->addVar('erreurs', array($user['Type'], $user['Message']));

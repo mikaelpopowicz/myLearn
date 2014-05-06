@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <routes>
 	<route url="/professeur(/?)" module="Dashboard" action="index" />
+	
+
+	<route url="/professeur/([0-9]{4}-[0-9]{4}\/.[^_/]+)/([^_/]+)/([^/]+)" module="Cours" action="show" vars="libelle,matiere,cours" />
+	<route url="/professeur/([0-9]{4}-[0-9]{4}\/.[^_/]+)([_[0-9]*]?)" module="Cours" action="list_cours" vars="libelle,page" />
 </routes>

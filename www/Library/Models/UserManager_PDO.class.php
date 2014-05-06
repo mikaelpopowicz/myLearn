@@ -37,57 +37,25 @@ class UserManager_PDO extends UserManager
 				"user" =>$user,
 				"statut" => $statut['Statut']
 			);
-			if($statut['Statut'] == "Eleve")
+			if($statut['Statut'] == "Eleve" || $statut['Statut'] == "Prof")
 			{
+				if($statut['Statut'] == "Prof")
+				{
+					$requete->nextRowset();
+					$result['matiere'] = base64_encode(serialize(\Library\Models\MatiereManager_PDO::getObj($requete)));
+				}
 				$requete->nextRowset();
 				$nombre = $requete->fetch(\PDO::FETCH_ASSOC)['Classes'];
 				$listeClasse = array();
 				if($nombre > 0)
 				{
-					$entity = array(
-						"Classe",
-						"Session",
-						"Section",
-						"Matiere",
-						"Professeur",
-						"Eleve"
-					);
-			
 					for($i = 0; $i < $nombre; $i++)
 					{
-						foreach ($entity as $key) {
-							$mode = "\Library\Entities\\".$key;
-							$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $mode);
-							$requete->nextRowset();
-							if($key == "Classe")
-							{
-								$classe = $requete->fetch();
-							}
-							else
-							{
-								if ($key == "Session" || $key == "Section")
-								{
-									$value = $requete->fetch();
-									$methode = 'set'.$key;
-									$classe->$methode($value);
-								}
-								else
-								{
-									$values = $requete->fetchAll();
-									$methode = 'set'.$key.'s';
-									$classe->$methode($values);
-								}
-							}
-						}
-						$listeClasse[] = $classe;
+						$requete->nextRowset();
+						$result['classes'][$i] = base64_encode(serialize(\Library\Models\ClasseManager_PDO::getObj($requete)));
 					}
 				}
-				for ($i=0; $i < count($listeClasse); $i++) { 
-					$listeClasse[$i] = base64_encode(serialize($listeClasse[$i]));
-				}
-				$result['classes'] = $listeClasse;
 			}
-			
 		} else {
 			$result = $requete->fetch();
 			$result = array(

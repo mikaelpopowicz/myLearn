@@ -125,8 +125,8 @@
 					<div class="navbar-inner">
 						<div class="nav-collapse collapse">
 							<ul class="nav accordmobile">
-								<li class="<?php echo $class_accueil;?>"><a href="/">Accueil</a></li>
-								<li class="dropdown parent <?php echo $class_cours;?>">
+								<li class="<?php echo isset($class_accueil) ? $class_accueil : "";?>"><a href="/">Accueil</a></li>
+								<li class="dropdown parent <?php echo isset($class_cours) ? $class_cours : "";?>">
 									<a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">Cours <i class="e-icon-down-open-mini"></i></a>
 									<ul class="dropdown-menu">
 										<?php

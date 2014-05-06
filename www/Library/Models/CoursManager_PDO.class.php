@@ -146,10 +146,11 @@ class CoursManager_PDO extends CoursManager
 		return $result;
 	}
 	
-	public function search($query)
+	public function search($query, $id)
 	{
-		$requete = $this->dao->prepare('CALL search_engine(:query)');
+		$requete = $this->dao->prepare('CALL search_engine(:query, :id)');
 		$requete->bindValue(':query', $query);
+		$requete->bindValue(':id', $id);
 		$requete->execute();
 		$nombre = $requete->fetch(\PDO::FETCH_ASSOC)['Cours'];
 		

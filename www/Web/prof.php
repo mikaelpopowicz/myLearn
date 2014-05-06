@@ -1,4 +1,5 @@
 <?php
+$start = microtime(true);
 require '../Library/autoload.php';
 if(file_exists('../Applications/Prof/ProfApplication.class.php')) {
 	$app = new Applications\Prof\ProfApplication($start);

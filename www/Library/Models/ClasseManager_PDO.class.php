@@ -108,7 +108,7 @@ class ClasseManager_PDO extends ClasseManager
 	
 	public function getList($id)
 	{
-		$requete = $this->dao->prepare('CALL select_classes(:id)');
+		$requete = $this->dao->prepare('CALL select_classes(:id, false)');
 		$requete->bindValue(':id', $id, \PDO::PARAM_INT);
 		$requete->execute();
 		$nombre = $requete->fetch()['Classes'];
