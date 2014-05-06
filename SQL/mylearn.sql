@@ -745,9 +745,9 @@ END @@
 # -----------------------------------------------------------------------------
 /*
 	Cherche toutes les classes ou toutes les classes dans lesquelle est UN élève
-	et dont la session max est celle actuelle
+	et dont la session max est celle actuelle ou un professeur
 */
-CREATE PROCEDURE select_classes(user INTEGER)
+CREATE PROCEDURE select_classes(user INTEGER, eleve BOOLEAN)
 BEGIN
 	# Déclaration
 	Declare fini int default 0;
@@ -773,6 +773,23 @@ BEGIN
 		)
 		ORDER BY s.session DESC;
 		
+	# Troisième curseur
+	Declare cur3 CURSOR
+	FOR SELECT c.id_classe
+		FROM classe c
+		INNER JOIN charger ch ON c.id_classe = ch.id_classe
+		INNER JOIN professeur p ON p.id_u = ch.id_u
+		INNER JOIN assigner a ON a.id_classe = c.id_classe AND a.id_m = p.id_m
+		INNER JOIN session s ON s.id_session = c.id_session
+		WHERE ch.id_u = user
+		AND s.id_session IN (
+			SELECT id_session
+			FROM session
+			GROUP BY id_session
+			HAVING SUBSTR(session,6) <= YEAR(CURDATE())
+		)
+		ORDER BY s.session DESC;
+		
 	# Gestionnaire d'erreur
 	Declare continue HANDLER
 		FOR NOT FOUND SET fini = 1;
@@ -788,24 +805,47 @@ BEGIN
 		END WHILE;
 		Close cur1;
 	ELSE
-		SELECT COUNT(*) AS "Classes"
-		FROM classe c
-		INNER JOIN etre e ON c.id_classe = e.id_classe
-		INNER JOIN session s ON s.id_session = c.id_session
-		WHERE e.id_u = user
-		AND s.id_session IN (
-			SELECT id_session
-			FROM session
-			GROUP BY id_session
-			HAVING SUBSTR(session,6) <= YEAR(CURDATE())
-		);
-		Open cur2;
-		FETCH cur2 INTO id;
-		WHILE fini != 1 DO
-			CALL select_class(id);
+		IF eleve IS true THEN
+			SELECT COUNT(*) AS "Classes"
+			FROM classe c
+			INNER JOIN etre e ON c.id_classe = e.id_classe
+			INNER JOIN session s ON s.id_session = c.id_session
+			WHERE e.id_u = user
+			AND s.id_session IN (
+				SELECT id_session
+				FROM session
+				GROUP BY id_session
+				HAVING SUBSTR(session,6) <= YEAR(CURDATE())
+			);
+			Open cur2;
 			FETCH cur2 INTO id;
-		END WHILE;
-		Close cur2;
+			WHILE fini != 1 DO
+				CALL select_class(id);
+				FETCH cur2 INTO id;
+			END WHILE;
+			Close cur2;
+		ELSE
+			SELECT COUNT(*) AS "Classes"
+			FROM classe c
+			INNER JOIN charger ch ON c.id_classe = ch.id_classe
+			INNER JOIN professeur p ON p.id_u = ch.id_u
+			INNER JOIN assigner a ON a.id_classe = c.id_classe AND a.id_m = p.id_m
+			INNER JOIN session s ON s.id_session = c.id_session
+			WHERE ch.id_u = user
+			AND s.id_session IN (
+				SELECT id_session
+				FROM session
+				GROUP BY id_session
+				HAVING SUBSTR(session,6) <= YEAR(CURDATE())
+			);
+			Open cur3;
+			FETCH cur3 INTO id;
+			WHILE fini != 1 DO
+				CALL select_class(id);
+				FETCH cur3 INTO id;
+			END WHILE;
+			Close cur3;
+		END IF;
 	END IF;
 END @@
 
@@ -833,7 +873,7 @@ BEGIN
 	WHERE c.id_classe = classe;
 	
 	# MatièreS
-	SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m) AS "cours"
+	SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m AND c.id_classe = classe) AS "cours"
 	FROM matiere m
 	INNER JOIN assigner a ON m.id_m = a.id_m
 	WHERE a.id_classe = classe
@@ -878,7 +918,7 @@ BEGIN
 		SELECT true AS "erreur";
 		SELECT * from errors WHERE code = "CL_NF";
 	ELSE
-		IF (SELECT COUNT(*) FROM etre WHERE id_u = util AND id_classe = idc) > 0 THEN
+		IF (SELECT COUNT(*) FROM etre WHERE id_u = util AND id_classe = idc) > 0 OR (SELECT COUNT(*) FROM charger WHERE id_u = util AND id_classe = idc) > 0 THEN
 			IF (MONTH(CURDATE()) < 8 AND SUBSTR(sess,1,4) < YEAR(CURDATE())) OR (MONTH(CURDATE()) > 8 AND SUBSTR(sess,1,4) <= YEAR(CURDATE())) THEN
 				# Selection de la classe
 				SELECT false AS "erreur";
@@ -941,9 +981,21 @@ CREATE PROCEDURE select_matiere(class INTEGER, mat INTEGER, qte INTEGER, page IN
 BEGIN
 	Declare id, debut INTEGER;
 	IF class IS NULL OR class = 0 THEN
-		SELECT id_m AS id, libelle, uri, icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m) AS "cours"
-		FROM matiere
-		WHERE id_m = mat;
+		IF qte IS NULL THEN
+			SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m) AS "cours"
+			FROM matiere m 
+			WHERE m.id_m = mat;
+		ELSE
+			SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (
+				SELECT COUNT(*)
+				FROM cours c
+				INNER JOIN professeur p ON p.id_m = c.id_m
+				INNER JOIN charger ch ON ch.id_u = p.id_u AND ch.id_classe = c.id_classe
+				WHERE c.id_m = m.id_m
+				AND p.id_u = qte) AS "cours"
+			FROM matiere m
+			WHERE m.id_m = mat;
+		END IF;
 	ELSE
 		IF (qte IS NULL OR qte = 0) AND (page IS NULL OR page = 0) THEN
 			SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (
@@ -1310,7 +1362,11 @@ END @@
 #       PROCEDURE : search_engine()
 # -----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 CREATE PROCEDURE search_engine(chaine TEXT)
+=======
+CREATE PROCEDURE search_engine(chaine TEXT, user INTEGER)
+>>>>>>> mikael
 BEGIN
 	Declare it, nb, id, done INTEGER default 0;
 	Declare pre INTEGER default 1;
@@ -1329,7 +1385,11 @@ BEGIN
 	DROP TABLE IF EXISTS search_results;
 	
 	# Création de la requete avec la clause LIKE
+<<<<<<< HEAD
 	SET query = 'SELECT id_cours FROM cours WHERE ';
+=======
+	SET query = CONCAT('SELECT c.id_cours FROM cours c INNER JOIN classe cl ON c.id_classe = cl.id_classe INNER JOIN matiere m ON m.id_m = c.id_m INNER JOIN etre e ON e.id_classe = cl.id_classe WHERE e.id_u = ',user, ' AND (');
+>>>>>>> mikael
 	SET clause = '\"%';
 	IF LENGTH(chaine) > 0 THEN
 		SET nb = nb + 1;
@@ -1354,7 +1414,11 @@ BEGIN
 		END IF;
 		SET clause = CONCAT(clause,'\"');
 	END IF;
+<<<<<<< HEAD
 	SET query = CONCAT(query, 'titre LIKE ',clause, ' OR description LIKE ',clause, ' OR contenu LIKE ',clause, ' ORDER BY dateAjout DESC');
+=======
+	SET query = CONCAT(query, 'c.titre LIKE ',clause, ' OR c.description LIKE ',clause, ' OR c.contenu LIKE ',clause, ' OR cl.libelle LIKE ',clause, 'OR m.libelle LIKE ',clause, ') ORDER BY dateAjout DESC');
+>>>>>>> mikael
 	SET query = CONCAT('CREATE TEMPORARY TABLE IF NOT EXISTS search_results AS (', query,');');
 	# SELECT query, nb;
 	SET @query = query;
@@ -1393,7 +1457,7 @@ END @@
 
 CREATE PROCEDURE connexion(login VARCHAR(128), pass VARCHAR(128))
 BEGIN
-	DECLARE id INTEGER(2);
+	DECLARE id, mat INTEGER(2);
 	DECLARE user VARCHAR(128);
 	DECLARE name VARCHAR(128);
 	DECLARE last VARCHAR(128);
@@ -1428,9 +1492,12 @@ BEGIN
 				SELECT "Admin" AS "Statut";
 			ELSEIF (SELECT COUNT(*) FROM professeur WHERE id_u = id) > 0 THEN
 				SELECT "Prof" AS "Statut";
+				SELECT id_m INTO mat FROM professeur WHERE id_u = id;
+				CALL select_matiere(NULL,mat,id,NULL);
+				CALL select_classes(id,false);
 			ELSEIF (SELECT COUNT(*) FROM eleve WHERE id_u = id) > 0 THEN
 				SELECT "Eleve" AS "Statut";
-				CALL select_classes(id);
+				CALL select_classes(id,true);
 			END IF;
 		ELSE
 			SELECT true AS "erreur";

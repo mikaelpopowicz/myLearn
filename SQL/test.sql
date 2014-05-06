@@ -6,7 +6,11 @@ DELIMITER @@
 #       PROCEDURE : search_engine()
 # -----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 CREATE PROCEDURE search_engine(chaine TEXT)
+=======
+CREATE PROCEDURE search_engine(chaine TEXT, user INTEGER)
+>>>>>>> mikael
 BEGIN
 	Declare it, nb, id, done INTEGER default 0;
 	Declare pre INTEGER default 1;
@@ -25,7 +29,11 @@ BEGIN
 	DROP TABLE IF EXISTS search_results;
 	
 	# Création de la requete avec la clause LIKE
+<<<<<<< HEAD
 	SET query = 'SELECT id_cours FROM cours WHERE ';
+=======
+	SET query = CONCAT('SELECT c.id_cours FROM cours c INNER JOIN classe cl ON c.id_classe = cl.id_classe INNER JOIN matiere m ON m.id_m = c.id_m INNER JOIN etre e ON e.id_classe = cl.id_classe WHERE e.id_u = ',user, ' AND (');
+>>>>>>> mikael
 	SET clause = '\"%';
 	IF LENGTH(chaine) > 0 THEN
 		SET nb = nb + 1;
@@ -50,7 +58,11 @@ BEGIN
 		END IF;
 		SET clause = CONCAT(clause,'\"');
 	END IF;
+<<<<<<< HEAD
 	SET query = CONCAT(query, 'titre LIKE ',clause, ' OR description LIKE ',clause, ' OR contenu LIKE ',clause, ' ORDER BY dateAjout DESC');
+=======
+	SET query = CONCAT(query, 'c.titre LIKE ',clause, ' OR c.description LIKE ',clause, ' OR c.contenu LIKE ',clause, ' OR cl.libelle LIKE ',clause, 'OR m.libelle LIKE ',clause, ') ORDER BY dateAjout DESC');
+>>>>>>> mikael
 	SET query = CONCAT('CREATE TEMPORARY TABLE IF NOT EXISTS search_results AS (', query,');');
 	# SELECT query, nb;
 	SET @query = query;

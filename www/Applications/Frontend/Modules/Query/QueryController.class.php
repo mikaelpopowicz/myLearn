@@ -25,7 +25,11 @@ class QueryController extends \Library\BackController
 		$this->page->addVar('title', 'MyLearn - Résultat(s) de la recherche');
 		$this->page->addVar('original', $query['original']);
 		
+<<<<<<< HEAD
 		$result = $this->managers->getManagerOf('Cours')->search($query['to_search']);
+=======
+		$result = $this->managers->getManagerOf('Cours')->search($query['to_search'], $this->app->user()->getAttribute('id'));
+>>>>>>> mikael
 		
 		if($result != false && is_array($result))
 		{

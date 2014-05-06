@@ -86,7 +86,11 @@ class EleveController extends \Library\BackController
 									<li><strong>Mot de passe :</strong> '.$mdp.'</li></ul>
 									</p>
 									<p class="callout">
+<<<<<<< HEAD
 										Pour activer votre compte  <a href="http://'.$_SERVER['HTTP_HOST'].'/connexion/'.$eleve->token().'"> cliquez ici!</a>
+=======
+										Pour activer votre compte  <a href="https://'.$_SERVER['HTTP_HOST'].'/connexion/'.$eleve->token().'"> cliquez ici!</a>
+>>>>>>> mikael
 									</p>';
 				
 					$encoded = $this->app->key()->encode($message);

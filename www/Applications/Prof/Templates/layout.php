@@ -55,17 +55,36 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="/admin">myLearn | Admin</a>
+				<a class="navbar-brand" href="/admin">myLearn | Professeur</a>
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
-					<li class="<?php echo $class_accueil;?>"><a href="/admin">Tableau de bord</a></li>
-					<li class="<?php echo $class_cours;?>"><a href="/admin/cours">Cours</a></li>
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Utilisateurs <b class="caret"></b></a>
+					<li class="<?php echo isset($class_accueil) ? $class_accueil : "";?>"><a href="/admin">Tableau de bord</a></li>
+					<li class="dropdown <?php echo isset($class_cours) ? $class_cours : "";?>">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Cours <b class="caret"></b></a>
 						<ul class="dropdown-menu">
-							<li><a href="/admin/user/listing">Listing</a></li>
-							<li><a href="/admin/user/acl">Gérer les droits</a></li>
+							<?php
+							
+							if(isset($classes) && is_array($classes) && count($classes) > 0)
+							{
+								foreach ($classes as $classe) {
+									$key = unserialize(base64_decode($classe));
+									$css = "class_".$key->id()."_cl";
+									$$css = isset($$css) ? $$css : "";
+									echo "<li class='".$$css."'><a href='/professeur/".str_replace("/","-",$key->session()->session())."/".$key->uri()."'>".$key->libelle()." - ".$key->session()->session()."</a></li>";
+								}
+							}
+							else
+							{
+								echo "<li>Aucune classe disponible</li>";
+							}
+							/*
+							foreach ($matieres as $key) {
+								$class = "class_".$key['libelle'];
+								echo '<li class="'.$$class.'"><a href="/cours/'.$key->libelle().'">'.$key->libelle().'</a></li>';
+							}
+							*/
+							?>
 						</ul>
 					</li>
 				</ul>
@@ -94,14 +113,13 @@
 
 	<!-- Bootstrap core JavaScript ================ -->
 	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="/js/jquery-1.7.2.min.js"></script>
-	<script src="/js/jquery.uniform.min.js"></script>
+	<script src="/js/jquery-1.10.2.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
-	<script src="/js/holder.js"></script>
-	<!-- Noty ================ -->
 	<script src='/assets/js/noty/packaged/jquery.noty.packaged.min.js'></script>
-	<script src='/assets/js/jquery.dataTables.js'></script>
-	<script src='/assets/js/datatables.js'></script>
+	<script src='/js/dataTables/jquery.dataTables.js'></script>
+	<script src='/js/dataTables/dataTables.bootstrap.js'></script>
+	<script src='/js/bootstrap-datepicker.js'></script>
+	<script src='/js/bootstrap-select.js'></script>
 	<script src='/js/custom.js'></script>
 	
 	<!--=== JavaScript insert code ===-->
