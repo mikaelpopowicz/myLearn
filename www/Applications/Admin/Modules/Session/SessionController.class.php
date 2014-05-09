@@ -5,7 +5,7 @@ class SessionController extends \Library\BackController
 {
 	public function executeIndex(\Library\HTTPRequest $request)
 	{
-		$this->page->addVar('title', 'myLearn - Liste des sessions');
+		$this->page->addVar('title', 'myAdmin - Liste des sessions');
 		$this->page->addVar('class_gest', "active");
 		$this->page->addVar('class_sess', "active");
 		$this->page->addVar('listeSession', $this->managers->getManagerOf('Session')->getList());
@@ -43,7 +43,7 @@ class SessionController extends \Library\BackController
 
 	public function executeAjout(\Library\HTTPRequest $request)
 	{
-		$this->page->addVar('title', 'myLearn - Nouvelle section');
+		$this->page->addVar('title', 'myAdmin - Nouvelle section');
 		$this->page->addVar('class_gest', "active");
 		$this->page->addVar('class_sess', "active");
 
@@ -72,7 +72,7 @@ class SessionController extends \Library\BackController
 	{
 		$session = $this->managers->getManagerOf('Session')->getUnique($request->getData('id'));
 		if($session != NULL) {
-			$this->page->addVar('title', 'myLearn - Modifier '.$session->session());
+			$this->page->addVar('title', 'myAdmin - Modifier '.$session->session());
 			$this->page->addVar('class_gest', "active");
 			$this->page->addVar('class_sess', "active");
 			$this->page->addVar('session', $session);
@@ -106,7 +106,7 @@ class SessionController extends \Library\BackController
 	{
 		$session = $this->managers->getManagerOf('Session')->getUnique($request->getData('id'));
 		if($session != NULL) {
-			$this->page->addVar('title', 'myLearn - '.$session->session());
+			$this->page->addVar('title', 'myAdmin - '.$session->session());
 			$this->page->addVar('class_gest', "active");
 			$this->page->addVar('class_sess', "active");
 			$this->page->addVar('session', $session);

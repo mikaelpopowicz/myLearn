@@ -32,7 +32,7 @@
 			<?php
 			foreach ($result as $cours) {
 				echo "\n\t<dt><h4><a class='primary-color' href='/cours/".str_replace('/','-',$cours->classe()->session()->session())."/".$cours->classe()->uri()."/".$cours->matiere()->uri()."/".$cours->uri()."'>".$cours->titre()."</a> &nbsp;&nbsp; <small>".$cours->classe()->libelle()." - ".$cours->classe()->session()->session()." | ".$cours->matiere()->libelle()."</small></h4></dt>";
-				echo "\n\t<dd><dl class='dl-horizontal'><dt>Description</dt><dd>".$cours->description()."<dd/><dt>Contenu</dt><dd>".substr($cours->contenu(), 0, 100)."</dd></dl></dd>";
+				echo "\n\t<dd><dl class='dl-horizontal'><dt>Description</dt><dd>".$cours->description()."<dd/></dl></dd>";
 			}	
 			?>
 		</dl>

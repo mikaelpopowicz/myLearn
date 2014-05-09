@@ -3,7 +3,7 @@
 		<form role="check" class="form-horizontal" method="post">
 			<div class="panel panel-info">
 				<div class="panel-heading">
-					<h3 class="panel-title">Informations BDD <span class="pull-right">Etape 2/4</span></h3>
+					<h3 class="panel-title">Informations BDD <span class="pull-right">Etape 2/5</span></h3>
 				</div>
 				<div class="panel-body">
 					<p>

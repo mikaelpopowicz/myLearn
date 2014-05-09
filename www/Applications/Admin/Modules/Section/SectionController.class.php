@@ -5,7 +5,7 @@ class SectionController extends \Library\BackController
 {
 	public function executeIndex(\Library\HTTPRequest $request)
 	{
-		$this->page->addVar('title', 'myLearn - Liste des sections');
+		$this->page->addVar('title', 'myAdmin - Liste des sections');
 		$this->page->addVar('class_gest', "active");
 		$this->page->addVar('class_sec', "active");
 		$this->page->addVar('listeSection', $this->managers->getManagerOf('Section')->getList());
@@ -42,7 +42,7 @@ class SectionController extends \Library\BackController
 
 	public function executeAjout(\Library\HTTPRequest $request)
 	{
-		$this->page->addVar('title', 'myLearn - Nouvelle section');
+		$this->page->addVar('title', 'myAdmin - Nouvelle section');
 		$this->page->addVar('class_gest', "active");
 		$this->page->addVar('class_sec', "active");
 
@@ -72,7 +72,7 @@ class SectionController extends \Library\BackController
 	{
 		$section = $this->managers->getManagerOf('Section')->getUnique($request->getData('id'));
 		if($section != NULL) {
-			$this->page->addVar('title', 'myLearn - Modifier '.$section['libelle']);
+			$this->page->addVar('title', 'myAdmin - Modifier '.$section['libelle']);
 			$this->page->addVar('class_gest', "active");
 			$this->page->addVar('class_sec', "active");
 			$this->page->addVar('section', $section);

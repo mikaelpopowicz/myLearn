@@ -87,7 +87,7 @@
 										<li class="divider"></li>
 										<li><a href="/mon-compte/configuration">Configuration</a></li>
 										<li>
-											<a href="/connexion/logout/<?php echo $_SERVER['REQUEST_URI'];?>">Déconnexion</a>
+											<a href="/connexion/logout/">Déconnexion</a>
 										</li>
 									</ul><!--close .dropdown-menu -->
 								</li><!--close .dropdown .parent -->
@@ -308,13 +308,14 @@
 	    height: 500,
 		content_css: "/assets/css/style.css",
 		plugins: "code",
+		invalid_elements : "script",
 		extended_valid_elements: "hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style],img[href|src|name|title|onclick|align|alt|title|width|height|vspace|hspace],iframe[id|class|width|size|noshade|src|height|frameborder|border|marginwidth|marginheight|target|scrolling|allowtransparency],style[type]"
 	 }); 
 	</script>
 	
 	<!-- DataTables ================ -->
 	<script src="/js/datatables/jquery.dataTables.js"></script>
-	<script src="/js/datatables/dataTables.bootstrap.js"></script>
+	<script src="/js/datatables/dataTables.bootstrap2.js"></script>
 	
 	
 	<!--initialize scripts / custom scripts--> 

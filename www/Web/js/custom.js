@@ -4,6 +4,8 @@ $(document).ready(function() {
 		      { "bSortable": false, "aTargets": [ 0 ] }
 		]
 	});
+	
+	$('span.help-block').parents('div.form-group').addClass('has-error');
 
 	$('.selectpicker').selectpicker();
 	
@@ -29,5 +31,5 @@ $(document).ready(function() {
 		$(cases).prop('checked', this.checked);
 	});	
 	
-	$('span.help-block').parents('div.form-group').addClass('has-error');
+	
 })

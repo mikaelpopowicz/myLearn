@@ -727,9 +727,9 @@ END ;
 # -----------------------------------------------------------------------------
 /*
 	Cherche toutes les classes ou toutes les classes dans lesquelle est UN élève
-	et dont la session max est celle actuelle
+	et dont la session max est celle actuelle ou un professeur
 */
-CREATE PROCEDURE select_classes(user INTEGER)
+CREATE PROCEDURE select_classes(user INTEGER, eleve BOOLEAN)
 BEGIN
 	# Déclaration
 	Declare fini int default 0;
@@ -755,6 +755,23 @@ BEGIN
 		)
 		ORDER BY s.session DESC;
 		
+	# Troisième curseur
+	Declare cur3 CURSOR
+	FOR SELECT c.id_classe
+		FROM classe c
+		INNER JOIN charger ch ON c.id_classe = ch.id_classe
+		INNER JOIN professeur p ON p.id_u = ch.id_u
+		INNER JOIN assigner a ON a.id_classe = c.id_classe AND a.id_m = p.id_m
+		INNER JOIN session s ON s.id_session = c.id_session
+		WHERE ch.id_u = user
+		AND s.id_session IN (
+			SELECT id_session
+			FROM session
+			GROUP BY id_session
+			HAVING SUBSTR(session,6) <= YEAR(CURDATE())
+		)
+		ORDER BY s.session DESC;
+		
 	# Gestionnaire d'erreur
 	Declare continue HANDLER
 		FOR NOT FOUND SET fini = 1;
@@ -770,24 +787,47 @@ BEGIN
 		END WHILE;
 		Close cur1;
 	ELSE
-		SELECT COUNT(*) AS "Classes"
-		FROM classe c
-		INNER JOIN etre e ON c.id_classe = e.id_classe
-		INNER JOIN session s ON s.id_session = c.id_session
-		WHERE e.id_u = user
-		AND s.id_session IN (
-			SELECT id_session
-			FROM session
-			GROUP BY id_session
-			HAVING SUBSTR(session,6) <= YEAR(CURDATE())
-		);
-		Open cur2;
-		FETCH cur2 INTO id;
-		WHILE fini != 1 DO
-			CALL select_class(id);
+		IF eleve IS true THEN
+			SELECT COUNT(*) AS "Classes"
+			FROM classe c
+			INNER JOIN etre e ON c.id_classe = e.id_classe
+			INNER JOIN session s ON s.id_session = c.id_session
+			WHERE e.id_u = user
+			AND s.id_session IN (
+				SELECT id_session
+				FROM session
+				GROUP BY id_session
+				HAVING SUBSTR(session,6) <= YEAR(CURDATE())
+			);
+			Open cur2;
 			FETCH cur2 INTO id;
-		END WHILE;
-		Close cur2;
+			WHILE fini != 1 DO
+				CALL select_class(id);
+				FETCH cur2 INTO id;
+			END WHILE;
+			Close cur2;
+		ELSE
+			SELECT COUNT(*) AS "Classes"
+			FROM classe c
+			INNER JOIN charger ch ON c.id_classe = ch.id_classe
+			INNER JOIN professeur p ON p.id_u = ch.id_u
+			INNER JOIN assigner a ON a.id_classe = c.id_classe AND a.id_m = p.id_m
+			INNER JOIN session s ON s.id_session = c.id_session
+			WHERE ch.id_u = user
+			AND s.id_session IN (
+				SELECT id_session
+				FROM session
+				GROUP BY id_session
+				HAVING SUBSTR(session,6) <= YEAR(CURDATE())
+			);
+			Open cur3;
+			FETCH cur3 INTO id;
+			WHILE fini != 1 DO
+				CALL select_class(id);
+				FETCH cur3 INTO id;
+			END WHILE;
+			Close cur3;
+		END IF;
 	END IF;
 END ;
 
@@ -815,7 +855,7 @@ BEGIN
 	WHERE c.id_classe = classe;
 	
 	# MatièreS
-	SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m) AS "cours"
+	SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m AND c.id_classe = classe) AS "cours"
 	FROM matiere m
 	INNER JOIN assigner a ON m.id_m = a.id_m
 	WHERE a.id_classe = classe
@@ -860,7 +900,7 @@ BEGIN
 		SELECT true AS "erreur";
 		SELECT * from errors WHERE code = "CL_NF";
 	ELSE
-		IF (SELECT COUNT(*) FROM etre WHERE id_u = util AND id_classe = idc) > 0 THEN
+		IF (SELECT COUNT(*) FROM etre WHERE id_u = util AND id_classe = idc) > 0 OR (SELECT COUNT(*) FROM charger WHERE id_u = util AND id_classe = idc) > 0 THEN
 			IF (MONTH(CURDATE()) < 8 AND SUBSTR(sess,1,4) < YEAR(CURDATE())) OR (MONTH(CURDATE()) > 8 AND SUBSTR(sess,1,4) <= YEAR(CURDATE())) THEN
 				# Selection de la classe
 				SELECT false AS "erreur";
@@ -923,9 +963,21 @@ CREATE PROCEDURE select_matiere(class INTEGER, mat INTEGER, qte INTEGER, page IN
 BEGIN
 	Declare id, debut INTEGER;
 	IF class IS NULL OR class = 0 THEN
-		SELECT id_m AS id, libelle, uri, icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m) AS "cours"
-		FROM matiere
-		WHERE id_m = mat;
+		IF qte IS NULL THEN
+			SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m) AS "cours"
+			FROM matiere m 
+			WHERE m.id_m = mat;
+		ELSE
+			SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (
+				SELECT COUNT(*)
+				FROM cours c
+				INNER JOIN professeur p ON p.id_m = c.id_m
+				INNER JOIN charger ch ON ch.id_u = p.id_u AND ch.id_classe = c.id_classe
+				WHERE c.id_m = m.id_m
+				AND p.id_u = qte) AS "cours"
+			FROM matiere m
+			WHERE m.id_m = mat;
+		END IF;
 	ELSE
 		IF (qte IS NULL OR qte = 0) AND (page IS NULL OR page = 0) THEN
 			SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (
@@ -1291,6 +1343,7 @@ END ;
 # -----------------------------------------------------------------------------
 #       PROCEDURE : search_engine()
 # -----------------------------------------------------------------------------
+
 CREATE PROCEDURE search_engine(chaine TEXT, user INTEGER)
 BEGIN
 	Declare it, nb, id, done INTEGER default 0;
@@ -1374,7 +1427,7 @@ END ;
 
 CREATE PROCEDURE connexion(login VARCHAR(128), pass VARCHAR(128))
 BEGIN
-	DECLARE id INTEGER(2);
+	DECLARE id, mat INTEGER(2);
 	DECLARE user VARCHAR(128);
 	DECLARE name VARCHAR(128);
 	DECLARE last VARCHAR(128);
@@ -1409,9 +1462,12 @@ BEGIN
 				SELECT "Admin" AS "Statut";
 			ELSEIF (SELECT COUNT(*) FROM professeur WHERE id_u = id) > 0 THEN
 				SELECT "Prof" AS "Statut";
+				SELECT id_m INTO mat FROM professeur WHERE id_u = id;
+				CALL select_matiere(NULL,mat,id,NULL);
+				CALL select_classes(id,false);
 			ELSEIF (SELECT COUNT(*) FROM eleve WHERE id_u = id) > 0 THEN
 				SELECT "Eleve" AS "Statut";
-				CALL select_classes(id);
+				CALL select_classes(id,true);
 			END IF;
 		ELSE
 			SELECT true AS "erreur";
@@ -1506,149 +1562,6 @@ BEGIN
 	END IF;
 END ;
 
-/*
-###############################################################################
-###############################################################################
-
-#						PROCEDURES OBSOLETES
-
-###############################################################################
-###############################################################################
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : select_class_session_user()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE select_class_session_user(classe VARCHAR(128), session VARCHAR(128), user INTEGER)
-BEGIN
-	Declare id INTEGER;
-	Declare lib VARCHAR(128);
-	DECLARE no_class CONDITION FOR 1329;
-	DECLARE EXIT HANDLER FOR no_class
-	BEGIN
-		SELECT true AS "erreur";
-		SELECT "Cette classe n'existe pas" AS "Message";
-	END;
-	SELECT c.id_classe AS id, c.libelle INTO id,lib
-	FROM classe c
-	INNER JOIN session s ON c.id_session = s.id_session
-	WHERE c.uri = classe
-	AND s.session = session;
-	IF (SELECT COUNT(*)
-		FROM classe c
-		INNER JOIN etre e ON e.id_classe = c.id_classe
-		WHERE c.id_classe = id
-		AND e.id_u = user) > 0 THEN	
-		IF (MONTH(CURDATE()) < 8 AND SUBSTR(session,1,4) < YEAR(CURDATE())) OR (MONTH(CURDATE()) > 8 AND SUBSTR(session,1,4) <= YEAR(CURDATE())) THEN
-			SELECT false AS "erreur";
-			CALL select_class(id);
-		ELSE
-			SELECT true AS "erreur";
-			SELECT "On ne peut prÃ©dire l'avenir" AS "Message";
-		END IF;
-	ELSE
-		SELECT true AS "erreur";
-		SELECT "Vous ne pouvez accÃ©der Ã  cette classe" AS "Message";
-	END IF;
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : select_cours_unique_classe_matiere()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE select_cours_unique_classe_matiere(cours VARCHAR(1024), classe INTEGER, matiere INTEGER)
-BEGIN
-	# Déclaration
-	Declare id INTEGER;
-	Declare no_cours CONDITION FOR 1329;
-	Declare EXIT HANDLER FOR no_cours
-	BEGIN
-		SELECT true AS "erreur";
-		SELECT "Cours inexistant" AS "Message";
-	END;
-	
-	SELECT id_cours INTO id
-	FROM cours
-	WHERE id_classe = classe
-	AND id_m = matiere
-	AND uri = cours;
-	
-	SELECT false AS "erreur";
-	INSERT INTO vue VALUES('',1,id,sysdate());
-	CALL select_cours(id);
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : select_cours_classe_matiere()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE select_cours_classe_matiere(classe INTEGER, matiere INTEGER)
-BEGIN
-	# Déclaration
-	Declare fini int default 0;
-	Declare id INTEGER;
-	
-	# Curseur
-	Declare cur1 CURSOR
-	FOR SELECT c.id_cours
-		FROM cours c
-		WHERE id_classe = classe
-		AND id_m = matiere;
-		
-	# Gestionnaire d'erreur
-	Declare continue HANDLER
-		FOR NOT FOUND SET fini = 1;
-	
-	# Nombre de cours
-	SELECT COUNT(*) AS "Cours"
-	FROM cours
-	WHERE id_classe = classe
-	AND id_m = matiere;
-	
-	# Ouverture du curseur
-	Open cur1;
-	FETCH cur1 INTO id;
-	WHILE fini != 1	DO
-		CALL select_cours(id);
-		FETCH cur1 INTO id;
-	END WHILE;
-	Close cur1;
-END @@
-
-# -----------------------------------------------------------------------------
-#       PROCEDURE : archiver_cours()
-# -----------------------------------------------------------------------------
-
-CREATE PROCEDURE archiver_cours(sess INTEGER)
-BEGIN
-Declare fini int default 0;
-Declare cours, matiere, classe, user, vue INTEGER(2);
-Declare titre, description VARCHAR(128);
-Declare contenu TEXT;
-Declare dateAjout, dateModif DATETIME;
-Declare curc CURSOR
-  FOR SELECT co.id_cours, co.id_m, co.id_classe, co.id_u, co.titre, co.description, co.contenu, co.dateAjout, co.dateModif, co.vues
-    FROM cours co
-    INNER JOIN classe cl ON co.id_classe = cl.id_classe
-    INNER JOIN session s ON cl.id_session = s.id_session
-    WHERE s.id_session = sess;
-Declare continue HANDLER
-  FOR NOT FOUND SET fini = 1;
-Open curc;
-FETCH curc INTO cours, matiere, classe, user, titre, description, contenu, dateAjout, dateModif, vue;
-
-While fini != 1
-  DO
-  INSERT INTO histo_cours VALUES(cours, matiere, classe, user, titre, description, contenu, dateAjout, dateModif, vue, sysdate());
-  DELETE FROM vers_cours WHERE id_cours = cours;
-  DELETE FROM cours WHERE id_cours = cours;
-  FETCH curc INTO cours, matiere, classe, user, titre, contenu, description, dateAjout, dateModif, vue;
-END While;
-Close curc;
-END @@
-
-*/
-
 
 
 
@@ -1740,28 +1653,3 @@ INSERT INTO etre VALUES(3,1);
 INSERT INTO etre VALUES(4,1);
 
 insert into cours set id_m = 1, id_classe = 1, id_u = 3, titre = "test", uri = "test", description = "test", contenu = "test", dateAjout = sysdate(), dateModif = sysdate();
-
-/*
-INSERT INTO matiere VALUES("", "MatiÃ¨re", "fa fa-cog");
-CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);
-CALL ajouter_eleve("eleve", "eleve", "eleve", "eleve@domain.tld", "59cee2a6f0ff147433684a69020158e115a40f41", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokeneleve')), "1989-10-2");
-CALL ajouter_session("FIRST");
-INSERT INTO section VALUES("",1,"BTS SIO");
-INSERT INTO section VALUES("",1,"BAC SEN");
-INSERT INTO classe VALUES("", 1, 1, "SIO1"),
-("", 1, 1, "SIO2"),
-("", 1, 1, "SIO1 LM"),
-("", 1, 1, "SIO2 LM"),
-("", 1, 1, "SIO1 MV"),
-("", 1, 1, "SIO2 MV");
-INSERT INTO cours VALUES(1, 1, 1, 1, "Titre","Description","Contenu", sysdate(), NULL);
-UPDATE cours SET titre = "Titre 2";
-SELECT SLEEP(1);
-UPDATE cours SET titre = "Titre 3";
-SELECT SLEEP(1);
-UPDATE cours SET titre = "Titre 4";
-SELECT SLEEP(1);
-UPDATE cours SET titre = "Titre 5";
-SELECT SLEEP(1);
-UPDATE cours SET titre = "Titre 6";
-*/

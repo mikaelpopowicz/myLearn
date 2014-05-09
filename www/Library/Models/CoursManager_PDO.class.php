@@ -312,7 +312,8 @@ class CoursManager_PDO extends CoursManager
 	
 	protected function modify(Cours $cours)
 	{
-	    $requete = $this->dao->prepare('UPDATE cours SET id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
+	    $requete = $this->dao->prepare('UPDATE cours SET id_classe = :classe, id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
+		$requete->bindValue(':classe', $cours->classe()->id());
 	    $requete->bindValue(':matiere', $cours->matiere()->id());
 		$requete->bindValue(':titre', $cours->titre());
 		$requete->bindValue(':uri', $cours->uri());

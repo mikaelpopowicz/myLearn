@@ -77,6 +77,7 @@ class EleveController extends \Library\BackController
 			
 			if($eleve->isValid()) {
 				$record = $this->managers->getManagerOf('Eleve')->save($eleve);
+				$http = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
 				if($record == false)
 				{
 					$message = '<h3>Bonjour, '.$eleve->nom().' '.$eleve->prenom().'</h3>
@@ -86,7 +87,7 @@ class EleveController extends \Library\BackController
 									<li><strong>Mot de passe :</strong> '.$mdp.'</li></ul>
 									</p>
 									<p class="callout">
-										Pour activer votre compte  <a href="https://'.$_SERVER['HTTP_HOST'].'/connexion/'.$eleve->token().'"> cliquez ici!</a>
+										Pour activer votre compte  <a href="'.$http.'://'.$_SERVER['HTTP_HOST'].'/connexion/'.$eleve->token().'"> cliquez ici!</a>
 									</p>';
 				
 					$encoded = $this->app->key()->encode($message);
@@ -104,7 +105,7 @@ class EleveController extends \Library\BackController
 				
 				
 					$envoi = $this->app->mail()->send();
-					if($envoi == true)
+					if($envoi == 1)
 					{
 						$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Enregistrement de l\'élève réussi"});</script>');
 					}

@@ -20,8 +20,10 @@
 	<!-- Custom styles for this template -->
 	<link href="/css/doc.css" rel="stylesheet">
 	<link href="/css/navbar.css" rel="stylesheet">
-	<link href="/assets/css/datatables.css" rel="stylesheet">
-	
+	<link href="/css/dataTables.bootstrap.css" rel="stylesheet">
+	<link href="/assets/css/font-awesome.css" rel="stylesheet">
+	<link href="/css/bootstrap-select.css" rel="stylesheet">
+	<link href="/css/datepicker.css" rel="stylesheet">
 	<script type="text/javascript" src="/js/tinymce/tinymce.min.js"></script>
 	<script>
 	tinymce.init({
@@ -30,6 +32,7 @@
 	    height: 500,
 		content_css: "/assets/css/style.css",
 		plugins: "code",
+		invalid_elements : "script",
 		extended_valid_elements: "hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style],img[href|src|name|title|onclick|align|alt|title|width|height|vspace|hspace],iframe[id|class|width|size|noshade|src|height|frameborder|border|marginwidth|marginheight|target|scrolling|allowtransparency],style[type]"
 	 }); 
 	</script>
@@ -61,7 +64,7 @@
 				<ul class="nav navbar-nav">
 					<li class="<?php echo isset($class_accueil) ? $class_accueil : "";?>"><a href="/admin">Tableau de bord</a></li>
 					<li class="dropdown <?php echo isset($class_cours) ? $class_cours : "";?>">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Cours <b class="caret"></b></a>
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Classes <b class="caret"></b></a>
 						<ul class="dropdown-menu">
 							<?php
 							
@@ -71,7 +74,7 @@
 									$key = unserialize(base64_decode($classe));
 									$css = "class_".$key->id()."_cl";
 									$$css = isset($$css) ? $$css : "";
-									echo "<li class='".$$css."'><a href='/professeur/".str_replace("/","-",$key->session()->session())."/".$key->uri()."'>".$key->libelle()." - ".$key->session()->session()."</a></li>";
+									echo "<li class='".$$css."'><a href='/professeur/cours/".str_replace("/","-",$key->session()->session())."/".$key->uri()."'>".$key->libelle()." - ".$key->session()->session()."</a></li>";
 								}
 							}
 							else
@@ -87,8 +90,10 @@
 							?>
 						</ul>
 					</li>
+					<li class="<?php echo isset($class_perso) ? $class_perso : "" ;?>"><a href="/professeur/mes-cours">Mes cours</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
+					<li class="<?php echo isset($class_param) ? $class_param : "";?>"><a href="/professeur/parametres">Paramètres</a></li>
 					<li class=""><a href="/connexion/logout//">Déconnexion</a></li>
 				</ul>
 			</div><!--/.nav-collapse -->
@@ -97,7 +102,10 @@
 		<?php
 		echo $content;
 		?>
-
+		<hr>
+	  	<footer class="footer">
+	  		<p class="text-muted">© 2014 . myLearn - Page executée en <?php echo $load->load()." ms";?></p>
+	  	</footer>
 	</div> <!-- /container -->
 	
 	<!--=== Includes modal ===-->

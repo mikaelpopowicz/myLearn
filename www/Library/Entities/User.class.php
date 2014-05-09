@@ -15,9 +15,10 @@ class User extends \Library\Entity
 	
 	const USER_INVALIDE = 1;
 	const NOM_INVALIDE = 2;
-	const EMAIL_INVALIDE = 3;
-	const PASS_INVALIDE = 4;
-	const SALT_INVALIDE = 5;
+	const PRENOM_INVALIDE = 3;
+	const EMAIL_INVALIDE = 4;
+	const PASS_INVALIDE = 5;
+	const SALT_INVALIDE = 6;
 	
 	public function isValid()
 	{
@@ -55,7 +56,15 @@ class User extends \Library\Entity
 	
 	public function setPrenom($prenom)
 	{
-		$this->prenom = $prenom;
+		if (!is_string($prenom) || empty($prenom))
+		{
+			$this->erreurs[] = self::PRENOM_INVALIDE;
+			$this->prenom = "";
+		}
+		else
+		{
+			$this->prenom = $prenom;
+		}
 	}
 	
 	public function setEmail($email)

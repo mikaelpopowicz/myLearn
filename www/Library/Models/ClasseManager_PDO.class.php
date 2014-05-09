@@ -47,6 +47,24 @@ class ClasseManager_PDO extends ClasseManager
 		return $classe;
 	}
 	
+	public function getClasses($id,$mode)
+	{
+		$requete = $this->dao->prepare('CALL select_classes(:user, :mode)');
+		$requete->bindValue(':user', $id);
+		$requete->bindValue(':mode', $mode);
+		$requete->execute();
+		$nombre = $requete->fetch()['Classes'];
+		if($nombre > 0)
+		{
+			for($i = 0; $i < $nombre; $i++)
+			{
+				$requete->nextRowset();
+				$result['classes'][$i] = base64_encode(serialize(\Library\Models\ClasseManager_PDO::getObj($requete)));
+			}
+			return $result['classes'];
+		}
+	}
+	
 	public function getByName($name,$id)
 	{
 		$name = explode('/',$name);

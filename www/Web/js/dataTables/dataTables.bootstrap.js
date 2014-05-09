@@ -2,7 +2,16 @@
 $.extend(true, $.fn.dataTable.defaults, {
     "sDom": "<'row'<'col-sm-6'l><'col-sm-6'f>r>" + "t" + "<'row'<'col-sm-6'i><'col-sm-6'p>>",
     "oLanguage": {
-        "sLengthMenu": "_MENU_ records per page"
+		"sLengthMenu": "_MENU_ résultats par page",
+		"sSearch": "Recherche : ",
+		"sInfo": "Vue de _START_ à _END_ sur _TOTAL_ résultats",
+		"sInfoEmpty": "Vue de _START_ à _END_ sur _TOTAL_ résultats",
+		"sEmptyTable": "Aucun résultat",
+		"sZeroRecords": "Aucun résultat",
+		"oPaginate": {
+			"sPrevious": "Précédent",
+			"sNext": "Suivant"
+		}
     }
 });
 
@@ -11,7 +20,7 @@ $.extend(true, $.fn.dataTable.defaults, {
 $.extend($.fn.dataTableExt.oStdClasses, {
     "sWrapper": "dataTables_wrapper form-inline",
     "sFilterInput": "form-control input-sm",
-    "sLengthSelect": "form-control input-sm"
+    "sLengthSelect": "form-control input-sm",
 });
 
 // In 1.10 we use the pagination renderers to draw the Bootstrap paging,

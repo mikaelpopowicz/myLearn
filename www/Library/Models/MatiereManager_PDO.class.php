@@ -136,6 +136,7 @@ class MatiereManager_PDO extends MatiereManager
 						$requete->nextRowset();
 						$result['cours'][] = \Library\Models\CoursManager_PDO::getObj($requete);
 					}
+					
 				}
 				else
 				{

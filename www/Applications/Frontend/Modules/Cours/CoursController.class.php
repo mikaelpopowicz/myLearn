@@ -44,7 +44,7 @@ class CoursController extends \Library\BackController {
 					
 					if(isset($result['pages']) && $result['pages'] > 1)
 					{
-						$paginate = \Library\Pagination::toString(array(
+						$paginate = \Library\Pagination::getFrontThemePag(array(
 							'delta' => 5,
 							'number' => $result['pages'],
 							'current' => $page,
@@ -150,7 +150,7 @@ class CoursController extends \Library\BackController {
 						$comment = new \Library\Entities\Comment(array(
 							"cours" => $cours,
 							"auteur" => $user,
-							"commentaire" => nl2br($request->postData('message'))
+							"commentaire" => htmlspecialchars(nl2br($request->postData('message')))
 						));
 						
 						if($comment->isValid())
@@ -207,7 +207,7 @@ class CoursController extends \Library\BackController {
 			$user = $this->managers->getManagerOf('User')->getUnique($this->app->user()->getAttribute('id'));
 			$cours = new \Library\Entities\Cours(array(
 				'auteur' => $user,
-				'classe' => unserialize(base64_decode($this->app->user()->getAttribute('classes')[0])),
+				'classe' => unserialize(base64_decode($request->postData('classe'))),
 				'matiere' => unserialize(base64_decode($request->postData('matiere'))),
 				'titre' => $request->postData('titre'),
 				'description' => $request->postData('description'),
@@ -248,6 +248,7 @@ class CoursController extends \Library\BackController {
 				if($request->postExists('modifier')) {
 					$cours = new \Library\Entities\Cours(array(
 						'id' => $cours->id(),
+						'classe' => unserialize(base64_decode($request->postData('classe'))),
 						'matiere' => unserialize(base64_decode($request->postData('matiere'))),
 						'titre' => $request->postData('titre'),
 						'description' => $request->postData('description'),
