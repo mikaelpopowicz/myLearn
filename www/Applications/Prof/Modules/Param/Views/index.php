@@ -13,27 +13,27 @@
 	<dl class="dl-horizontal">
 		<dt>
 			Username
-		</dt>
+		</dtDT5i/s9d
 		<dd>
-			<?php echo !empty($user->getAttribute('username')) ? $user->getAttribute('username') : "&nbsp;" ;?>
+			<?php echo $user->getAttribute('username') != "" ? $user->getAttribute('username') : "&nbsp;" ;?>
 		</dd>
 		<dt>
 			Nom
 		</dt>
 		<dd>
-			<?php echo !empty($user->getAttribute('nom')) ? $user->getAttribute('nom') : "&nbsp;" ;?>
+			<?php echo $user->getAttribute('nom') != "" ? $user->getAttribute('nom') : "&nbsp;" ;?>
 		</dd>
 		<dt>
 			Prénom
 		</dt>
 		<dd>
-			<?php echo !empty($user->getAttribute('prenom')) ? $user->getAttribute('prenom') : "&nbsp;" ;?>
+			<?php echo $user->getAttribute('prenom') != "" ? $user->getAttribute('prenom') : "&nbsp;" ;?>
 		</dd>
 		<dt>
 			Email
 		</dt>
 		<dd>
-			<?php echo !empty($user->getAttribute('email')) ? $user->getAttribute('email') : "&nbsp;" ;?>
+			<?php echo $user->getAttribute('email') != "" ? $user->getAttribute('email') : "&nbsp;" ;?>
 		</dd>
 	</dl>
 	<a class="btn btn-primary" href="/professeur/parametres/modifier-user">
