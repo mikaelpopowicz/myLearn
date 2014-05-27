@@ -6,5 +6,6 @@ RewriteEngine On
 RewriteRule ^Json_098764DFVBU864REDERCTYUV/ json.php [QSA,L]
 RewriteRule ^admin(\/?) admin.php [QSA,L]
 RewriteRule ^professeur(\/?) prof.php [QSA,L]
+RewriteRule ^info(\/?) info.php [QSA,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ frontend.php [QSA,L]
