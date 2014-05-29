@@ -695,56 +695,6 @@ CREATE TRIGGER version_cours
 BEFORE UPDATE ON cours
 FOR EACH ROW
 BEGIN
-<<<<<<< HEAD
-	DECLARE id INTEGER(2);
-	DECLARE user VARCHAR(128);
-	DECLARE name VARCHAR(128);
-	DECLARE last VARCHAR(128);
-	DECLARE mail VARCHAR(128);
-	DECLARE passwd VARCHAR(128);
-	DECLARE actif BOOLEAN;
-	DECLARE sel VARCHAR(40);
-	DECLARE tok VARCHAR(40);
-	DECLARE dateU DATE;
-	DECLARE no_user_for_login CONDITION FOR 1329;
-	
-	DECLARE EXIT HANDLER FOR no_user_for_login
-	BEGIN
-		SELECT true AS "erreur";
-		SELECT "Erreur de saisie identidiant/mot de passe" AS "Message", "danger" AS "Type";
-	END;
-	
-	SELECT salt INTO sel
-	FROM user
-	WHERE username = login;
-
-	SET passwd = SHA1(MD5(CONCAT(SHA1(MD5(sel)),SHA1(pass),SHA1(MD5(sel)))));
-	
-	IF (SELECT COUNT(*) FROM user WHERE username = login AND password = passwd) > 0 THEN
-		SELECT id_u,username,nom,prenom,email,password,active,salt,token,dateUser INTO id,user,name,last,mail,passwd,actif,sel,tok,dateU
-		FROM user
-		WHERE username = login AND password = passwd;
-		IF actif THEN
-			SELECT id, user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
-			SELECT false AS "erreur";
-			SELECT id, user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
-			IF (SELECT COUNT(*) FROM administrateur WHERE id_u = id) > 0 THEN
-				SELECT "Admin" AS "Statut";
-			ELSEIF (SELECT COUNT(*) FROM professeur WHERE id_u = id) > 0 THEN
-				SELECT "Prof" AS "Statut";
-			ELSEIF (SELECT COUNT(*) FROM eleve WHERE id_u = id) > 0 THEN
-				SELECT "Eleve" AS "Statut";
-				CALL select_classes(id);
-			END IF;
-		ELSE
-			SELECT true AS "erreur";
-			SELECT "Votre compte n'est pas encore activÃ©" AS "Message", "warning" AS "Type";
-		END IF;
-	ELSE
-		SELECT true AS "erreur";
-		SELECT "Erreur de saisie identidiant/mot de passe" AS "Message", "danger" AS "Type";
-	END IF;
-=======
   # Compter le nombre de versions existantes
   Declare versions int;
   SELECT COUNT(*) INTO versions
@@ -766,7 +716,6 @@ BEGIN
   END IF;
   INSERT INTO vers_cours VALUES(new.id_cours,old.titre,old.description,old.contenu,sysdate());
   SET new.dateModif = sysdate();
->>>>>>> FETCH_HEAD
 END @@
 
 # -----------------------------------------------------------------------------
