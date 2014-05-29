@@ -10,14 +10,22 @@ class Mailer extends \Library\ApplicationComponent
 	private $team;
 	private $contact;
 	private $phpmail;
-	
+	private $host;
+	private $port;
+	private $username;
+	private $password;
+	private $sender;
 	
 	public function __construct($app) {
 		parent::__construct($app);
 		
 		$this->setTeam($app->config()->get('conf_nom'));
 		$this->setContact($app->config()->get('conf_contact'));
-		
+		$this->setHost($app->config()->get('smtp_host'));
+		$this->setPort($app->config()->get('smtp_host'));
+		$this->setUsername($app->config()->get('smtp_user'));
+		$this->setPassword($app->config()->get('smtp_pass'));
+		$this->setSender($app->config()->get('conf_email'));
 		$this->phpmail = new \PHPMailer(true);
 		$this->phpmail->IsSMTP();
 	}
@@ -42,32 +50,56 @@ class Mailer extends \Library\ApplicationComponent
 		$this->contact = $contact;
 	}
 	
+	public function setHost($host)
+	{
+		$this->host = $host;
+	}
+	
+	public function setPort($port)
+	{
+		$this->port = $port;
+	}
+	
+	public function setUsername($username)
+	{
+		$this->username = $username;
+	}
+	
+	public function setPassword($password)
+	{
+		$this->password = $password;
+	}
+	
+	public function setSender($sender)
+	{
+		$this->sender = $sender;
+	}
+	
 	public function send()
 	{
 		$this->phpmail->IsHTML(true);
 		$this->phpmail->CharSet		=	"utf-8";
 		$this->phpmail->Subject		=	$this->sujet;
 		$this->phpmail->Body		=	$this->message;
-		$this->phpmail->Host		=	"smtp.orange.fr";
+		$this->phpmail->Host		=	$this->host;
 		$this->phpmail->SMTPDebug	=	0;
 		$this->phpmail->SMTPAuth	=	true;
-		$this->phpmail->Port		=	587;
-		$this->phpmail->Username	=	"mpopowicz.uf";
-		$this->phpmail->Password	=	"ufinfo91";
-		$this->phpmail->SetFrom($this->app->config()->get('conf_email'), "MyLearn");
-		//$this->phpmail->AddReplyTo($this->app->config()->get('conf_email'), "MyLearn");
+		$this->phpmail->Port		=	$this->port;
+		$this->phpmail->Username	=	$this->username;
+		$this->phpmail->Password	=	$this->password;
+		$this->phpmail->SetFrom($this->sender, "MyLearn");
 		$this->phpmail->AddAddress($this->mail);
 		try {
-			
-			
 			$this->phpmail->Send();
 			return true;
-		} catch (phpmailerException $e) {
-			echo $e->errorMessage(); //Pretty error messages from PHPMailer
+		} catch (\phpmailerException $e) {
+			return $e->errorMessage(); //Pretty error messages from PHPMailer
 		} catch (Exception $e) {
-			echo $e->getMessage(); //Boring error messages from anything else!
+			return $e->getMessage(); //Boring error messages from anything else!
 		}
 	}
+	
+	
 	
 	public function setMessage($titre, $message) {
 		/*
@@ -77,6 +109,9 @@ class Mailer extends \Library\ApplicationComponent
 		$this->message.= "Content-Type: text/html; charset=\"UTF-8\"".$this->ligne;
 		$this->message.= "Content-Transfer-Encoding: 8bit".$this->ligne;
 		*/
+		
+		$http = $_SERVER['HTTPS'] == "on" ? "https" : "http";
+		
 		$string = '
 			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 			<html xmlns="http://www.w3.org/1999/xhtml">
@@ -342,7 +377,7 @@ class Mailer extends \Library\ApplicationComponent
 									<tr>
 										<td>
 											<div id="logo" class="text-logo">
-												<h2><a href="http://ppe/"><span>my</span>Learn</a></h2>
+												<h2><a href="'.$http.'://'.$_SERVER['HTTP_HOST'].'"><span>my</span>Learn</a></h2>
 											</div>
 											</td>
 										<td align="right"><h6 class="collapse">'.$titre.'</h6></td>

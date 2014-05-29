@@ -81,10 +81,6 @@
 							echo "</tr>";
 						}
 					}
-					else
-					{
-						echo "<tr><td colspan='8'>Aucun résultat</td></tr>";
-					}
 					?>
 				</tbody>
 			</table>

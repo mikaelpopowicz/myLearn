@@ -5,6 +5,7 @@ class InstallApplication extends \Library\Application {
 	
 	public function __construct($start) {
 		parent::__construct('Install',$start);
+		$this->mail = new \Library\Mailer($this);
 	}
 	
 	public function run() {

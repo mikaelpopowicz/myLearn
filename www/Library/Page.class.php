@@ -35,7 +35,7 @@ class Page extends ApplicationComponent
 		// Ajout variable globale
 		$config = $this->app->config();
 		$user = $this->app->user();
-		if($this->app->name() == "Frontend") $classes = $user->getAttribute('classes');
+		if($this->app->name() == "Frontend" || $this->app->name() == "Prof") $classes = $user->getAttribute('classes');
 		
 		// Extraction de variable du controlleur
 		extract($this->vars);

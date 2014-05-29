@@ -3,7 +3,7 @@
 		<form role="check" class="form-horizontal" method="post">
 			<div class="panel panel-info">
 				<div class="panel-heading">
-					<h3 class="panel-title">Informations établissement <span class="pull-right">Etape 3/4</span></h3>
+					<h3 class="panel-title">Informations établissement <span class="pull-right">Etape 3/5</span></h3>
 				</div>
 				<div class="panel-body">
 					<p>
@@ -26,17 +26,6 @@
 							<textarea id="description" name="description" class="form-control"><?php echo isset($infos) ? ($infos['description']) : "Description pour la page de connexion";?></textarea>
 							<?php
 							if(isset($erreur) && in_array('description', $erreur)) {
-								echo "<span class='help-block'></span>";
-							}
-							?>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="email" class="col-sm-3 control-label">Email myLearn</label>
-						<div class="col-sm-4">
-							<input type="text" id="email" name="email" class="form-control" placeholder="Mail d'envoi de myLearn" value="<?php echo isset($infos) ? $infos['email'] : "";?>">
-							<?php
-							if(isset($erreur) && in_array('email', $erreur)) {
 								echo "<span class='help-block'></span>";
 							}
 							?>

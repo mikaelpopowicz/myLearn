@@ -146,10 +146,11 @@ class CoursManager_PDO extends CoursManager
 		return $result;
 	}
 	
-	public function search($query)
+	public function search($query, $id)
 	{
-		$requete = $this->dao->prepare('CALL search_engine(:query)');
+		$requete = $this->dao->prepare('CALL search_engine(:query, :id)');
 		$requete->bindValue(':query', $query);
+		$requete->bindValue(':id', $id);
 		$requete->execute();
 		$nombre = $requete->fetch(\PDO::FETCH_ASSOC)['Cours'];
 		
@@ -190,6 +191,32 @@ class CoursManager_PDO extends CoursManager
 			$cours->setDateModif(new \DateTime($cours->dateModif()));
 		}
      
+		$requete->closeCursor();
+     
+		return $listeCours;
+	}
+	
+	public function getListJson($id, $matiere)
+	{
+		$sql = 'SELECT m.libelle, c.id_cours, c.titre, c.description, c.dateAjout, u.nom, u.prenom
+			FROM matiere m 
+			INNER JOIN cours c ON c.id_m = m.id_m
+			INNER JOIN assigner a ON a.id_m = m.id_m
+			INNER jOIN etre et ON et.id_classe = a.id_classe
+			INNER JOIN eleve e ON e.id_u = et.id_u
+			INNER JOIN user u ON u.id_u = c.id_u
+			WHERE e.id_u = :id 
+			AND m.id_m = :matiere
+			GROUP BY c.id_cours
+			ORDER BY c.titre';
+			//id, titre, desc, contenu, date, auteur, matiere du cours 
+		$requete = $this->dao->prepare($sql);
+		$requete->bindValue(':id', $id );
+		$requete->bindValue(':matiere', $matiere );
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
+     
+		$listeCours = $requete->fetchAll();
 		$requete->closeCursor();
      
 		return $listeCours;
@@ -311,7 +338,8 @@ class CoursManager_PDO extends CoursManager
 	
 	protected function modify(Cours $cours)
 	{
-	    $requete = $this->dao->prepare('UPDATE cours SET id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
+	    $requete = $this->dao->prepare('UPDATE cours SET id_classe = :classe, id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
+		$requete->bindValue(':classe', $cours->classe()->id());
 	    $requete->bindValue(':matiere', $cours->matiere()->id());
 		$requete->bindValue(':titre', $cours->titre());
 		$requete->bindValue(':uri', $cours->uri());

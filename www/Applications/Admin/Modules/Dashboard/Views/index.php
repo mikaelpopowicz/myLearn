@@ -80,13 +80,9 @@
 						<span class="badge badge-success"><?php echo $matiere->count();?></span>
 						Matière
 					</a>
-					<a href="/admin/cours" class="list-group-item">
+					<a href="#" class="list-group-item">
 						<span class="badge badge-success"><?php echo $cours->count();?></span>
 						Cours
-					</a>
-					<a href="/admin/devoirs" class="list-group-item">
-						<span class="badge badge-success"><?php echo $devoir->count();?></span>
-						Devoirs
 					</a>
 				</div>	
 			</div>
@@ -112,8 +108,6 @@
 		</div>
 	</div>
 </div>
-<form method="post">
-	<button class="btn btn-primary" type="submit" name="addVolume">
-		Génération en masse
-	</button>
-</form>
+<div>
+	mcryp => <?php echo extension_loaded ("mcrypt") ? "Oui" : "non" ;?>
+</div>

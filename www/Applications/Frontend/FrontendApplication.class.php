@@ -13,16 +13,23 @@ class FrontendApplication extends \Library\Application {
 		$controller = $this->getController();
 		if ($this->user->isAuthenticated())
 		{
-			if($controller->action() != 'logout') {
-				if($this->user->getAttribute('status') == 'Prof') {
-					$this->httpResponse->redirect('/professeur');
-				} else if($this->user->getAttribute('status') == 'Admin') {
-					$this->httpResponse->redirect('/admin');
-				} else if($this->user->getAttribute('status') == 'Eleve' && count($this->user->getAttribute('classes')) < 1) {
-					$this->httpResponse->redirect503();
+			if($controller != false)
+			{
+				if($controller->action() != 'logout') {
+					if($this->user->getAttribute('status') == 'Prof') {
+						$this->httpResponse->redirect('/professeur');
+					} else if($this->user->getAttribute('status') == 'Admin') {
+						$this->httpResponse->redirect('/admin');
+					} else if($this->user->getAttribute('status') == 'Eleve' && count($this->user->getAttribute('classes')) < 1) {
+						$this->httpResponse->redirect503();
+					}
 				}
+				$controller->execute();
 			}
-			$controller->execute();
+			else
+			{
+				$this->httpResponse->redirect('/');
+			}
 		}
 		else
 		{

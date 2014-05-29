@@ -6,7 +6,7 @@ if(file_exists('../Applications/Frontend/FrontendApplication.class.php') && file
 	$app = new Applications\Frontend\FrontendApplication($start);
 	$app->run();
 } else {
-	$app = new Applications\Install\InstallApplication;
+	$app = new Applications\Install\InstallApplication($start);
 	$app->run();
 }
 ?>

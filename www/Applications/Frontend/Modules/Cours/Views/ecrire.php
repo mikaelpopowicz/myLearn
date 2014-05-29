@@ -57,6 +57,22 @@
 					</div>
 				</div>
 				<div class="control-group">
+					<label for="classe" class="control-label">Classe</label>
+					<div class="controls">
+						<select name="classe" id="classe" class="input-block-level">
+							<?php
+							if(isset($classes) && is_array($classes)) {
+								foreach ($classes as $classe) {
+									$classe = unserialize(base64_decode($classe));
+									$selected = isset($cours['classe']) && $cours['classe']->id() == $classe->id() ? "selected" : "";
+									echo "<option value='".base64_encode(serialize($classe))."' ".$selected.">".$classe->libelle()."</option>";
+								}
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="control-group">
 					<label class="control-label" for="description">Description</label>
 					<div class="controls">
 							<textarea rows="4"class="input-block-level" id="description" name="description" placeholder="Description du chapitre"><?php echo isset($cours['description']) ? $cours['description'] : "";?></textarea>
