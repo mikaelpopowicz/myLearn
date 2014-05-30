@@ -5,7 +5,7 @@ class ClasseController extends \Library\BackController
 {
 	public function executeIndex(\Library\HTTPRequest $request)
 	{
-		$this->page->addVar('title', 'myLearn - Liste des classes');
+		$this->page->addVar('title', 'myAdmin - Liste des classes');
 		$this->page->addVar('class_gest', "active");
 		$this->page->addVar('class_cls', "active");
 		$this->page->addVar('listeClasse', $this->managers->getManagerOf('Classe')->getList(0));
@@ -44,7 +44,7 @@ class ClasseController extends \Library\BackController
 
 	public function executeAjout(\Library\HTTPRequest $request)
 	{
-		$this->page->addVar('title', 'myLearn - Nouvelle section');
+		$this->page->addVar('title', 'myAdmin - Nouvelle section');
 		$this->page->addVar('class_gest', "active");
 		$this->page->addVar('class_cls', "active");
 		$this->page->addVar('sessions', $this->managers->getManagerOf('Session')->getList());
@@ -59,7 +59,8 @@ class ClasseController extends \Library\BackController
 			$classe = new \Library\Entities\Classe(array(
 				"session" => unserialize(base64_decode($request->postData('session'))),
 				"section" => unserialize(base64_decode($request->postData('section'))),
-				"libelle" => $request->postData('libelle')
+				"libelle" => $request->postData('libelle'),
+				"uri" => \Library\Cleaner::getUri($request->postData('libelle'))
 			));
 			
 			if($classe->isValid()) {
@@ -77,7 +78,7 @@ class ClasseController extends \Library\BackController
 	{
 		$classe = $this->managers->getManagerOf('Classe')->getUnique($request->getData('id'));
 		if($classe != NULL) {
-			$this->page->addVar('title', 'myLearn - Modifier '.$classe->libelle());
+			$this->page->addVar('title', 'myAdmin - Modifier '.$classe->libelle());
 			$this->page->addVar('class_gest', "active");
 			$this->page->addVar('class_cls', "active");
 			$this->page->addVar('classe', $classe);
@@ -94,7 +95,8 @@ class ClasseController extends \Library\BackController
 					"id" => $classe['id'],
 					"session" => unserialize(base64_decode($request->postData('session'))),
 					"section" => unserialize(base64_decode($request->postData('section'))),
-					"libelle" => $request->postData('libelle')
+					"libelle" => $request->postData('libelle'),
+					"uri" => \Library\Cleaner::getUri($request->postData('libelle'))
 				));
 				
 				if($cls->isValid()) {
@@ -115,7 +117,7 @@ class ClasseController extends \Library\BackController
 	{
 		$classe = $this->managers->getManagerOf('Classe')->getUnique($request->getData('id'));
 		if($classe != NULL) {
-			$this->page->addVar('title', 'myLearn - '.$classe->libelle());
+			$this->page->addVar('title', 'myAdmin - '.$classe->libelle());
 			$this->page->addVar('class_gest', "active");
 			$this->page->addVar('class_cls', "active");
 			$this->page->addVar('classe', $classe);

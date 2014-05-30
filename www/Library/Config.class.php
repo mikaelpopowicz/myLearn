@@ -22,7 +22,7 @@ class Config extends ApplicationComponent
      
 		if (isset($this->vars[$var]))
 		{
-			if(substr($var,0,2) == "db")
+			if(substr($var,0,2) == "db" || substr($var,0,4) == "smtp")
 			{
 				foreach ($this->vars as $key => $value) {
 					if($key == "cryp_key")

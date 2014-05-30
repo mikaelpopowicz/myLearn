@@ -121,7 +121,7 @@ class ConnexionController extends \Library\BackController
 				$this->app->mail()->setMessage($sujet, $mail);
 				$this->app->mail()->setSujet($sujet);
 				$envoi = $this->app->mail()->send();
-				if($envoi != true)
+				if($envoi != 1)
 				{
 					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "error", layout: "topCenter", text: "'.$envoi.'"});</script>');
 				}

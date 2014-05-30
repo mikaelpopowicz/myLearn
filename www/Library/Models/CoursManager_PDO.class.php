@@ -146,6 +146,33 @@ class CoursManager_PDO extends CoursManager
 		return $result;
 	}
 	
+	public function getListJson($id,$mat)
+	{
+		$requete = $this->dao->prepare('CALL select_matiere_cours(:mat,null,:id,null)');
+		$requete->bindValue(':mat', $mat);
+		$requete->bindValue(':id', $id);
+		$requete->execute();
+		$nombre = $requete->fetch(\PDO::FETCH_ASSOC)['Cours'];
+		
+		if($nombre > 0)
+		{
+			for ($i=0; $i < $nombre; $i++) { 
+				$requete->nextRowset();
+				$result['classe'] = \Library\Models\ClasseManager_PDO::getObj($requete);
+				$requete->nextRowset();
+				$result['matiere'] = \Library\Models\MatiereManager_PDO::getObj($requete);
+				$requete->nextRowset();
+				$result[$i] = \Library\Models\CoursManager_PDO::getObj($requete);
+				$result[$i]->setClasse($result['classe']);
+				$result[$i]->setMatiere($result['matiere']);
+				unset($result['classe']);
+				unset($result['matiere']);
+			}
+			return $result;
+		}
+		return false;
+	}
+	
 	public function search($query, $id)
 	{
 		$requete = $this->dao->prepare('CALL search_engine(:query, :id)');
@@ -195,6 +222,8 @@ class CoursManager_PDO extends CoursManager
      
 		return $listeCours;
 	}
+	
+	
 
 	public function getListByAuthor($auteur)
 	{
@@ -261,8 +290,8 @@ class CoursManager_PDO extends CoursManager
 		$result['cours']->setMatiere($result['matiere']);
 		unset($result['classe']);
 		unset($result['matiere']);
-		
-		return $result;
+
+		return $result['cours'];		
 	}
 
 	public function count()
@@ -312,7 +341,8 @@ class CoursManager_PDO extends CoursManager
 	
 	protected function modify(Cours $cours)
 	{
-	    $requete = $this->dao->prepare('UPDATE cours SET id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
+	    $requete = $this->dao->prepare('UPDATE cours SET id_classe = :classe, id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
+		$requete->bindValue(':classe', $cours->classe()->id());
 	    $requete->bindValue(':matiere', $cours->matiere()->id());
 		$requete->bindValue(':titre', $cours->titre());
 		$requete->bindValue(':uri', $cours->uri());

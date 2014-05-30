@@ -55,6 +55,7 @@ class MatiereManager_PDO extends MatiereManager
 		return $listeMatiere;
 	}
 	
+<<<<<<< HEAD
 	public function getListEleves($id)
 	{
 		$sql = 'SELECT id_m as id, libelle
@@ -72,6 +73,25 @@ class MatiereManager_PDO extends MatiereManager
 		
 		$listeMatiere = $requete->fetchAll();
      
+=======
+	public function getListJson($id)
+	{
+		$sql = 'SELECT m.id_m as id, m.libelle
+			FROM matiere m 
+			INNER JOIN assigner a ON a.id_m = m.id_m
+			INNER jOIN etre et ON et.id_classe = a.id_classe
+			INNER JOIN eleve e ON e.id_u = et.id_u
+			WHERE e.id_u = :id 
+			GROUP BY m.id_m
+			ORDER BY libelle';
+     
+		$requete = $this->dao->prepare($sql);
+		$requete->bindValue(':id', $id );
+		$requete->execute();
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
+     
+		$listeMatiere = $requete->fetchAll();
+>>>>>>> mikael
 		$requete->closeCursor();
      
 		return $listeMatiere;
@@ -158,6 +178,7 @@ class MatiereManager_PDO extends MatiereManager
 						$requete->nextRowset();
 						$result['cours'][] = \Library\Models\CoursManager_PDO::getObj($requete);
 					}
+					
 				}
 				else
 				{

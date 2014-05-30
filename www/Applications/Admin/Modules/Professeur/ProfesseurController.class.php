@@ -72,6 +72,7 @@ class ProfesseurController extends \Library\BackController
 			
 			if($professeur->isValid()) {
 				$record = $this->managers->getManagerOf('Professeur')->save($professeur);
+				$http = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
 				if($record == false)
 				{
 					$message = '<h3>Bonjour, '.$professeur->nom().' '.$professeur->prenom().'</h3>
@@ -82,9 +83,13 @@ class ProfesseurController extends \Library\BackController
 									</p>
 									<p class="callout">
 <<<<<<< HEAD
+<<<<<<< HEAD
 										Pour activer votre compte  <a href="http://'.$_SERVER['HTTP_HOST'].'/connexion/'.$professeur->token().'"> cliquez ici!</a>
 =======
 										Pour activer votre compte  <a href="https://'.$_SERVER['HTTP_HOST'].'/connexion/'.$professeur->token().'"> cliquez ici!</a>
+>>>>>>> mikael
+=======
+										Pour activer votre compte  <a href="'.$http.'://'.$_SERVER['HTTP_HOST'].'/connexion/'.$professeur->token().'"> cliquez ici!</a>
 >>>>>>> mikael
 									</p>';
 				
@@ -103,7 +108,7 @@ class ProfesseurController extends \Library\BackController
 				
 				
 					$envoi = $this->app->mail()->send();
-					if($envoi == true)
+					if($envoi == 1)
 					{
 						$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Enregistrement du professeur réussi"});</script>');
 					}

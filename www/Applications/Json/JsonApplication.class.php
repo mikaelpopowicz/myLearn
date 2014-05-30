@@ -10,7 +10,7 @@ class JsonApplication extends \Library\Application
    
 	public function run()
 	{
-		$controller = $this->getController();     
+		$controller = $this->getController();
 		$controller->execute();
      
 		$this->httpResponse->setPage($controller->page());

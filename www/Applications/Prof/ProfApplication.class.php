@@ -12,6 +12,9 @@ class ProfApplication extends \Library\Application
 	{
 		if ($this->user->isAuthenticated() && $this->user()->getAttribute('status') == 'Prof')
 		{
+			if(count($this->user->getAttribute('classes')) < 1) {
+				$this->httpResponse->redirect503();
+			}
 			$controller = $this->getController();
 		}
 		else

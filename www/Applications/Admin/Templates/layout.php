@@ -79,8 +79,6 @@
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Cours <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 								<li class="<?php echo isset($class_mat) ? $class_mat : "";?>"><a href="/admin/matieres">Matières</a></li>
-								<li class="<?php echo isset($class_cr) ? $class_cr : "";?>"><a href="/admin/cours">Cours</a></li>
-								<li class="<?php echo isset($class_devoir) ? $class_devoir : "";?>"><a href="/admin/devoirs">Devoirs</a></li>
 							</ul>
 						</li>
 						<li class="dropdown <?php echo isset($class_user) ? $class_user : "";?>">
@@ -122,6 +120,7 @@
 		<?php
 		echo $content;
 		?>
+		<hr>
 	  	<footer class="footer">
 	  		<p class="text-muted">© 2014 . myLearn - Page executée en <?php echo $load->load()." ms";?></p>
 	  	</footer>
