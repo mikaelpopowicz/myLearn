@@ -1,31 +1,6 @@
 <?php
 namespace Applications\Json\Modules\Cours;
 
-<<<<<<< HEAD
-class CoursController extends \Library\BackController
-{
-	public function listeMatieres( \Library\HTTPRequest $request)
-		{
-			$user = $request->getData('id');
-			$listeMatieres = $this->getManagerOf('Matiere')->getListEleves($user);
-			
-			if (count(listeMatieres)>0) 
-			{
-				
-			}
-		}	
-		
-	public function listeCours( \Library\HTTPRequest $request)
-		{
-				
-		}
-			
-	public function afficherCours( \Library\HTTPRequest $request)
-		{
-			
-		}
-}
-=======
 
 
 class CoursController extends \Library\BackController
@@ -38,11 +13,11 @@ class CoursController extends \Library\BackController
 		$listeMatiere = $this->managers->getManagerOf('Matiere')->getListJson($request->getData('id'));
 
 		$reponse = array();
-		
+
 		if($listeMatiere == null || count($listeMatiere) < 1)
 		{
 			$reponse['result'] = false;
-			
+
 		}
 		else
 		{
@@ -54,11 +29,11 @@ class CoursController extends \Library\BackController
 				);
 			}
 		}
-		
+
 		$reponse = json_encode($reponse);
 		$this->page->addVar('json', $reponse);
 	}
-	
+
 	public function executeListCours(\Library\HTTPRequest $request)
 	{
 		$this->page->addVar('title', 'Liste des cours de la matiere '.$request->getData('matiere'));
@@ -66,7 +41,7 @@ class CoursController extends \Library\BackController
 		$this->setView('index');
 		$cours = $this->managers->getManagerOf('Cours')->getListJson($request->getData('id'),$request->getData('matiere'));
 		$reponse = array();
-		
+
 		if($cours == null || count($cours) < 1)
 		{
 			$reponse['result'] = false;
@@ -88,7 +63,7 @@ class CoursController extends \Library\BackController
 		$reponse = json_encode($reponse);
 		$this->page->addVar('json', $reponse);
 	}
-	
+
 	public function executeAffCours(\Library\HTTPRequest $request)
 	{
 		$this->page->addVar('title', 'Le cours '.$request->getData('cours'));
@@ -96,7 +71,7 @@ class CoursController extends \Library\BackController
 		$this->setView('index');
 		$cours = $this->managers->getManagerOf('Cours')->getUnique($request->getData('cours'));
 		$reponse = array();
-		
+
 		if($cours instanceof \Library\Entities\Cours)
 		{
 			$reponse['Cours'] = array(
@@ -116,8 +91,7 @@ class CoursController extends \Library\BackController
 		$this->page->addVar('json', $reponse);
 	}
 }
-	
-	
-	
->>>>>>> mikael
+
+
+
 ?>
