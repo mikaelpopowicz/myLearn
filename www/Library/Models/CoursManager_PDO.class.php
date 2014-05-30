@@ -146,6 +146,33 @@ class CoursManager_PDO extends CoursManager
 		return $result;
 	}
 	
+	public function getListJson($id,$mat)
+	{
+		$requete = $this->dao->prepare('CALL select_matiere_cours(:mat,null,:id,null)');
+		$requete->bindValue(':mat', $mat);
+		$requete->bindValue(':id', $id);
+		$requete->execute();
+		$nombre = $requete->fetch(\PDO::FETCH_ASSOC)['Cours'];
+		
+		if($nombre > 0)
+		{
+			for ($i=0; $i < $nombre; $i++) { 
+				$requete->nextRowset();
+				$result['classe'] = \Library\Models\ClasseManager_PDO::getObj($requete);
+				$requete->nextRowset();
+				$result['matiere'] = \Library\Models\MatiereManager_PDO::getObj($requete);
+				$requete->nextRowset();
+				$result[$i] = \Library\Models\CoursManager_PDO::getObj($requete);
+				$result[$i]->setClasse($result['classe']);
+				$result[$i]->setMatiere($result['matiere']);
+				unset($result['classe']);
+				unset($result['matiere']);
+			}
+			return $result;
+		}
+		return false;
+	}
+	
 	public function search($query, $id)
 	{
 		$requete = $this->dao->prepare('CALL search_engine(:query, :id)');
@@ -196,31 +223,7 @@ class CoursManager_PDO extends CoursManager
 		return $listeCours;
 	}
 	
-	public function getListJson($id, $matiere)
-	{
-		$sql = 'SELECT m.libelle, c.id_cours, c.titre, c.description, c.dateAjout, u.nom, u.prenom
-			FROM matiere m 
-			INNER JOIN cours c ON c.id_m = m.id_m
-			INNER JOIN assigner a ON a.id_m = m.id_m
-			INNER jOIN etre et ON et.id_classe = a.id_classe
-			INNER JOIN eleve e ON e.id_u = et.id_u
-			INNER JOIN user u ON u.id_u = c.id_u
-			WHERE e.id_u = :id 
-			AND m.id_m = :matiere
-			GROUP BY c.id_cours
-			ORDER BY c.titre';
-			//id, titre, desc, contenu, date, auteur, matiere du cours 
-		$requete = $this->dao->prepare($sql);
-		$requete->bindValue(':id', $id );
-		$requete->bindValue(':matiere', $matiere );
-		$requete->execute();
-		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
-     
-		$listeCours = $requete->fetchAll();
-		$requete->closeCursor();
-     
-		return $listeCours;
-	}
+	
 
 	public function getListByAuthor($auteur)
 	{
@@ -287,8 +290,8 @@ class CoursManager_PDO extends CoursManager
 		$result['cours']->setMatiere($result['matiere']);
 		unset($result['classe']);
 		unset($result['matiere']);
-		
-		return $result;
+
+		return $result['cours'];		
 	}
 
 	public function count()

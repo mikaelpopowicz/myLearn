@@ -1055,6 +1055,15 @@ BEGIN
 		AND id_classe = class
 		ORDER BY dateAjout DESC
 		LIMIT debut,qte;
+	
+	# Curseur 3
+	Declare cur3 CURSOR
+	FOR SELECT c.id_cours
+		FROM cours c
+		INNER JOIN etre e ON e.id_classe = c.id_classe
+		WHERE e.id_u = qte
+		AND c.id_m = mat
+		ORDER BY dateAjout Desc;
 		
 	# Gestionnaire d'erreur
 	Declare continue HANDLER
@@ -1062,14 +1071,29 @@ BEGIN
 	
 	# Nombre de cours
 	IF class IS NULL OR class = 0 THEN
-		SELECT COUNT(*) AS "Cours_1" FROM cours WHERE id_m = mat;
-		Open cur1;
-		FETCH cur1 INTO id;
-		WHILE fini != 1	DO
-			CALL select_cours(id, false);
+		IF qte IS NULL OR qte = 0 THEN
+			SELECT COUNT(*) AS "Cours_1" FROM cours WHERE id_m = mat;
+			Open cur1;
 			FETCH cur1 INTO id;
-		END WHILE;
-		Close cur1;
+			WHILE fini != 1	DO
+				CALL select_cours(id, false);
+				FETCH cur1 INTO id;
+			END WHILE;
+			Close cur1;
+		ELSE
+			SELECT COUNT(c.id_cours) AS "Cours"
+			FROM cours c
+			INNER JOIN etre e ON e.id_classe = c.id_classe
+			WHERE id_m = mat
+			AND e.id_u = qte;
+			Open cur3;
+			FETCH cur3 INTO id;
+			WHILE fini != 1	DO
+				CALL select_cours(id, true);
+				FETCH cur3 INTO id;
+			END WHILE;
+			Close cur3;
+		END IF;
 	ELSE
 		IF MOD((SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class),qte) = 0 THEN
 			SET page = (SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class)/qte;
