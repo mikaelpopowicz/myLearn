@@ -2,21 +2,21 @@
 <definitions>
 	<define var="version" value="1.0" />
 	<define var="release" value="05/2014" />
-	<define var="db_host" value="e/Et7ZG7/+wI" />
-	<define var="db_name" value="euci6Zyh/g==" />
-	<define var="db_user" value="ZfEh+A==" />
-	<define var="db_user_pass" value="Y/Eh/g==" />
+	<define var="db_host" value="v/726ClQZKVJ" />
+	<define var="db_name" value="vuj57CRKZQ==" />
+	<define var="db_user" value="of76/Q==" />
+	<define var="db_user_pass" value="p/76+w==" />
 	<define var="conf_nom" value="Ecole de démonstration" />
 	<define var="conf_description" value="Description pour la page de connexion" />
 	<define var="conf_email" value="noreply@ecole.fr" />
 	<define var="conf_contact" value="contact@ecole.fr" />
-	<define var="conf_date" value="09/05/2014" />
-	<define var="cryp_iv" value="TYloYom9wic=" />
-	<define var="cryp_key" value="YzVQUmRSR254UUFrTzJqc25wbDh4TG02" />
-	<define var="smtp_host" value="ZPM6/NO84v4SqxDdHyk=" />
-	<define var="smtp_port" value="IqZ5" />
-	<define var="smtp_user" value="eu4h/JKk+fwG4gCV" />
-	<define var="smtp_pass" value="Yvgn4pu8qa4=" />
+	<define var="conf_date" value="31/05/2014" />
+	<define var="cryp_iv" value="YVSPbl+Ez6g=" />
+	<define var="cryp_key" value="UmV1cUFSR1ExRFBLV0ZhOVZpQ1pJM3Q3" />
+	<define var="smtp_host" value="oPzh+WtXebdTsXmoINk=" />
+	<define var="smtp_port" value="5qmi" />
+	<define var="smtp_user" value="vuH6+SpPYrVH+Gng" />
+	<define var="smtp_pass" value="pvf85yNXMuc=" />
 	<define var="cours_page" value="5" />
 	<define var="installed" value="true" />
 </definitions>

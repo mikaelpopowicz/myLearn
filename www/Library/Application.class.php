@@ -12,6 +12,7 @@ abstract class Application
 	protected $mail;
 	protected $message;
 	protected $loading;
+	
 	public function __construct($name = "", $start)
 	{
 		$this->name			= $name;

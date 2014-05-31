@@ -1,4 +1,5 @@
-drop procedure if exists search_engine;
+drop function if exists keygen;
+drop procedure if exists ajouter_eleve;
 
 DELIMITER @@
 
@@ -6,74 +7,85 @@ DELIMITER @@
 #       PROCEDURE : search_engine()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE search_engine(chaine TEXT, user INTEGER)
+CREATE FUNCTION keygen(len INTEGER, uniq BOOLEAN)
+returns VARCHAR(128)
+  Deterministic
 BEGIN
-	Declare it, nb, id, done INTEGER default 0;
-	Declare pre INTEGER default 1;
-	Declare clause,query TEXT default "";
+	Declare it, al INTEGER DEFAULT 0;
+	Declare chars VARCHAR(128);
+	Declare result VARCHAR(128);
+	Declare one VARCHAR(1);
+	Declare test BOOLEAN default true;
 	
-	# Curseur
-	Declare cur1 CURSOR
-	FOR SELECT id_cours
-		FROM search_results;
-		
-	# Gestionnaire d'erreur
-	Declare continue HANDLER
-		FOR NOT FOUND SET done = 1;
+	SET chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	SET result = "";
 	
-	# Suppression de la table temporaire si elle existe
-	DROP TABLE IF EXISTS search_results;
-	
-	# Création de la requete avec la clause LIKE
-	SET query = CONCAT('SELECT c.id_cours FROM cours c INNER JOIN classe cl ON c.id_classe = cl.id_classe INNER JOIN matiere m ON m.id_m = c.id_m INNER JOIN etre e ON e.id_classe = cl.id_classe WHERE e.id_u = ',user, ' AND (');
-	SET clause = '\"%';
-	IF LENGTH(chaine) > 0 THEN
-		SET nb = nb + 1;
-		IF  LOCATE('+',chaine) > 0 THEN
-			SET it = LOCATE('+',chaine);
-			SET clause = CONCAT(clause,SUBSTR(chaine, pre, it-1),'%');
-			SET pre = it + 1;
-			
-			WHILE it != 0	DO
-				SET nb = nb + 1;
-				SET it = LOCATE('+',chaine, pre);
-				
-					IF it > 0 THEN
-						SET clause = CONCAT(clause,SUBSTR(chaine, pre, it-pre),'%');
-					ELSE
-						SET clause = CONCAT(clause,SUBSTR(chaine, pre),'%');
-					END IF;
-				SET pre = it + 1;
+	IF uniq THEN
+		WHILE test DO
+			WHILE it < len DO
+				SET al = FLOOR(RAND()*LENGTH(chars));
+				SET one = SUBSTR(chars, al, 1);
+				SET result = CONCAT(result, one);
+				SET it = it + 1;
 			END WHILE;
-		ELSE
-			SET clause = CONCAT(clause,chaine,'%');
-		END IF;
-		SET clause = CONCAT(clause,'\"');
-	END IF;
-	SET query = CONCAT(query, 'c.titre LIKE ',clause, ' OR c.description LIKE ',clause, ' OR c.contenu LIKE ',clause, ' OR cl.libelle LIKE ',clause, 'OR m.libelle LIKE ',clause, ') ORDER BY dateAjout DESC');
-	SET query = CONCAT('CREATE TEMPORARY TABLE IF NOT EXISTS search_results AS (', query,');');
-	# SELECT query, nb;
-	SET @query = query;
-	# Création de la table temporaire
-	PREPARE requete FROM @query;
-	EXECUTE requete;
-	DEALLOCATE PREPARE requete;
-	
-	# Compte du nombre de résultat
-	SELECT COUNT(*) AS "Cours" FROM search_results;
-	
-	IF (SELECT COUNT(*) FROM search_results) > 0 THEN
-		# Ouverture du curseur
-		OPEN cur1;
-		FETCH cur1 INTO id;
-		WHILE done != 1	DO
-			CALL select_cours(id, true);
-			FETCH cur1 INTO id;
+			IF (SELECT COUNT(*) FROM user WHERE token = result) < 1 THEN
+				SET test = false;
+			END IF;
 		END WHILE;
-		Close cur1;
-		SET done = 0;
+	ELSE
+		WHILE it < len DO
+			SET al = FLOOR(RAND()*LENGTH(chars));
+			SET one = SUBSTR(chars, al, 1);
+			SET result = CONCAT(result, one);
+			SET it = it + 1;
+		END WHILE;
 	END IF;
+	
+	Return result;
 END @@
 
+# -----------------------------------------------------------------------------
+#       PROCEDURE : ajouter_eleve()
+# -----------------------------------------------------------------------------
+
+CREATE PROCEDURE ajouter_eleve(a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_dateNaissance DATE)
+BEGIN
+	Declare sel, tok, mdp VARCHAR(40);
+	Declare md VARCHAR(8);
+	Declare surname VARCHAR(128);
+	Declare id, it INTEGER DEFAULT 0;
+	Declare test BOOLEAN DEFAULT true;
+	
+	IF (SELECT COUNT(*) FROM user WHERE email = a_email) > 0 THEN
+		SELECT true AS "erreur";
+		SELECT * FROM errors WHERE code = "ACT_MAU";
+	ELSE
+		SET id = (SELECT autoincrement());
+		SET tok = (SELECT keygen(40,true));
+		SET sel = (SELECT keygen(40,false));
+		SET md = (SELECT keygen(8,false));
+		SET mdp = SHA1(MD5(CONCAT(SHA1(MD5(sel)), SHA1(MD5(md)), SHA1(md5(Sel)))));
+	
+		WHILE test DO
+			IF it < 1 THEN
+				SET surname = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom));
+			ELSE
+				SET surname = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom, it));
+			END IF;
+			IF (SELECT COUNT(*) FROM user WHERE username = surname) < 1 THEN
+				SET test = false;
+			ELSE
+				SET it = it + 1;
+			END IF;
+		END WHILE;
+	
+		INSERT INTO USER VALUES(id, surname, a_nom, a_prenom, a_email, mdp, 0, sel, tok, SYSDATE());
+		INSERT INTO eleve VALUES(id, a_dateNaissance);
+		SELECT false AS "erreur";
+		SELECT id_u AS id, username, nom , prenom, email, md AS password, active, salt, token, dateUser
+		FROM user
+		WHERE id_u = id;
+	END IF;
+END @@
 
 DELIMITER ;

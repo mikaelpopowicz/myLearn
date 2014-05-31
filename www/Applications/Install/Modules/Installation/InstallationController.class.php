@@ -306,7 +306,7 @@ class InstallationController extends \Library\BackController
 						}
 						if(empty($erreur)) {
 							$sujet = 'Test de configuration STMP myLearn';
-							$mail = 'Test de configuration SMTP de l\'établissement'.unserialize(base64_decode($this->app->user()->getAttribute('infos')))['nom'];
+							$mail = 'Test de configuration SMTP de l\'établissement '.unserialize(base64_decode($this->app->user()->getAttribute('infos')))['nom'];
 							$this->app->mail()->setMail("mikael.popowicz@gmail.com");
 							$this->app->mail()->setMessage($sujet, $mail);
 							$this->app->mail()->setSujet($sujet);

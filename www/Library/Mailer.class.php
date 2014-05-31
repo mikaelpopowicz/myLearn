@@ -22,7 +22,7 @@ class Mailer extends \Library\ApplicationComponent
 		$this->setTeam($app->config()->get('conf_nom'));
 		$this->setContact($app->config()->get('conf_contact'));
 		$this->setHost($app->config()->get('smtp_host'));
-		$this->setPort($app->config()->get('smtp_host'));
+		$this->setPort($app->config()->get('smtp_port'));
 		$this->setUsername($app->config()->get('smtp_user'));
 		$this->setPassword($app->config()->get('smtp_pass'));
 		$this->setSender($app->config()->get('conf_email'));
@@ -91,12 +91,12 @@ class Mailer extends \Library\ApplicationComponent
 		$this->phpmail->AddAddress($this->mail);
 		try {
 			$this->phpmail->Send();
-			return true;
 		} catch (\phpmailerException $e) {
 			return $e->errorMessage(); //Pretty error messages from PHPMailer
 		} catch (Exception $e) {
 			return $e->getMessage(); //Boring error messages from anything else!
 		}
+		return true;
 	}
 	
 	

@@ -22,7 +22,7 @@ class User extends \Library\Entity
 	
 	public function isValid()
 	{
-		return !(empty($this->password) || empty($this->email) || empty($this->nom) || !empty($this->erreurs));
+		return !(empty($this->email) || empty($this->nom) || !empty($this->erreurs));
 	}
 	
 	

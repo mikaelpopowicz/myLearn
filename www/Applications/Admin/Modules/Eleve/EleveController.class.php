@@ -51,8 +51,8 @@ class EleveController extends \Library\BackController
 		}
 		
 		if($request->postExists('ajouter')) {
-			$mdp = $this->app->key()->getNewSalt(8);
-			$salt = $this->app->key()->getNewSalt(40);
+			//$mdp = $this->app->key()->getNewSalt(8);
+			//$salt = $this->app->key()->getNewSalt(40);
 			$date = $request->postData('date');
 			if(!empty($date)) {
 				$date = explode('/', $date);
@@ -62,48 +62,48 @@ class EleveController extends \Library\BackController
 				$date = new \DateTime('0000-00-00');
 			}
 			
-			$username = strtolower(substr($request->postData('prenom'),0,1).$request->postData('nom'));
+			//$username = strtolower(substr($request->postData('prenom'),0,1).$request->postData('nom'));
 			
 			$eleve = new \Library\Entities\Eleve(array(
-				"username" => $username,
+				//"username" => $username,
 				"nom" => $request->postData('nom'),
 				"prenom" => $request->postData('prenom'),
 				"email" => $request->postData('email'),
 				"dateNaissance" => $date,
-				"salt" => $salt,
-				"password" => sha1(md5(sha1(md5($salt)).sha1(md5($mdp)).sha1(md5($salt)))),
-				"token" => $this->app->key()->getNewSalt(40)
+				//"salt" => $salt,
+				//"password" => sha1(md5(sha1(md5($salt)).sha1(md5($mdp)).sha1(md5($salt)))),
+				//"token" => $this->app->key()->getNewSalt(40)
 			));
 			
 			if($eleve->isValid()) {
 				$record = $this->managers->getManagerOf('Eleve')->save($eleve);
-				$http = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
-				if($record == false)
+				if($record instanceof \Library\Entities\Eleve)
 				{
+					$http = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
 					$message = '<h3>Bonjour, '.$eleve->nom().' '.$eleve->prenom().'</h3>
 									<p class="lead">Nous vous souhaitons la bienvenue sur myLearn</p>
 									<p>Votre compte a été créé, vous pouvez maintenant activer votre compte en suivant le lien ci-dessous, pour pourrez vous connecter avec les identifiants suivants :
-									<ul><li><strong>Username :</strong> '.$eleve->username().'</li>
+									<ul><li><strong>Username :</strong> '.$username.'</li>
 									<li><strong>Mot de passe :</strong> '.$mdp.'</li></ul>
 									</p>
 									<p class="callout">
-										Pour activer votre compte  <a href="'.$http.'://'.$_SERVER['HTTP_HOST'].'/connexion/'.$eleve->token().'"> cliquez ici!</a>
+										Pour activer votre compte  <a href="'.$http.'://'.$_SERVER['HTTP_HOST'].'/connexion/'.$token.'"> cliquez ici!</a>
 									</p>';
-				
+			
 					$encoded = $this->app->key()->encode($message);
 					$crypt = new \Library\Entities\Crypt(array(
-						"id" => $eleve->token(),
+						"id" => $token,
 						"message" => $encoded['crypted'],
 						"cle" => $encoded['key']
 					));
 					$this->managers->getManagerOf('Crypt')->add($crypt);				
-				
+			
 					$sujet = 'Activation de votre compte';
 					$this->app->mail()->setMail($eleve->email());
 					$this->app->mail()->setMessage($sujet, $message);
 					$this->app->mail()->setSujet($sujet);
-				
-				
+					//echo "<pre>";print_r($this->app->mail());echo "</pre>";die();
+			
 					$envoi = $this->app->mail()->send();
 					if($envoi == 1)
 					{
@@ -111,19 +111,16 @@ class EleveController extends \Library\BackController
 					}
 					else
 					{
-						$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "error", layout: "topCenter", text: "'.$envoi.'"});</script>');
+						$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "error", layout: "topCenter", text: "Erreur :"});</script>');
 					}
-					
 					$this->app->httpresponse()->redirect('/admin/eleves');
 				}
 				else
 				{
+					$this->page->addVar('erreurs', $eleve['erreurs']);
+					$this->page->addVar('eleve', $eleve);
 					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "'.$record->type().'", layout: "topCenter", text: "'.$record->message().'"});</script>');
-					$this->page->addVar('$eleve', $eleve);
-				}
-				
-				
-				
+				}	
 			} else {
 				$this->page->addVar('erreurs', $eleve['erreurs']);
 				$this->page->addVar('eleve', $eleve);
