@@ -84,6 +84,7 @@ class Mailer extends \Library\ApplicationComponent
 		$this->phpmail->Host		=	$this->host;
 		$this->phpmail->SMTPDebug	=	0;
 		$this->phpmail->SMTPAuth	=	true;
+		$this->phpmail->SMTPSecure	=	"tls";
 		$this->phpmail->Port		=	$this->port;
 		$this->phpmail->Username	=	$this->username;
 		$this->phpmail->Password	=	$this->password;

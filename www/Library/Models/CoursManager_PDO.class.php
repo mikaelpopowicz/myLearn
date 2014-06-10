@@ -175,10 +175,10 @@ class CoursManager_PDO extends CoursManager
 	
 	public function getList()
 	{
-		$sql = 'SELECT c.id_c as id, b.username AS auteur, c.id_m AS matiere, c.titre, c.description, c.contenu, c.dateAjout, c.dateModif, c.count_c
+		$sql = 'SELECT c.id_cours as id, u.username AS auteur, c.id_m AS matiere, c.titre, c.description, c.contenu, c.dateAjout, c.dateModif
 			FROM cours c
-			INNER JOIN byte b ON c.id_u = b.id_u
-			ORDER BY id_c DESC';
+			INNER JOIN user u ON c.id_u = u.id_u
+			ORDER BY id_cours DESC';
      
 		$requete = $this->dao->query($sql);
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Cours');

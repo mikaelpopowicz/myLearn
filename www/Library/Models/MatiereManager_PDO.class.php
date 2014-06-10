@@ -41,7 +41,7 @@ class MatiereManager_PDO extends MatiereManager
 	
 	public function getList()
 	{
-		$sql = 'SELECT id_m as id, libelle, icon
+		$sql = 'SELECT id_m as id, libelle, icon, uri
 			FROM matiere
 			ORDER BY libelle';
      
