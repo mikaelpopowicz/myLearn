@@ -244,7 +244,19 @@ CREATE TABLE IF NOT EXISTS errors
  ) 
  comment = "";
 
-
+# -----------------------------------------------------------------------------
+#       TABLE : logs_con
+# -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS logs_con
+ (
+   id_con INTEGER(2) NOT NULL AUTO_INCREMENT ,
+   id_u INTEGER(2) NOT NULL  ,
+   username VARCHAR(128) NOT NULL,
+   dateConnexion DATETIME NOT NULL,
+   etat VARCHAR(128) NOT NULL
+   , PRIMARY KEY (id_con) 
+ )
+ comment = "";
 
 
 # /////////////////////////////////////////////////////////////////////////////
@@ -396,42 +408,156 @@ Begin
 END ;
 
 # -----------------------------------------------------------------------------
+#       FUNCTION : autoincrementDev() (Auto incrémentation des devoirs)
+# -----------------------------------------------------------------------------
+
+Create function autoincrementDev()
+returns INTEGER(2)
+  Deterministic
+Begin
+  Declare nbi int;
+  SELECT MAX(id_d) INTO nbi
+  FROM devoir;
+  IF nbi IS NULL
+  THEN
+    SET nbi = 0;
+  END IF;
+  SET nbi = nbi+1;
+  return nbi;
+END ;
+
+# -----------------------------------------------------------------------------
+#       FUNCTION : keygen()
+# -----------------------------------------------------------------------------
+
+CREATE FUNCTION keygen(len INTEGER, uniq BOOLEAN)
+returns VARCHAR(128)
+  Deterministic
+BEGIN
+	Declare it, al INTEGER DEFAULT 0;
+	Declare chars VARCHAR(128);
+	Declare result VARCHAR(128);
+	Declare one VARCHAR(1);
+	Declare test BOOLEAN default true;
+	
+	SET chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	SET result = "";
+	
+	IF uniq THEN
+		WHILE test DO
+			WHILE it < len DO
+				SET al = FLOOR(RAND()*LENGTH(chars));
+				SET one = SUBSTR(chars, al, 1);
+				SET result = CONCAT(result, one);
+				SET it = it + 1;
+			END WHILE;
+			IF (SELECT COUNT(*) FROM user WHERE token = result) < 1 THEN
+				SET test = false;
+			END IF;
+		END WHILE;
+	ELSE
+		WHILE it < len DO
+			SET al = FLOOR(RAND()*LENGTH(chars));
+			SET one = SUBSTR(chars, al, 1);
+			SET result = CONCAT(result, one);
+			SET it = it + 1;
+		END WHILE;
+	END IF;
+	
+	Return result;
+END ;
+
+# -----------------------------------------------------------------------------
 #       PROCEDURE : ajouter_eleve()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE ajouter_eleve(a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_salt VARCHAR(40), a_token VARCHAR(40), a_dateNaissance DATE)
+CREATE PROCEDURE ajouter_eleve(a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_dateNaissance DATE)
 BEGIN
-	Declare id int;
-	SET id = (SELECT autoincrement());
-	IF (SELECT COUNT(*) FROM user u INNER JOIN eleve e ON u.id_u = e.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND e.dateNaissance = a_dateNaissance) < 1 THEN
-	    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
-	    INSERT INTO eleve VALUES(id, a_dateNaissance);
-		SELECT false AS erreur;
+	Declare sel, tok, mdp VARCHAR(40);
+	Declare md VARCHAR(8);
+	Declare surname VARCHAR(128);
+	Declare id, it INTEGER DEFAULT 0;
+	Declare test BOOLEAN DEFAULT true;
+	
+	IF (SELECT COUNT(*) FROM user WHERE email = a_email) > 0 THEN
+		SELECT true AS "erreur";
+		SELECT * FROM errors WHERE code = "ACT_MAU";
 	ELSE
-		SELECT true AS erreur;
-		SELECT * from errors WHERE code = "USR_DB";
-  END IF;
+		SET id = (SELECT autoincrement());
+		SET tok = (SELECT keygen(40,true));
+		SET sel = (SELECT keygen(40,false));
+		SET md = (SELECT keygen(8,false));
+		SET mdp = SHA1(MD5(CONCAT(SHA1(MD5(sel)), SHA1(MD5(md)), SHA1(md5(Sel)))));
+	
+		WHILE test DO
+			IF it < 1 THEN
+				SET surname = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom));
+			ELSE
+				SET surname = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom, it));
+			END IF;
+			IF (SELECT COUNT(*) FROM user WHERE username = surname) < 1 THEN
+				SET test = false;
+			ELSE
+				SET it = it + 1;
+			END IF;
+		END WHILE;
+	
+		INSERT INTO user VALUES(id, surname, a_nom, a_prenom, a_email, mdp, 0, sel, tok, SYSDATE());
+		INSERT INTO eleve VALUES(id, a_dateNaissance);
+		SELECT false AS "erreur";
+		SELECT id_u AS id, username, nom , prenom, email, md AS password, active, salt, token, dateUser
+		FROM user
+		WHERE id_u = id;
+	END IF;
 END ;
 
 # -----------------------------------------------------------------------------
 #       PROCEDURE : up_eleve()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE up_eleve(id INTEGER, a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_active BOOLEAN, a_salt VARCHAR(40), a_token VARCHAR(40), a_dateNaissance DATE)
+CREATE PROCEDURE up_eleve(id INTEGER, a_user VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128),a_dateNaissance DATE)
 BEGIN
-  UPDATE user SET
-  username = a_username,
-  nom = a_nom,
-  prenom = a_prenom,
-  email = a_email,
-  password = a_pass,
-  active = a_active,
-  salt = a_salt,
-  token = a_token
-  WHERE id_u = id;
-  UPDATE eleve SET
-  dateNaissance = a_dateNaissance
-  WHERE id_u = id;
+	Declare surname VARCHAR(128);
+	Declare sel VARCHAR(40);
+	Declare it INTEGER DEFAULT 0;
+	Declare test BOOLEAN DEFAULT true;
+	
+	IF (SELECT COUNT(*) FROM user WHERE email = a_email AND id_u != id) > 0 THEN
+		SELECT true AS "erreur";
+		SELECT * FROM errors WHERE code = "ACT_MAU";
+	ELSE
+		IF a_user IS NULL OR a_user = "" THEN
+			WHILE test DO
+				IF it < 1 THEN
+					SET a_user = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom));
+				ELSE
+					SET a_user = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom, it));
+				END IF;
+				IF (SELECT COUNT(*) FROM user WHERE username = surname AND id_u != id) < 1 THEN
+					SET test = false;
+				ELSE
+					SET it = it + 1;
+				END IF;
+			END WHILE;
+		END IF;
+		IF (SELECT password FROM user WHERE id_u = id) != a_pass THEN
+			SET sel = (SELECT keygen(40,false));
+			SET a_pass = SHA1(MD5(CONCAT(SHA1(MD5(sel)),SHA1(MD5(a_pass)),SHA1(MD5(sel)))));
+			UPDATE user SET salt = sel, password = a_pass, token = (SELECT keygen(40,true)) WHERE id_u = id;
+		END IF;
+		UPDATE user SET
+	    username = a_user,
+	    nom = a_nom,
+	    prenom = a_prenom,
+	    email = a_email
+	    WHERE id_u = id;
+	    UPDATE eleve SET
+	    dateNaissance = a_dateNaissance
+	    WHERE id_u = id;
+		SELECT false AS "erreur";
+		SELECT * FROM errors WHERE code = "OP_S";
+	END IF;
+  
 END ;
 
 # -----------------------------------------------------------------------------
@@ -450,39 +576,91 @@ END ;
 #       PROCEDURE : ajouter_prof()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE ajouter_prof(a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_salt VARCHAR(40), a_token VARCHAR(40), matiere INTEGER(2))
+CREATE PROCEDURE ajouter_prof(a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), matiere INTEGER(2))
 BEGIN
-	Declare id int;
-	SET id = (SELECT autoincrement());
-	IF (SELECT COUNT(*) FROM user u INNER JOIN professeur p ON p.id_u = u.id_u WHERE u.nom = a_nom AND u.prenom = a_prenom AND p.id_m = matiere) < 1 THEN
-	    INSERT INTO user VALUES(id, a_username, a_nom, a_prenom, a_email, a_pass, 0, a_salt, a_token, CURDATE());
-	    INSERT INTO professeur VALUES(id, matiere);
+	Declare sel, tok, mdp VARCHAR(40);
+	Declare md VARCHAR(8);
+	Declare surname VARCHAR(128);
+	Declare id, it INTEGER DEFAULT 0;
+	Declare test BOOLEAN DEFAULT true;
+
+	IF (SELECT COUNT(*) FROM user WHERE email = a_email) > 0 THEN
+		SELECT true AS "erreur";
+		SELECT * FROM errors WHERE code = "ACT_MAU";
 	ELSE
-		SELECT true AS erreur;
-		SELECT * from errors WHERE code = "USR_DB";
-  END IF;
+		SET id = (SELECT autoincrement());
+		SET tok = (SELECT keygen(40,true));
+		SET sel = (SELECT keygen(40,false));
+		SET md = (SELECT keygen(8,false));
+		SET mdp = SHA1(MD5(CONCAT(SHA1(MD5(sel)), SHA1(MD5(md)), SHA1(md5(Sel)))));
+
+		WHILE test DO
+			IF it < 1 THEN
+				SET surname = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom));
+			ELSE
+				SET surname = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom, it));
+			END IF;
+			IF (SELECT COUNT(*) FROM user WHERE username = surname) < 1 THEN
+				SET test = false;
+			ELSE
+				SET it = it + 1;
+			END IF;
+		END WHILE;
+
+		INSERT INTO user VALUES(id, surname, a_nom, a_prenom, a_email, mdp, 0, sel, tok, SYSDATE());
+		INSERT INTO professeur VALUES(id, matiere);
+		SELECT false AS "erreur";
+		SELECT id_u AS id, username, nom , prenom, email, md AS password, active, salt, token, dateUser
+		FROM user
+		WHERE id_u = id;
+	END IF;
 END ;
 
 # -----------------------------------------------------------------------------
 #       PROCEDURE : up_prof()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE up_prof(id INTEGER, a_username VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), a_active BOOLEAN, a_salt VARCHAR(40), a_token VARCHAR(40), matiere INTEGER(2))
+CREATE PROCEDURE up_prof(id INTEGER, a_user VARCHAR(128), a_nom VARCHAR(128), a_prenom VARCHAR(128), a_email VARCHAR(128), a_pass VARCHAR(128), matiere INTEGER(2))
 BEGIN
-  UPDATE user SET
-	username = a_username,
-	nom = a_nom,
-	prenom = a_prenom,
-	email = a_email,
-	password = a_pass,
-	active = a_active,
-  salt = a_salt,
-  token = a_token
-  WHERE id_u = id;
+	Declare sel VARCHAR(40);
+	Declare it INTEGER DEFAULT 0;
+	Declare test BOOLEAN DEFAULT true;
 
-  UPDATE professeur SET
-  id_m = matiere
-  WHERE id_u = id;
+	IF (SELECT COUNT(*) FROM user WHERE email = a_email AND id_u != id) > 0 THEN
+		SELECT true AS "erreur";
+		SELECT * FROM errors WHERE code = "ACT_MAU";
+	ELSE
+		IF a_user IS NULL OR a_user = "" THEN
+			WHILE test DO
+				IF it < 1 THEN
+					SET a_user = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom));
+				ELSE
+					SET a_user = LOWER(CONCAT(SUBSTR(a_prenom, 1,1),a_nom, it));
+				END IF;
+				IF (SELECT COUNT(*) FROM user WHERE username = surname AND id_u != id) < 1 THEN
+					SET test = false;
+				ELSE
+					SET it = it + 1;
+				END IF;
+			END WHILE;
+		END IF;
+		IF (SELECT password FROM user WHERE id_u = id) != a_pass THEN
+			SET sel = (SELECT keygen(40,false));
+			SET a_pass = SHA1(MD5(CONCAT(SHA1(MD5(sel)),SHA1(MD5(a_pass)),SHA1(MD5(sel)))));
+			UPDATE user SET salt = sel, password = a_pass, token = (SELECT keygen(40,true)) WHERE id_u = id;
+		END IF;
+		UPDATE user SET
+		username = a_user,
+		nom = a_nom,
+		prenom = a_prenom,
+		email = a_email
+		WHERE id_u = id;
+		UPDATE professeur SET
+		id_m = matiere
+		WHERE id_u = id;
+		SELECT false AS "erreur";
+		SELECT * FROM errors WHERE code = "OP_S";
+	END IF;
 END ;
 
 # -----------------------------------------------------------------------------
@@ -568,6 +746,31 @@ BEGIN
 	IF old.active = 0 AND (SELECT COUNT(*) FROM crypt WHERE token = old.token) > 0 THEN
 		DELETE FROM crypt WHERE token = old.token;
 	END IF;
+END ;
+
+# -----------------------------------------------------------------------------
+#       EVENT : maj_token
+# -----------------------------------------------------------------------------
+CREATE EVENT maj_token
+ON SCHEDULE EVERY 6 HOUR STARTS CURRENT_TIMESTAMP DO
+BEGIN
+	Declare fini int default 0;
+	Declare id INTEGER(2);
+	Declare cur CURSOR
+	FOR SELECT id_u
+		FROM user;
+	Declare continue HANDLER
+		FOR NOT FOUND SET fini = 1;
+	Open cur;
+	FETCH cur INTO id;
+	While fini != 1
+		DO
+			UPDATE user
+			SET token = (SELECT keygen(40,true))
+			WHERE id_u = id;
+			FETCH cur INTO id;
+	END While;
+	Close cur;
 END ;
 
 ###############################################################################
@@ -670,6 +873,34 @@ END ;
 ###############################################################################
 
 # -----------------------------------------------------------------------------
+#       PROCEDURE : ajouter_devoir
+# -----------------------------------------------------------------------------
+CREATE PROCEDURE ajouter_devoir(prof INTEGER, class INTEGER, sumary TEXT, max DATE)
+BEGIN
+	Declare fini int default 0;
+	Declare id,devoir INTEGER(2);
+	Declare curc CURSOR
+	FOR SELECT id_u
+		FROM etre
+		WHERE id_classe = class;
+	Declare continue HANDLER
+		FOR NOT FOUND SET fini = 1;
+	
+	SET devoir = (SELECT autoincrementDev());
+	
+	INSERT INTO devoir SET id_d = devoir, id_u = prof, id_classe = class, dateDevoir = CURDATE(), enonce = sumary, dateMax = max;
+	
+	Open curc;
+	FETCH curc INTO id;
+	While fini != 1
+		DO
+			INSERT INTO avoir set id_u = id, id_d = devoir;
+			FETCH curc INTO id;
+	END While;
+	Close curc;
+END ;
+
+# -----------------------------------------------------------------------------
 #       TRIGGER : version_cours (Versionning de cours)
 # -----------------------------------------------------------------------------
 
@@ -712,14 +943,14 @@ BEGIN
   # Récupération du titre, description et contenu de la version choisie
   SELECT titre, description, contenu INTO v_titre, v_desc, v_contenu
   FROM vers_cours 
-  WHERE id_cours=id
-  AND dateModif=version;
+  WHERE id_cours = id
+  AND dateModif = version;
   # Insertion des informations récupérés dans le cours choisi
   UPDATE cours 
   SET titre = v_titre, 
   description = v_desc,
   contenu = v_contenu
-  WHERE id_cours=id;
+  WHERE id_cours = id;
 END ;
 
 # -----------------------------------------------------------------------------
@@ -1037,6 +1268,15 @@ BEGIN
 		AND id_classe = class
 		ORDER BY dateAjout DESC
 		LIMIT debut,qte;
+	
+	# Curseur 3
+	Declare cur3 CURSOR
+	FOR SELECT c.id_cours
+		FROM cours c
+		INNER JOIN etre e ON e.id_classe = c.id_classe
+		WHERE e.id_u = qte
+		AND c.id_m = mat
+		ORDER BY dateAjout Desc;
 		
 	# Gestionnaire d'erreur
 	Declare continue HANDLER
@@ -1044,14 +1284,29 @@ BEGIN
 	
 	# Nombre de cours
 	IF class IS NULL OR class = 0 THEN
-		SELECT COUNT(*) AS "Cours_1" FROM cours WHERE id_m = mat;
-		Open cur1;
-		FETCH cur1 INTO id;
-		WHILE fini != 1	DO
-			CALL select_cours(id, false);
+		IF qte IS NULL OR qte = 0 THEN
+			SELECT COUNT(*) AS "Cours_1" FROM cours WHERE id_m = mat;
+			Open cur1;
 			FETCH cur1 INTO id;
-		END WHILE;
-		Close cur1;
+			WHILE fini != 1	DO
+				CALL select_cours(id, false);
+				FETCH cur1 INTO id;
+			END WHILE;
+			Close cur1;
+		ELSE
+			SELECT COUNT(c.id_cours) AS "Cours"
+			FROM cours c
+			INNER JOIN etre e ON e.id_classe = c.id_classe
+			WHERE id_m = mat
+			AND e.id_u = qte;
+			Open cur3;
+			FETCH cur3 INTO id;
+			WHILE fini != 1	DO
+				CALL select_cours(id, true);
+				FETCH cur3 INTO id;
+			END WHILE;
+			Close cur3;
+		END IF;
 	ELSE
 		IF MOD((SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class),qte) = 0 THEN
 			SET page = (SELECT COUNT(*) FROM cours WHERE id_m = mat AND id_classe = class)/qte;
@@ -1441,11 +1696,14 @@ BEGIN
 	
 	DECLARE EXIT HANDLER FOR no_user_for_login
 	BEGIN
+		# - - - Logs de connexion
+		INSERT INTO logs_con SET id_u = 0, username = login, dateConnexion = SYSDATE(), etat = "Mauvais login";
+		# - - -
 		SELECT true AS "erreur";
 		SELECT "Erreur de saisie identidiant/mot de passe" AS "Message", "danger" AS "Type";
 	END;
 	
-	SELECT salt INTO sel
+	SELECT id_u, username, salt INTO id, user, sel
 	FROM user
 	WHERE username = login;
 
@@ -1456,6 +1714,9 @@ BEGIN
 		FROM user
 		WHERE username = login AND password = passwd;
 		IF actif THEN
+			# - - - Logs de connexion
+			INSERT INTO logs_con SET id_u = id, username = user, dateConnexion = SYSDATE(), etat = "Connexion réussie";
+			# - - -
 			SELECT false AS "erreur";
 			SELECT id, user AS username, name AS nom, last AS prenom, mail AS email, passwd AS password, actif AS active, sel AS salt, tok AS token, dateU AS dateUser;
 			IF (SELECT COUNT(*) FROM administrateur WHERE id_u = id) > 0 THEN
@@ -1470,10 +1731,16 @@ BEGIN
 				CALL select_classes(id,true);
 			END IF;
 		ELSE
+			# - - - Logs de connexion
+			INSERT INTO logs_con SET id_u = id, username = user, dateConnexion = SYSDATE(), etat = "Compte non activé";
+			# - - -
 			SELECT true AS "erreur";
 			SELECT "Votre compte n'est pas encore activÃ©" AS "Message", "warning" AS "Type";
 		END IF;
 	ELSE
+		# - - - Logs de connexion
+		INSERT INTO logs_con SET id_u = id, username = user, dateConnexion = SYSDATE(), etat = "Mauvais mot de passe";
+		# - - -
 		SELECT true AS "erreur";
 		SELECT "Erreur de saisie identidiant/mot de passe" AS "Message", "danger" AS "Type";
 	END IF;
@@ -1483,7 +1750,7 @@ END ;
 #       PROCEDURE : activation()
 # -----------------------------------------------------------------------------
 
-CREATE PROCEDURE activation(oldtk VARCHAR(40), newtk VARCHAR(40))
+CREATE PROCEDURE activation(oldtk VARCHAR(40))
 BEGIN
 	Declare id INTEGER;
 	Declare actif INTEGER;
@@ -1497,7 +1764,7 @@ BEGIN
 		IF actif = 0 THEN
 			UPDATE user
 			SET active = 1,
-			token = newtk
+			token = (SELECT keygen(40,true))
 			WHERE id_u = id;
 			SELECT * FROM errors WHERE code = "ACT_S";
 		ELSE
@@ -1587,6 +1854,7 @@ INSERT INTO errors VALUES("OP_S","Opération réussie","success"),
 ("LOG_NA","Votre compte n'est pas encore activé","warning"),
 ("ACT_WT","Une erreur s'est produite, veuillez recommencer la procédure d'activation","error"),
 ("ACT_WM","Aucun compte ne correspond à cet email","danger"),
+("ACT_MAU","L'adresse email est déjà utilisée","error"),
 ("ACT_AA","Ce compte est déjà activé","warning"),
 ("ACT_RS","Mail envoyé","success"),
 ("ACT_S","Activation réussie","success"),
@@ -1621,11 +1889,11 @@ INSERT INTO classe VALUES("",1,1,"SIO 1 LM","sio-1-lm"),
 ("",2,1,"SIO 2 JV","sio-2-jv");
 
 # Ajout d'un professeur
-CALL ajouter_prof("prof", "prof", "prof", "prof@domain.tld", "0a9f3ec3809e9162ba1219bfe03970b6a0e10068", "8262216f0c53cd1ebc83e1bb6b84ddce84fe7738", sha1(md5('tokenprofesseur')), 1);
+CALL ajouter_prof( "prof", "prof", "prof@domain.tld", 1);
 
 # Ajout des élèves
-CALL ajouter_eleve("miko", "Popowicz", "Mikael", "mikael.popowicz@gmail.com","6cab4ededffe060e7218b01d29c9e05437ea50b8", "MogaT0OEtu8KrKDpH4ZqIFTHVvpMHhz432Jb5OEg", "UpGTd7CJn6AcuNuqIGvyMtYWnyap9y6Crlh1CnJb", "0000-00-00");
-CALL ajouter_eleve("cam", "Docquier", "Camille", "docquier.camille@gmail.com","6cab4ededffe060e7218b01d29c9e05437ea50b8", "MogaT0OEtu8KrKDpH4ZqIFTHVvpMHhz432Jb5OEg", "MogaT0OEtu8KrKDpH4ZqIFTHVvpMHhz432Jb5OEg", "0000-00-00");
+CALL ajouter_eleve("Popowicz", "Mikael", "mikael.popowicz@gmail.com", "0000-00-00");
+CALL ajouter_eleve("Docquier", "Camille", "docquier.camille@gmail.com", "0000-00-00");
 UPDATE user SET active = 1;
 
 # Assignation des matières aux classes
@@ -1652,4 +1920,4 @@ INSERT INTO charger VALUES(1,2),
 INSERT INTO etre VALUES(3,1);
 INSERT INTO etre VALUES(4,1);
 
-insert into cours set id_m = 1, id_classe = 1, id_u = 3, titre = "test", uri = "test", description = "test", contenu = "test", dateAjout = sysdate(), dateModif = sysdate();
+INSERT INTO cours set id_m = 1, id_classe = 1, id_u = 3, titre = "test", uri = "test", description = "test", contenu = "test", dateAjout = "2012-09-18", dateModif = sysdate();

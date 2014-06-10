@@ -326,8 +326,7 @@ class CoursManager_PDO extends CoursManager
 	
 	protected function add(Cours $cours)
 	{
-		$requete = $this->dao->prepare('INSERT INTO cours SET id_u = :auteur, id_classe = :classe, id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateAjout = sysdate(), dateModif = sysdate()');
-		
+		$requete = $this->dao->prepare('CALL ajouter_cours(:auteur, :classe, :matiere, :titre, :uri, :description, :contenu)');
 	    $requete->bindValue(':auteur', $cours->auteur()->id());
 		$requete->bindValue(':classe', $cours->classe()->id());
 		$requete->bindValue(':matiere', $cours->matiere()->id());
@@ -341,14 +340,16 @@ class CoursManager_PDO extends CoursManager
 	
 	protected function modify(Cours $cours)
 	{
-	    $requete = $this->dao->prepare('UPDATE cours SET id_classe = :classe, id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
+		//echo 'Cours :'.$cours->id().' - Classe :'.$cours->classe()->id().' - Matiere : '.$cours->matiere()->id().' - Titre : '.$cours->titre();
+	    $requete = $this->dao->prepare('CALL up_cours(:id, :classe, :matiere, :titre, :uri, :description, :contenu)');
+		$requete->bindValue(':id', $cours->id());
 		$requete->bindValue(':classe', $cours->classe()->id());
-	    $requete->bindValue(':matiere', $cours->matiere()->id());
-		$requete->bindValue(':titre', $cours->titre());
+		$requete->bindValue(':matiere', $cours->matiere()->id());
+	    $requete->bindValue(':titre', $cours->titre());
 		$requete->bindValue(':uri', $cours->uri());
 		$requete->bindValue(':description', $cours->description());
-		$requete->bindValue(':contenu', $cours->contenu());
-		$requete->bindValue(':id', $cours->id());
+	    $requete->bindValue(':contenu', $cours->contenu());
+		//echo '<pre>';print_r($requete);echo '</pre>';die();
 	    $requete->execute();
 	}
 	

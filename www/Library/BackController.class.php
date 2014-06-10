@@ -76,4 +76,18 @@ abstract class BackController extends ApplicationComponent
 		$this->app->user()->setAttribute('prenom', $user->prenom());
 		$this->app->user()->setAttribute('email', $user->email());
 	}
+	
+	public static function rmdir($dir)
+	{
+		$dir = rtrim($dir, '/').'/';
+		$handle = opendir($dir);
+		while (false !== ($file = readdir($handle))) {
+			if($file != '.' && $file != '..') {
+				$fullpath = $dir.$file;
+				if(is_dir($fullpath)) \Library\BackController::rmdir($fullpath); else unlink($fullpath);
+			}
+		}
+		closedir($handle);
+		rmdir($dir);
+	}
 }

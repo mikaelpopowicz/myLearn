@@ -5,6 +5,8 @@ class CoursController extends \Library\BackController
 {
 	public function executeIndex(\Library\HTTPRequest $request)
 	{
+		$this->page->addVar('title', 'MyLearn - Liste des classes');
+		$this->page->addVar('class_cours', 'active');
 		$result = $this->managers->getManagerOf('Classe')->getClasses($this->app->user()->getAttribute('id'),false);
 		if(isset($result) && is_array($result))
 		{
@@ -12,40 +14,6 @@ class CoursController extends \Library\BackController
 		}
 		$matiere = unserialize(base64_decode($this->app->user()->getAttribute('matiere')));
 		$this->page->addVar('matiere', $matiere);
-	}
-	
-	public function executeFoin(\Library\HTTPRequest $request)
-	{
-		
-		if($request->postExists('blabla'))
-		{
-			if($request->postExists('batman'))
-			{
-				/*
-					$unObjet = \Library\Entities\Test(array(
-						"attr" => $uneVariable
-					));
-				*/
-				
-				$champ = $request->postData('batman');
-				$unObjetDeTest = new \Library\Entities\Test(array(
-					"titre" => $champ
-				));
-				
-				
-				if($unObjetDeTest->isValid())
-				{
-					$this->page->addVar('texte','Valide');
-					$this->page->addVar('objet', $unObjetDeTest);
-				}
-				else
-				{
-					$this->page->addVar('texte', 'Non valide');
-					$this->page->addVar('objet', $unObjetDeTest);
-					$this->page->addVar('erreur', $unObjetDeTest->erreurs());
-				}
-			}
-		}
 	}
 	
 	public function executeList_cours(\Library\HTTPRequest $request)
@@ -230,9 +198,9 @@ class CoursController extends \Library\BackController
 	public function executeModifier(\Library\HTTPRequest $request)
 	{
 		$result = $this->managers->getManagerOf('Cours')->getUnique($request->getData('id'));
-		if(isset($result['cours']) && ($result['cours'] instanceof \Library\Entities\Cours))
+		if(($result instanceof \Library\Entities\Cours))
 		{
-			$cours = $result['cours'];
+			$cours = $result;
 			
 			if($cours->auteur()->id() == $this->app->user()->getAttribute('id'))
 			{
@@ -269,7 +237,7 @@ class CoursController extends \Library\BackController
 				$this->app->httpResponse()->redirect('/professeur/mes-cours');
 			}		
 		} else {
-			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "'.$cours.'"});</script>');
+			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "Erreur"});</script>');
 			$this->app->httpResponse()->redirect('/professeur/mes-cours');
 		}
 	}

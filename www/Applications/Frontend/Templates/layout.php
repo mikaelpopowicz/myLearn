@@ -85,7 +85,6 @@
 										<li class="divider"></li>
 										<li><a href="/cours/ecrire-un-cours">Ecrire un cours</a></li>
 										<li class="divider"></li>
-										<li><a href="/mon-compte/configuration">Configuration</a></li>
 										<li>
 											<a href="/connexion/logout/">Déconnexion</a>
 										</li>
@@ -153,8 +152,8 @@
 										?>
 									</ul>
 								</li>
-								<li class="<?php echo $class_devoirs;?>"><a href="/devoirs">Devoirs</a></li>
-								<li class="<?php echo $class_contact;?>"><a href="/contact">Contact</a></li>
+								<li class="<?php echo isset($class_devoir) ? $class_devoir : "";?>"><a href="/devoirs">Devoirs</a></li>
+								<li class="<?php echo isset($class_contact) ? $class_contact : "";?>"><a href="/contact">Contact</a></li>
 							</ul>
 						</div>
 						<!--/.nav-collapse -->
@@ -196,13 +195,12 @@
 				<div class="row-fluid">
 					<div class="span3">
 						<section>
-							<h4>Contact Us</h4>
-							<p>Corporate-Elegance Creative<br>
-								1255 Nowhere Street<br>
-								Tampa, FL 33655<br>
-								<strong>phone:</strong> <a href="tel:8135551234" class="tele">813.555.1234</a><br>
-								<strong>fax:</strong> 813.555.1235<br>
-								<span class="overflow"><strong>email:</strong> <a href="mailto:email@domain.com">email@companydomain.com</a></span>
+							<h4>Contact</h4>
+							<p><?php echo $config->get('conf_nom');?><br>
+								<?php echo $config->get('conf_address');?><br>
+								<?php echo $config->get('conf_ville').', '.$config->get('conf_cp');?><br>
+								<strong>Tel:</strong> <a href="tel:<?php echo '+33'.str_replace(' ','',substr($config->get('conf_tel'),1));?>" class="tele"><?php echo $config->get('conf_tel');?></a><br>
+								<span class="overflow"><strong>Email:</strong> <a href="mailto:<?php echo $config->get('conf_contact');?>"><?php echo $config->get('conf_contact');?></a></span>
 							</p>
 						</section>
 						<!--close section-->
@@ -231,8 +229,8 @@
 						<section>
 							<h4>A propos</h4>
 							<p><?php 
-								//echo $config->get('conf_description');
-									?></p>
+								echo $config->get('conf_description');
+								?></p>
 						</section>
 					</div>
 					<!-- close .span4 -->

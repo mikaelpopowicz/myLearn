@@ -2,21 +2,25 @@
 <definitions>
 	<define var="version" value="1.0" />
 	<define var="release" value="05/2014" />
-	<define var="db_host" value="v/726ClQZKVJ" />
-	<define var="db_name" value="vuj57CRKZQ==" />
-	<define var="db_user" value="of76/Q==" />
-	<define var="db_user_pass" value="p/76+w==" />
+	<define var="db_host" value="BJeDaOwav2cu" />
+	<define var="db_name" value="BYGMbOEAvg==" />
+	<define var="db_user" value="GpePfQ==" />
+	<define var="db_user_pass" value="HJePew==" />
 	<define var="conf_nom" value="Ecole de démonstration" />
 	<define var="conf_description" value="Description pour la page de connexion" />
+	<define var="conf_address" value="6, rue émile berthier" />
+	<define var="conf_ville" value="saint michel sur orge" />
+	<define var="conf_cp" value="91240" />
+	<define var="conf_tel" value="02 83 74 93 21" />
 	<define var="conf_email" value="noreply@ecole.fr" />
 	<define var="conf_contact" value="contact@ecole.fr" />
-	<define var="conf_date" value="31/05/2014" />
-	<define var="cryp_iv" value="YVSPbl+Ez6g=" />
-	<define var="cryp_key" value="UmV1cUFSR1ExRFBLV0ZhOVZpQ1pJM3Q3" />
-	<define var="smtp_host" value="oPzh+WtXebdTsXmoINk=" />
-	<define var="smtp_port" value="5qmi" />
-	<define var="smtp_user" value="vuH6+SpPYrVH+Gng" />
-	<define var="smtp_pass" value="pvf85yNXMuc=" />
+	<define var="conf_date" value="03/06/2014" />
+	<define var="cryp_iv" value="uWC41vmkaaE=" />
+	<define var="cryp_key" value="UVRQTUVOWjM2UVYwQ3RGR0tkSzVVVWgx" />
+	<define var="smtp_host" value="G5WUea4donU02TaA0Lk=" />
+	<define var="smtp_port" value="XcDX" />
+	<define var="smtp_user" value="BYiPee8FuXcgkCbI" />
+	<define var="smtp_pass" value="HZ6JZ+Yd6SU=" />
 	<define var="cours_page" value="5" />
 	<define var="installed" value="true" />
 </definitions>

@@ -3,82 +3,111 @@ namespace Library\Models;
 use \Library\Entities\Devoir;
 class DevoirManager_PDO extends DevoirManager
 {
-	public function getList()
+	public static function getObj($requete)
 	{
-		$sql = 'SELECT d.id_d AS id, d.dateDevoir, d.enonce, d.dateMax, p.id_p AS prof, c.id_classe AS classe
-			FROM devoir d
-			INNER JOIN professeur p ON p.id_p = d.id_p 
-			INNER JOIN classe c ON c.id_classe = d.id_classe';
-		$requete = $this->dao->query($sql);
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Devoir');
-		$listeDevoir = $requete->fetchAll();
-		foreach ($listeDevoir as $devoir)
-		{
-			$devoir->setDateDevoir(new \DateTime($devoir->dateDevoir()));
-			$devoir->setDateMax(new \DateTime($devoir->dateMax()));
+		$result = $requete->fetch();
+		$result->setDateDevoir(new \DateTime($result->dateDevoir()));
+		$result->setDateMax(new \DateTime($result->dateMax()));
+		$entities = array(
+			"Classe",
+			"Professeur",
+			"Piece",
+			"Rendu"
+		);
+		foreach ($entities as $key) {
+			$requete->nextRowset();
+			$static = '\Library\Models\\'.$key.'Manager_PDO';
+			if ($key == "Classe" || $key == "Professeur")
+			{
+				$value = $static::getObj($requete);
+				$methode = 'set'.$key;
+				$result->$methode($value);
+			}
+			else if($key == "Piece")
+			{
+				$nb = $requete->fetch(\PDO::FETCH_ASSOC)['Pieces jointes'];
+				if($nb > 0)
+				{
+					$requete->nextRowset();
+					$value = $static::getObj($requete, 'Groups');
+					$methode = 'setPieces';
+					$result->$methode($value);
+				}
+			}
+			else
+			{
+				$nb = $requete->fetch(\PDO::FETCH_ASSOC)['Cibles'];
+				if($nb == "unique")
+				{
+					$requete->nextRowset();
+					$value = $static::getObj($requete);
+					$methode = 'setRendus';
+					$result->$methode($value);
+				}
+				else
+				{
+					$value = array();
+					if($nb > 0)
+					{
+						for ($i=0; $i < $nb; $i++) {
+							$requete->nextRowset();
+							$value[$i] = $static::getObj($requete);
+						}
+						$methode = 'setRendus';
+						$result->$methode($value);
+					}
+				}
+			}
 		}
-		$requete->closeCursor();
-		return $listeDevoir;
+		return $result;
+		
 	}
-
-	public function getListOfTeacher($professeur)
+	
+	public function getList($id,$prof)
 	{
-		$requete = $this->dao->prepare('SELECT d.id_d AS id, d.dateDevoir, d.enonce, d.dateMax, p.id_p AS prof, c.id_classe AS classe
-			FROM devoir d
-			INNER JOIN professeur p ON p.id_p = d.id_p 
-			INNER JOIN classe c ON c.id_classe = d.id_classe
-			WHERE p.id_p = :id_p');
-		$requete->bindValue(':id_p', $professeur, \PDO::PARAM_INT);
-		$requete->execute();
-		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Devoir');
-		$listeDevoir = $requete->fetchAll();
-		foreach ($listeDevoir as $devoir)
-		{
-			$devoir->setDateDevoir(new \DateTime($devoir->dateDevoir()));
-			$devoir->setDateMax(new \DateTime($devoir->dateMax()));
-		}
-		$requete->closeCursor();
-		return $listeDevoir;
-	}
-
-	public function getListOf($classe)
-	{
-		$requete = $this->dao->prepare('SELECT d.id_d AS id, d.dateDevoir, d.enonce, d.dateMax, p.id_p AS prof, c.id_classe AS classe
-			FROM devoir d
-			INNER JOIN professeur p ON p.id_p = d.id_p
-			INNER JOIN classe c ON c.id_classe = d.id_classe
-			WHERE c.id_classe = :classe');
-		$requete->bindValue(':classe', $classe, \PDO::PARAM_INT);
-		$requete->execute();
-		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Devoir');
-		$listeDevoir = $requete->fetchAll();
-		foreach ($listeDevoir as $devoir)
-		{
-			$devoir->setDateDevoir(new \DateTime($devoir->dateDevoir()));
-			$devoir->setDateMax(new \DateTime($devoir->dateMax()));
-		}
-		$requete->closeCursor();
-     
-		return $listeDevoir;
-	} 
-
-	public function getUnique($id)
-	{
-		$requete = $this->dao->prepare('SELECT d.id_d AS id, d.dateDevoir, d.enonce, d.dateMax, p.id_p AS prof, c.id_classe AS classe
-			FROM devoir d
-			INNER JOIN professeur p ON p.id_p = d.id_p
-			INNER JOIN classe c ON c.id_classe = d.id_classe
-			WHERE d.id_d = :id');
+		$requete = $this->dao->prepare('CALL select_devoirs(:id, :prof)');
 		$requete->bindValue(':id', $id, \PDO::PARAM_INT);
+		$requete->bindValue(':prof', $prof);
 		$requete->execute();
-		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Devoir');
-		if ($devoir = $requete->fetch())
+		$nb = $requete->fetch(\PDO::FETCH_ASSOC)['Devoirs'];
+		if($nb > 0)
 		{
-			$devoir->setDateDevoir(new \DateTime($devoir->dateDevoir()));
-			$devoir->setDateMax(new \DateTime($devoir->dateMax()));
-			return $devoir;
-		}
+			$result = array();
+			for ($i=0; $i < $nb; $i++) { 
+				$requete->nextRowset();
+				$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+				$requete->nextRowset();
+				if($erreur == 0)
+				{
+					$result[] = \Library\Models\DevoirManager_PDO::getObj($requete);
+				}
+			}
+			return $result;
+		}     
 		return null;
+	}
+
+	public function getUnique($id, $user, $prof)
+	{
+		$requete = $this->dao->prepare('CALL select_devoir(:id, :user, :prof)');
+		$requete->bindValue(':id', $id, \PDO::PARAM_INT);
+		$requete->bindValue(':user', $user, \PDO::PARAM_INT);
+		$requete->bindValue(':prof', $prof);
+		$requete->execute();
+		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+		$requete->nextRowset();
+		if($erreur == 0)
+		{
+			$result = \Library\Models\DevoirManager_PDO::getObj($requete);
+		}
+		else
+		{
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result = $requete->fetch();
+		}
+		//echo '<pre>';print_r($result);die("</pre>");
+		return $result;
 	}
 
 	public function count()
@@ -88,26 +117,40 @@ class DevoirManager_PDO extends DevoirManager
 
 	protected function add(Devoir $devoir)
 	{
-		$requete = $this->dao->prepare('INSERT INTO devoir SET id_p = :prof, id_c = :classe, enonce = :enoncer, dateDevoir = CURDATE(), dateMax = :dateMax');
+		$requete = $this->dao->prepare('CALL ajouter_devoir(:prof, :classe, :lib, :enonce, :dateMax)');
 		
-	    $requete->bindValue(':prof', $devoir->prof());
-		$requete->bindValue(':classe', $devoir->classe());
-	    $requete->bindValue(':ennoncer', $devoir->ennoncer());
+	    $requete->bindValue(':prof', $devoir->professeur()->id());
+		$requete->bindValue(':classe', $devoir->classe()->id());
+		$requete->bindValue(':lib', $devoir->libelle());
+	    $requete->bindValue(':enonce', $devoir->enonce());
 	    $requete->bindValue(':dateMax', $devoir->dateMax()->format('Y-m-d'));
- 
 	    $requete->execute();
+		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+		$requete->nextRowset();
+		if($erreur == 0)
+		{
+			$result = \Library\Models\DevoirManager_PDO::getObj($requete);
+		}
+		else
+		{
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result = $requete->fetch();
+		}
+		//echo '<pre>';print_r($result);echo '</pre>';
+		return $result;
 	}
 	
 	protected function modify(Devoir $devoir)
 	{
-	    $requete = $this->dao->prepare('UPDATE devoir SET id_p = :prof, id_c = :classe, enonce = :enoncer, dateDevoir = :dateDevoir, dateMax = :dateMax WHERE id_d = :id');
-		$requete->bindValue(':prof', $devoir['prof']);
-	    $requete->bindValue(':classe', $devoir['classe']);
-		$requete->bindValue(':enoncer', $devoir['enoncer']);
-		$requete->bindValue(':dateMax', $devoir['dateMax']);
-		$requete->bindValue(':id', $devoir['id']);
+	    $requete = $this->dao->prepare('CALL up_devoir(:id, :lib, :enonce, :dateMax, :actif)');
+		$requete->bindValue(':id', $devoir->id());
+		$requete->bindValue(':lib', $devoir->libelle());
+	    $requete->bindValue(':enonce', $devoir->enonce());
+	    $requete->bindValue(':dateMax', $devoir->dateMax()->format('Y-m-d'));
+		$requete->bindValue(':actif', $devoir->active());
 	    $requete->execute();
 	}
+	
 	
   	public function delete(Devoir $devoir)
   	{

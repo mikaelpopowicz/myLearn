@@ -30,7 +30,7 @@
 					<input type="password" id="pass2" name="pass2" class="form-control" placeholder="******" required>
 					<?php
 					if(isset($erreurs)) {
-						echo "<span class='help-block'>".$erreurs[0]."</span>";
+						echo "<span class='help-block'>".$erreurs."</span>";
 					}
 					?>
 				</div>

@@ -11,7 +11,7 @@ class CoursController extends \Library\BackController
 		$this->page->addVar('no_layout', true);
 		$this->setView('index');
 		$listeMatiere = $this->managers->getManagerOf('Matiere')->getListJson($request->getData('id'));
-
+		//$this->app->httpResponse()->addHeader('content-type: application/json; charset=utf-8');
 		$reponse = array();
 		
 		if($listeMatiere == null || count($listeMatiere) < 1)
@@ -25,13 +25,16 @@ class CoursController extends \Library\BackController
 			foreach ($listeMatiere as $key) {
 				$reponse['Matieres'][] = array(
 					"id" => $key->id(),
-					"libelle" => $key->libelle()
+					"libelle" => $key->libelle(),
+					"cours" => $key->cours()
 				);
 			}
 		}
 		
 		$reponse = json_encode($reponse);
+		//var_dump($reponse);
 		$this->page->addVar('json', $reponse);
+		
 	}
 	
 	public function executeListCours(\Library\HTTPRequest $request)
@@ -80,7 +83,8 @@ class CoursController extends \Library\BackController
 				"contenu" => $cours->contenu(),
 				"date" => $cours->dateAjout()->format('d/m/Y'),
 				"auteur" => $cours->auteur()->nom().' '.$cours->auteur()->prenom(),
-				"classe" => $cours->classe()->libelle().' - '.$cours->classe()->session()->session()
+				"classe" => $cours->classe()->libelle().' - '.$cours->classe()->session()->session(),
+				"commentaires" => count($cours->commentaires())
 			);
 		}
 		else

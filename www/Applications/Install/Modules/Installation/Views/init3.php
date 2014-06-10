@@ -43,6 +43,50 @@
 						</div>
 					</div>
 				</div>
+				<div class="form-group">
+					<label for="address" class="col-sm-3 control-label">Adresse</label>
+					<div class="col-sm-4">
+						<input type="text" id="address" name="address" class="form-control" placeholder="10 rue de l'Université" value="<?php echo isset($infos) ? $infos['address'] : "";?>">
+						<?php
+						if(isset($erreur) && in_array('address', $erreur)) {
+							echo "<span class='help-block'></span>";
+						}
+						?>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="ville" class="col-sm-3 control-label">Ville</label>
+					<div class="col-sm-4">
+						<input type="text" id="ville" name="ville" class="form-control" placeholder="Paris" value="<?php echo isset($infos) ? $infos['ville'] : "";?>">
+						<?php
+						if(isset($erreur) && in_array('ville', $erreur)) {
+							echo "<span class='help-block'></span>";
+						}
+						?>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="cp" class="col-sm-3 control-label">Code postal</label>
+					<div class="col-sm-4">
+						<input type="text" id="cp" name="cp" class="form-control" placeholder="75 001" value="<?php echo isset($infos) ? $infos['cp'] : "";?>">
+						<?php
+						if(isset($erreur) && in_array('cp', $erreur)) {
+							echo "<span class='help-block'></span>";
+						}
+						?>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="tel" class="col-sm-3 control-label">Téléphone</label>
+					<div class="col-sm-4">
+						<input type="text" id="tel" name="tel" class="form-control" placeholder="01 02 03 04 05" value="<?php echo isset($infos) ? $infos['tel'] : "";?>">
+						<?php
+						if(isset($erreur) && in_array('tel', $erreur)) {
+							echo "<span class='help-block'></span>";
+						}
+						?>
+					</div>
+				</div>
 				<div class="panel-footer">
 					<button name="previous" class="btn btn-default">Retour</button>
 					<button name="next" class="btn btn-primary pull-right" <?php echo isset($next) ? $next : ""?> >Suivant</button>	

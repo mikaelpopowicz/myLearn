@@ -38,7 +38,7 @@
 	
 	<route url="/admin/parametres(/?)" module="Param" action="index" />
 	<route url="/admin/parametres/modifier-informations" module="Param" action="infos" />
-	
+	<route url="/admin/parametres/modifier-smtp" module="Param" action="smtp" />
 	<route url="/admin/parametres/modifier-user" module="Param" action="user" />
 	<route url="/admin/parametres/modifier-password" module="Param" action="password" />
 	

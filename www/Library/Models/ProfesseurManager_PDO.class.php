@@ -15,6 +15,11 @@ class ProfesseurManager_PDO extends ProfesseurManager
 		{
 			$result['professeur'] = $requete->fetch();
 			$result['professeur']->setDateUser(new \DateTime($result['professeur']->dateUser()));
+			$requete->nextRowset();
+			$result['matiere'] = \Library\Models\MatiereManager_PDO::getObj($requete);
+			$result['professeur']->setMatiere($result['matiere']);
+			unset($result['matiere']);
+			$result = $result['professeur'];
 		}
 		else if ($mode == 'Groups')
 		{
@@ -129,42 +134,48 @@ class ProfesseurManager_PDO extends ProfesseurManager
 	
 	protected function add(Professeur $professeur)
 	{
-	    $requete = $this->dao->prepare('CALL ajouter_prof(:username, :nom, :prenom, :email, :password, :salt, :token, :matiere)');
-	    $requete->bindValue(':username', $professeur->username());
+	    $requete = $this->dao->prepare('CALL ajouter_prof(:nom, :prenom, :email, :matiere)');
 	    $requete->bindValue(':nom', $professeur->nom());
 	    $requete->bindValue(':prenom', $professeur->prenom());
 	    $requete->bindValue(':email', $professeur->email());
-	    $requete->bindValue(':password', $professeur->password());
-	    $requete->bindValue(':salt', $professeur->salt());
-	    $requete->bindValue(':token', $professeur->token());
 	    $requete->bindValue(':matiere', $professeur->matiere()->id());
 	    $requete->execute();
 		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
-		if($erreur != 0)
+		$requete->nextRowset();
+		if($erreur == 0)
 		{
-			$requete->nextRowset();
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Professeur');
+			$result = $requete->fetch();
+		}
+		else
+		{
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result = $requete->fetch();
+		}
+		return $result;
+	}
+	
+	protected function modify(Professeur $professeur)
+	{
+		$requete = $this->dao->prepare('CALL up_prof(:id, :username, :nom, :prenom, :email, :password, :matiere)');
+		$requete->bindValue(':id', $professeur->id());
+		$requete->bindValue(':username', $professeur->username());
+		$requete->bindValue(':nom', $professeur->nom());
+		$requete->bindValue(':prenom', $professeur->prenom());
+		$requete->bindValue(':email', $professeur->email());
+		$requete->bindValue(':password', $professeur->password());
+		$requete->bindValue(':matiere', $professeur->matiere()->id());
+		$requete->execute();
+		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+		$requete->nextRowSet();
+		if($erreur == 1 || $erreur == 0)
+		{
 			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
 			$result = $requete->fetch();
 			return $result;
 		}
 		return false;
 	}
-	
-	protected function modify(Professeur $professeur)
-	  {
-  	    $requete = $this->dao->prepare('CALL up_prof(:id, :username, :nom, :prenom, :email, :password, :active, :salt, :token, :matiere)');
-		$requete->bindValue(':id', $professeur->id());
-  	    $requete->bindValue(':username', $professeur->username());
-  	    $requete->bindValue(':nom', $professeur->nom());
-  	    $requete->bindValue(':prenom', $professeur->prenom());
-  	    $requete->bindValue(':email', $professeur->email());
-  	    $requete->bindValue(':password', $professeur->password());
-		$requete->bindValue(':active', $professeur->active());
-  	    $requete->bindValue(':salt', $professeur->salt());
-  	    $requete->bindValue(':token', $professeur->token());
-  	    $requete->bindValue(':matiere', $professeur->matiere()->id());
-  	    $requete->execute();
-	  }
 
   	public function delete(Professeur $professeur)
   	{

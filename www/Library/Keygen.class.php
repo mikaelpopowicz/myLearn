@@ -83,6 +83,10 @@ class Keygen extends ApplicationComponent
 		if($key == NULL) {
 			$this->setKey($this->getNewSalt(self::KEY_LN, false));
 		}
+		else
+		{
+			$this->setKey($key);
+		}
 		$crypted = base64_encode(mcrypt_encrypt(MCRYPT_3DES, $this->key, $str, MCRYPT_MODE_NOFB, $this->iv));
 		return array("key" => base64_encode($this->key), "crypted" => $crypted);
 		$this->key = "";
@@ -91,7 +95,7 @@ class Keygen extends ApplicationComponent
 	public function decode($str, $key)
 	{
 		$str = base64_decode($str);
-		$this->key = base64_decode($key);
+		$this->setKey(base64_decode($key));
 		$decrypted = mcrypt_decrypt(MCRYPT_3DES, $this->key, $str, MCRYPT_MODE_NOFB, $this->iv);
 		$this->key = "";
 		return $decrypted;
