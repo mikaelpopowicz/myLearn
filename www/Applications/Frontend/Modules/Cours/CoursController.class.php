@@ -200,7 +200,7 @@ class CoursController extends \Library\BackController {
 	public function executeEcrire(\Library\HTTPRequest $request)
 	{
 		if($request->postExists('annuler')) {
-			$this->app->httpResponse()->redirect('/membre/mes-cours');
+			$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 		}
 		
 		if($request->postExists('ajouter')) {
@@ -233,9 +233,9 @@ class CoursController extends \Library\BackController {
 	public function executeModifier(\Library\HTTPRequest $request)
 	{
 		$result = $this->managers->getManagerOf('Cours')->getUnique($request->getData('id'));
-		if(isset($result['cours']) && ($result['cours'] instanceof \Library\Entities\Cours))
+		if($result instanceof \Library\Entities\Cours)
 		{
-			$cours = $result['cours'];
+			$cours = $result;
 			
 			if($cours->auteur()->id() == $this->app->user()->getAttribute('id'))
 			{
@@ -273,7 +273,7 @@ class CoursController extends \Library\BackController {
 				$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 			}		
 		} else {
-			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "'.$cours.'"});</script>');
+			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "'.$result.'"});</script>');
 			$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 		}
 	}

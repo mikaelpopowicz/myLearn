@@ -1,4 +1,11 @@
-
+<div class="row">
+	<div class="col-lg-12">
+		<ol class="breadcrumb">
+			<li><a href="/professeur">Accueil</a></li>
+			<li class="active">Mes cours</li>
+		</ol>
+	</div>
+</div>
 	<form method="post" class="form-horizontal">
 		
 		<!--==== Barre de boutons ====-->

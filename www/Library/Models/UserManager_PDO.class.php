@@ -66,11 +66,10 @@ class UserManager_PDO extends UserManager
 		return $result;
 	}
 	
-	public function activation($oldTk,$newTk)
+	public function activation($oldTk)
 	{
-		$requete = $this->dao->prepare('CALL activation(:old, :new)');
+		$requete = $this->dao->prepare('CALL activation(:old)');
 		$requete->bindValue(':old', $oldTk);
-		$requete->bindValue(':new', $newTk);
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
 		$result = $requete->fetch();

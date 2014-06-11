@@ -13,7 +13,7 @@
 	<dl class="dl-horizontal">
 		<dt>
 			Username
-		</dtDT5i/s9d
+		</dt>
 		<dd>
 			<?php echo $user->getAttribute('username') != "" ? $user->getAttribute('username') : "&nbsp;" ;?>
 		</dd>

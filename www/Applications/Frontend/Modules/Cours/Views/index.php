@@ -43,20 +43,24 @@
 				</div>
 			</div>
 			<div class="span4">
-				<a class="innershadows btn btn-block btn-primary" href="/cours/sisr"><h2><i class="fa fa-terminal"></i> SISR</h2></a>
+				<a class="innershadows" href="/mon-compte">
+					<img class="banner-img" src="/images/compte.png">					
+				</a>
 				<div class="content">
-					<h4 class="text-center primary-color">Le réseau</h4>
+					<h4 class="text-center primary-color">Mon compte</h4>
 					<p>
-						Retrouvez les cours et exercices du programme SISR, réseau, routage, etc.
+						Gérez votre profil à tous moments. Vos données personnelles et votre mot de passe.
 					</p>
 				</div>
 			</div>
 			<div class="span4">
-				<a class="innershadows btn btn-block btn-primary" href="/tutos"><h2><i class="e-icon-share"></i> Tutos & contributions</h2></a>
+				<a class="innershadows" href="/contact">
+					<img class="banner-img" src="/images/contact.png">					
+				</a>
 				<div class="content">
-					<h4 class="text-center primary-color">Les tutos et les cours</h4>
+					<h4 class="text-center primary-color">Restez connectés</h4>
 					<p>
-						Retrouvez les cours de toutes les matières, et aussi des tutos divers.
+						Retrouvez tous les contacts utiles, vos professeurs et l'école.
 					</p>
 				</div>
 			</div>

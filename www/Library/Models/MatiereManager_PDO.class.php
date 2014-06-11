@@ -23,9 +23,9 @@ class MatiereManager_PDO extends MatiereManager
 	
 	public function getUnique($id)
 	{
-		$requete = $this->dao->prepare('SELECT id_m AS id, libelle, icon
-			FROM matiere
-			WHERE id_m = :id');
+		$requete = $this->dao->prepare('SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m) AS "cours"
+				FROM matiere m
+				WHERE m.id_m = :id');
 		$requete->bindValue(':id', $id, \PDO::PARAM_INT);
 		$requete->execute();
      
@@ -41,9 +41,8 @@ class MatiereManager_PDO extends MatiereManager
 	
 	public function getList()
 	{
-		$sql = 'SELECT id_m as id, libelle, icon
-			FROM matiere
-			ORDER BY libelle';
+		$sql = 'SELECT m.id_m AS id, m.libelle, m.uri, m.icon, (SELECT COUNT(*) FROM cours c WHERE c.id_m = m.id_m) AS "cours"
+				FROM matiere m';
      
 		$requete = $this->dao->query($sql);
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
@@ -51,13 +50,19 @@ class MatiereManager_PDO extends MatiereManager
 		$listeMatiere = $requete->fetchAll();
      
 		$requete->closeCursor();
-     
 		return $listeMatiere;
 	}
 	
 	public function getListJson($id)
 	{
-		$sql = 'SELECT m.id_m as id, m.libelle
+		$sql = 'SELECT m.id_m as id, m.libelle, (
+					SELECT COUNT(*)
+					FROM cours c
+					INNER jOIN etre et ON et.id_classe = c.id_classe
+					INNER JOIN eleve e ON e.id_u = et.id_u
+					WHERE c.id_m = id
+					AND e.id_u = :id
+			) AS "cours"
 			FROM matiere m 
 			INNER JOIN assigner a ON a.id_m = m.id_m
 			INNER jOIN etre et ON et.id_classe = a.id_classe

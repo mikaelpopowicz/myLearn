@@ -19,43 +19,31 @@ class ParamController extends \Library\BackController
 			}
 
 			if($request->postExists('modifier')) {
-				$mailList = $this->managers->getManagerOf('User')->getList();
-				$mail = $request->postData('email');
-				foreach($mailList as $list) {
-					if ($list['email'] == $mail && $list['email'] != $user['email']) {
-						$mail = "";
-					}
-				}
-
-				$username = $this->managers->getManagerOf('User')->getByName($request->postData('username'));
-				//echo '<pre>';print_r($user);echo '</pre>';
-				if($username != NULL) {
-					if($username['id'] == $user['id']) {
-						$name = $request->postData('username');
-					} else {
-						$name = "";
-					}
-				} else {
-					$name = $request->postData('username');
-				}
-
-				$user->setUsername($name);
-				$user->setEmail($mail);
+				$user->setUsername($request->postData('username'));
+				$user->setEmail($request->postData('email'));
 				$user->setNom($request->postData('nom'));
 				$user->setPrenom($request->postData('prenom'));
 
-				
-				
 				if($user->isValid()) {
-					$this->managers->getManagerOf('Professeur')->save($user);
-					$this->updateUserAttribute($user);
-					$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "success", layout: "topCenter", text: "Informations modifiées"});</script>');
-					$this->app->httpresponse()->redirect('/professeur/parametres');
+					$record = $this->managers->getManagerOf('Professeur')->save($user);
+					if($record instanceof \Library\Entities\Error)
+					{
+						$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "'.$record->type().'", layout: "topCenter", text: "'.$record->message().'"});</script>');
+						if($record->code() == "OP_S")
+						{
+							$this->updateUserAttribute($user);
+							$this->app->httpresponse()->redirect('/professeur/parametres');
+						}
+						else
+						{
+							$this->page->addVar('profil', $user);
+							$this->page->addVar('erreurs', $user['erreurs']);
+						}
+					}
 				} else {
 					$this->page->addVar('profil', $user);
 					$this->page->addVar('erreurs', $user['erreurs']);
 				}
-
 			}
 
 			$this->page->addVar('title', 'MyLearn - Modifier mes informations');
@@ -77,17 +65,21 @@ class ParamController extends \Library\BackController
 				
 				if($pass1 == $pass2)
 				{
-					$user->setPassword(sha1(md5(sha1(md5($user->salt())).sha1(md5($pass1)).sha1(md5($user->salt())))));
-					$this->managers->getManagerOf('Professeur')->save($user);
-					$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "success", layout: "topCenter", text: "Informations modifiées"});</script>');
-					$this->app->httpresponse()->redirect('/professeur/parametres/');
+					$user->setPassword($pass1);
+					$record = $this->managers->getManagerOf('Professeur')->save($user);
+					if($record instanceof \Library\Entities\Error)
+					{
+						$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$record->type().'", layout: "topCenter", text: "'.$record->message().'"});</script>');
+						if($record->code() == "OP_S")
+						{
+							$this->app->httpresponse()->redirect('/professeur/parametres/');
+						}
+					}
 				} else {
-					$erreurs[] = 'Mot de passe non identique';
+					$erreurs = 'Mot de passe non identique';
 					$this->page->addVar('erreurs', $erreurs);
 				}
-
 			}
-
 			$this->page->addVar('title', 'MyLearn - Modifier mot de passe');
 			$this->page->addVar('class_param', 'active');
 			$this->page->addVar('profil', $user);
@@ -119,7 +111,7 @@ class ParamController extends \Library\BackController
 					$check = $request->postData('check');
 					$delete = array();
 					for ($i = 0; $i < count($check); $i++) {
-						$delete[$i] = $this->managers->getManagerOf('Cours')->getUnique($check[$i])['cours'];
+						$delete[$i] = $this->managers->getManagerOf('Cours')->getUnique($check[$i]);
 					}
 					$this->page->addVar('delete', $delete);
 					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete.php');

@@ -2,21 +2,25 @@
 <definitions>
 	<define var="version" value="1.0" />
 	<define var="release" value="05/2014" />
-	<define var="db_host" value="e/Et7ZG7/+wI" />
-	<define var="db_name" value="euci6Zyh/g==" />
-	<define var="db_user" value="ZfEh+A==" />
-	<define var="db_user_pass" value="Y/Eh/g==" />
-	<define var="conf_nom" value="Ecole de démonstration" />
+	<define var="db_host" value="voOsw0TpoXf/" />
+	<define var="db_name" value="v5Wjx0nzoA==" />
+	<define var="db_user" value="oIOg1g==" />
+	<define var="db_user_pass" value="oIOg1g==" />
+	<define var="conf_nom" value="Ecole de test" />
 	<define var="conf_description" value="Description pour la page de connexion" />
-	<define var="conf_email" value="noreply@ecole.fr" />
-	<define var="conf_contact" value="contact@ecole.fr" />
-	<define var="conf_date" value="09/05/2014" />
-	<define var="cryp_iv" value="TYloYom9wic=" />
-	<define var="cryp_key" value="YzVQUmRSR254UUFrTzJqc25wbDh4TG02" />
-	<define var="smtp_host" value="ZPM6/NO84v4SqxDdHyk=" />
-	<define var="smtp_port" value="IqZ5" />
-	<define var="smtp_user" value="eu4h/JKk+fwG4gCV" />
-	<define var="smtp_pass" value="Yvgn4pu8qa4=" />
+	<define var="conf_address" value="6-8 impasse des deux cousins" />
+	<define var="conf_ville" value="Paris" />
+	<define var="conf_cp" value="75017" />
+	<define var="conf_tel" value="0130348670" />
+	<define var="conf_email" value="adam.menebhi@gmail.Com" />
+	<define var="conf_contact" value="adam.menebhi@gmail.com" />
+	<define var="conf_date" value="11/06/2014" />
+	<define var="cryp_iv" value="+JMFsLsgR0c=" />
+	<define var="cryp_key" value="bFNLZUc3UGxsVm90MFFzemtMZFNlaXNZ" />
+	<define var="smtp_host" value="oYG70gbmo2XiQCtbXiw=" />
+	<define var="smtp_port" value="59T4" />
+	<define var="smtp_user" value="s4iuzwbsq2ruTm1RcSb2u/mLkKMQ4A==" />
+	<define var="smtp_pass" value="k6D2k0vs+zU=" />
 	<define var="cours_page" value="5" />
 	<define var="installed" value="true" />
 </definitions>

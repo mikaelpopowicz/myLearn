@@ -2,7 +2,6 @@
 	<div class="col-lg-12">
 		<ol class="breadcrumb">
 			<li><a href="/professeur">Accueil</a></li>
-			<li><a href="/professeur/cours">Liste des classes</a></li>
 			<li class="active"><?php echo $classe->libelle().' - '.$classe->session()->session()?></li>
 		</ol>
 	</div>

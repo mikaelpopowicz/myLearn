@@ -2,7 +2,7 @@
 	<div class="col-lg-12">
 		<ol class="breadcrumb">
 			<li><a href="/professeur">Accueil</a></li>
-			<li><a href="/professeur/cours">Cours</a></li>
+			<li><a href="/professeur/mes-cours">Mes cours</a></li>
 			<li class="active">Ecrire un cours</li>
 		</ol>
 	</div>

@@ -49,8 +49,4 @@ class ConnexionController extends \Library\BackController
 			}
 		}		
 	}
-	public function executeIndex(\Library\HTTPRequest $request)
-	{
-		
-	}
 }

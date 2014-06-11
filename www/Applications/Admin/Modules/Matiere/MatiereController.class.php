@@ -119,14 +119,13 @@ class MatiereController extends \Library\BackController
 		$success = array();
 		for ($i=0; $i < $request->postData('count'); $i++) {
 			$suppr = unserialize(base64_decode($request->postData('suppr_'.$i)));
-			$profs = $this->managers->getManagerOf('Professeur')->countOf($suppr['id']);
-			$cours = $this->managers->getManagerOf('Cours')->countOf($suppr['id']);
-			if($profs < 1 && $cours < 1) {
+			$cours = $suppr->cours();
+			//echo '<pre>';print_r($cours);echo "</pre>";die();
+			if($cours < 1) {
 				$this->managers->getManagerOf('Matiere')->delete($suppr);
 				$success[] = $suppr['libelle'];
 			} else {
 				$erreurs[$suppr['libelle']] = array(
-					"profs" => $profs,
 					"cours" => $cours
 				);
 			}
@@ -137,15 +136,8 @@ class MatiereController extends \Library\BackController
 			$str = "<br/>".count($success)." a(ont) été supprimée(s). Voici la liste des erreurs :<ul>";
 			foreach ($erreurs as $key => $value) {
 				$str .= "<li>".$key." - ";
-				$tiret = "";
-				if($value['profs'] > 0) {
-					$str .= $value['profs']." professeur(s) dépendant(s)";
-				}
-				if($value['cours']) {
-					if ($value['profs'] > 0) {
-						$tiret = ", ";
-					}
-					$str .= $tiret.$value['cours']." cours dépendant(s)";
+				if($value['cours'] > 0) {
+					$str .= $value['cours']." cours dépendant(s)";
 				}
 				$str .= "</li>";
 			}

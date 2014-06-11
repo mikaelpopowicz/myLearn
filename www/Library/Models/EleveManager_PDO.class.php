@@ -131,39 +131,36 @@ class EleveManager_PDO extends EleveManager
 	
 	protected function add(Eleve $eleve)
 	{
-	    $requete = $this->dao->prepare('CALL ajouter_eleve(:username, :nom, :prenom, :email, :password, :salt, :token, :dateNaissance)');
-	    $requete->bindValue(':username', $eleve->username());
+	    $requete = $this->dao->prepare('CALL ajouter_eleve(:nom, :prenom, :email, :dateNaissance)');
 	    $requete->bindValue(':nom', $eleve->nom());
 	    $requete->bindValue(':prenom', $eleve->prenom());
 	    $requete->bindValue(':email', $eleve->email());
-	    $requete->bindValue(':password', $eleve->password());
-	    $requete->bindValue(':salt', $eleve->salt());
-	    $requete->bindValue(':token', $eleve->token());
 	    $requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
 	    $requete->execute();
 		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
-		if($erreur == 1)
+		$requete->nextRowSet();
+		if($erreur == 0)
 		{
-			$requete->nextRowset();
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Eleve');
+			$result = $requete->fetch();
+		}
+		else
+		{
 			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
 			$result = $requete->fetch();
-			return $result;
 		}
-		return false;
+		return $result;
 	}
 	
 	protected function modify(Eleve $eleve)
 	  {
-	    $requete = $this->dao->prepare('CALL up_eleve(:id, :username, :nom, :prenom, :email, :password, :active, :salt, :token, :dateNaissance)');
+	    $requete = $this->dao->prepare('CALL up_eleve(:id, :user, :nom, :prenom, :email, :password, :dateNaissance)');
 		$requete->bindValue(':id', $eleve->id());
-	    $requete->bindValue(':username', $eleve->username());
+		$requete->bindValue(':user', $eleve->username());
 	    $requete->bindValue(':nom', $eleve->nom());
 	    $requete->bindValue(':prenom', $eleve->prenom());
 	    $requete->bindValue(':email', $eleve->email());
 	    $requete->bindValue(':password', $eleve->password());
-		$requete->bindValue(':active', $eleve->active());
-	    $requete->bindValue(':salt', $eleve->salt());
-	    $requete->bindValue(':token', $eleve->token());
 		if($eleve->dateNaissance() instanceof \DateTime)
 		{
 			$requete->bindValue(':dateNaissance', $eleve->dateNaissance()->format('Y-m-d'));
@@ -174,6 +171,15 @@ class EleveManager_PDO extends EleveManager
 		}
 	    
 	    $requete->execute();
+		$erreur = $requete->fetch(\PDO::FETCH_ASSOC)['erreur'];
+		$requete->nextRowSet();
+		if($erreur == 1 || $erreur == 0)
+		{
+			$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
+			$result = $requete->fetch();
+			return $result;
+		}
+		return false;
 	  }
 
   	public function delete(Eleve $eleve)

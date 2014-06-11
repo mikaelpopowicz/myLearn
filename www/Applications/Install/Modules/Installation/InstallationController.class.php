@@ -239,7 +239,11 @@ class InstallationController extends \Library\BackController
 					$infos = array(
 						"nom" => $request->postData('nom'),
 						"description" => $request->postData('description'),
-						"contact" => $request->postData('contact')
+						"contact" => $request->postData('contact'),
+						"address" => $request->postData('address'),
+						"ville" => $request->postData('ville'),
+						"cp" => $request->postData('cp'),
+						"tel" => $request->postData('tel')
 					);
 					$erreur = array();
 					foreach ($infos as $donnee => $value) {
@@ -293,6 +297,7 @@ class InstallationController extends \Library\BackController
 						$smtp = array(
 							"host" => $request->postData('host'),
 							"port" => $request->postData('port'),
+							"security" => $request->postData('security'),
 							"user" => $request->postData('user'),
 							"password" => $request->postData('password'),
 							"envoi" => $request->postData('envoi')
@@ -305,13 +310,17 @@ class InstallationController extends \Library\BackController
 							}
 						}
 						if(empty($erreur)) {
-							$sujet = 'Test de configuration STMP myLearn';
-							$mail = 'Test de configuration SMTP de l\'établissement'.unserialize(base64_decode($this->app->user()->getAttribute('infos')))['nom'];
-							$this->app->mail()->setMail("mikael.popowicz@gmail.com");
+							$infos = unserialize(base64_decode($this->app->user()->getAttribute('infos')));
+							
+							$sujet = 'Test de configuration SMTP myLearn';
+							$mail = 'Test de configuration SMTP de l\'établissement '.$infos['nom'];
+							$this->app->mail()->setMail($infos['contact']);
+							$this->app->mail()->setTeam($infos['nom']);
 							$this->app->mail()->setMessage($sujet, $mail);
 							$this->app->mail()->setSujet($sujet);
 							$this->app->mail()->setHost($smtp['host']);
 							$this->app->mail()->setPort($smtp['port']);
+							$smtp['security'] == "none" ? $this->app->mail()->setSecurity("") : $this->app->mail()->setSecurity($smtp['security']);
 							$this->app->mail()->setUsername($smtp['user']);
 							$this->app->mail()->setPassword($smtp['password']);
 							$this->app->mail()->setSender($smtp['envoi']);
@@ -380,6 +389,10 @@ class InstallationController extends \Library\BackController
 						$this->app->config()->setVar('db_user_pass', $this->app->key()->encode($bdd['password'], $this->app->key()->key())['crypted']);
 						$this->app->config()->setVar('conf_nom', $infos['nom']);
 						$this->app->config()->setVar('conf_description', $infos['description']);
+						$this->app->config()->setVar('conf_address',$infos['address']);
+						$this->app->config()->setVar('conf_ville',$infos['ville']);
+						$this->app->config()->setVar('conf_cp',$infos['cp']);
+						$this->app->config()->setVar('conf_tel',$infos['tel']);
 						$this->app->config()->setVar('conf_email', $smtp['envoi']);
 						$this->app->config()->setVar('conf_contact', $infos['contact']);
 						$this->app->config()->setVar('conf_date', $date->format('d/m/Y'));

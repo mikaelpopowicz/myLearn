@@ -49,7 +49,7 @@ class MembreController extends \Library\BackController
 					$check = $request->postData('check');
 					$delete = array();
 					for ($i = 0; $i < count($check); $i++) {
-						$delete[$i] = $this->managers->getManagerOf('Cours')->getUnique($check[$i])['cours'];
+						$delete[$i] = $this->managers->getManagerOf('Cours')->getUnique($check[$i]);
 					}
 					$this->page->addVar('delete', $delete);
 					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete.php');
@@ -88,26 +88,7 @@ class MembreController extends \Library\BackController
 				$this->app->httpresponse()->redirect('/mon-compte');
 			}
 
-			if($request->postExists('modifier')) {
-				$mailList = $this->managers->getManagerOf('User')->getList();
-				$mail = $request->postData('email');
-				foreach($mailList as $list) {
-					if ($list['email'] == $mail && $list['email'] != $user['email']) {
-						$mail = "";
-					}
-				}
-
-				$username = $this->managers->getManagerOf('User')->getByName($request->postData('username'));
-				if($username != NULL) {
-					if($username['id'] == $user['id']) {
-						$name = $request->postData('username');
-					} else {
-						$name = "";
-					}
-				} else {
-					$name = $request->postData('username');
-				}
-				
+			if($request->postExists('modifier')) {			
 				$date = $request->postData('anniversaire');
 				if(!empty($date)) {
 					$date = explode('/', $date);
@@ -117,24 +98,32 @@ class MembreController extends \Library\BackController
 					$date = new \DateTime('0000-00-00');
 				}
 
-				$user->setUsername($name);
+				$user->setUsername($request->postData('username'));
 				$user->setNom($request->postData('nom'));
 				$user->setPrenom($request->postData('prenom'));
-				$user->setEmail($mail);
+				$user->setEmail($request->postData('email'));
 				$user->setDateNaissance($date);
 
-				
-				
 				if($user->isValid()) {
-					$this->managers->getManagerOf('Eleve')->save($user);
-					$this->updateUserAttribute($user);
-					$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "success", layout: "topCenter", text: "Informations modifiées"});</script>');
-					$this->app->httpresponse()->redirect('/mon-compte');
+					$record = $this->managers->getManagerOf('Eleve')->save($user);
+					if($record instanceof \Library\Entities\Error)
+					{
+						$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "'.$record->type().'", layout: "topCenter", text: "'.$record->message().'"});</script>');
+						if($record->code() == "OP_S")
+						{
+							$this->updateUserAttribute($user);
+							$this->app->httpresponse()->redirect('/mon-compte');
+						}
+						else
+						{
+							$this->page->addVar('profil', $user);
+							$this->page->addVar('erreurs', $user['erreurs']);
+						}
+					}
 				} else {
 					$this->page->addVar('profil', $user);
 					$this->page->addVar('erreurs', $user['erreurs']);
 				}
-
 			}
 
 			$this->page->addVar('title', 'MyLearn - Modifier mes informations');
@@ -153,13 +142,13 @@ class MembreController extends \Library\BackController
 				$pass2 = $request->postData('pass2');
 
 				if($pass1 == $pass2) {
-					$user->setPassword(sha1(md5(sha1(md5($user['salt'])).sha1(md5($request->postData('pass1'))).sha1(md5($user['salt'])))));
-					$user->setToken($this->app->key()->getNewSalt(40));
+					$user->setPassword($pass1);
 					$this->managers->getManagerOf('Eleve')->save($user);
-					$this->app->user()->setFlash('<script>noty({type: "success", layout: "topCenter", text: "Mot de passe modifié"});</script>');
+					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "success", layout: "topCenter", text: "Mot de passe modifié"});</script>');
 					$this->app->httpResponse()->redirect('/mon-compte');
 				} else {
-					$this->page->addVar('erreurs', "");
+					$erreurs[] = 'Mot de passe non identique';
+					$this->page->addVar('erreurs', $erreurs);
 				} 
 			}
 		}

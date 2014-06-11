@@ -4,6 +4,14 @@ $(document).ready(function() {
 		      { "bSortable": false, "aTargets": [ 0 ] }
 		]
 	});
+
+	$(".scrollto, .mobile-page-nav .btn").click(function (event) {
+		event.preventDefault();
+		$('html,body').animate({
+			scrollTop: $(this.hash).offset().top - 190
+		}, 800);
+		return false;
+	});
 	
 	$('span.help-block').parents('div.form-group').addClass('has-error');
 

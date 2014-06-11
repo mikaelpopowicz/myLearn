@@ -10,6 +10,10 @@
 	<route url="/cours/modifier-([0-9]+)" module="Cours" action="modifier" vars="id" />
 	
 	<route url="/devoirs(\/?)" module="Devoir" action="index" />
+	<route url="/devoirs/supprimer-document" module="Devoir" action="delDocument" />
+	<route url="/devoirs/consulter-([0-9]*)" module="Devoir" action="show" vars="id" />
+	<route url="/devoirs/consulter-([0-9]*)/telecharger-([0-9]*)" module="Devoir" action="download" vars="id,fichier" />
+	<route url="/devoirs/consulter-([0-9]*)/document-([0-9]*)" module="Devoir" action="document" vars="id,fichier" />
 	
 	<route url="/contact" module="Contact" action="index" />
 	

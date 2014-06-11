@@ -62,7 +62,6 @@
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
-					<li class="<?php echo isset($class_accueil) ? $class_accueil : "";?>"><a href="/admin">Tableau de bord</a></li>
 					<li class="dropdown <?php echo isset($class_cours) ? $class_cours : "";?>">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">Classes <b class="caret"></b></a>
 						<ul class="dropdown-menu">
@@ -91,6 +90,7 @@
 						</ul>
 					</li>
 					<li class="<?php echo isset($class_perso) ? $class_perso : "" ;?>"><a href="/professeur/mes-cours">Mes cours</a></li>
+					<li class="<?php echo isset($class_devoir) ? $class_devoir : "" ;?>"><a href="/professeur/devoirs">Devoirs</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li class="<?php echo isset($class_param) ? $class_param : "";?>"><a href="/professeur/parametres">Paramètres</a></li>
