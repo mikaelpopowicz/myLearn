@@ -17,12 +17,12 @@ class ClasseController extends \Library\BackController
 			if ($request->postExists('check')) {
 				$check = $request->postData('check');
 				if (count($check) > 1) {
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous ne pouvez modifier qu\'une classe à la fois"});</script>');
+					$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous ne pouvez modifier qu\'une classe à la fois');
 				} else {
 					$this->app->httpResponse()->redirect('/admin/classes/modifier-'.$check[0]);
 				}
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,timeout: 10000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins une classe pour la modifier"});</script>');
+				$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins une classe pour la modifier');
 			}
 			
 		// Cas de suppression
@@ -37,7 +37,7 @@ class ClasseController extends \Library\BackController
 				$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete.php');
 				$this->page->updateVar('js', "<script>$('#modalDeleteClasse').modal('show');</script>");
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins une classe pour la supprimer"});</script>');
+				$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins une classe pour la supprimer');
 			}
 		}
 	}
@@ -65,7 +65,7 @@ class ClasseController extends \Library\BackController
 			
 			if($classe->isValid()) {
 				$this->managers->getManagerOf('Classe')->save($classe);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Création de la classe réussie"});</script>');
+				$this->app->user()->setFlash('success','Création de la classe réussie"');
 				$this->app->httpresponse()->redirect('/admin/classes');
 			} else {
 				$this->page->addVar('erreurs', $classe['erreurs']);
@@ -101,7 +101,7 @@ class ClasseController extends \Library\BackController
 				
 				if($cls->isValid()) {
 					$this->managers->getManagerOf('Classe')->save($cls);
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification de la classe réussie"});</script>');
+					$this->app->user()->setFlash('success','Modification de la classe réussie');
 					$this->app->httpresponse()->redirect('/admin/classes');
 				} else {
 					$this->page->addVar('erreurs', $cls['erreurs']);
@@ -140,7 +140,7 @@ class ClasseController extends \Library\BackController
 					));
 					$this->managers->getManagerOf('Etre')->add($etre);
 				}
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Opération réussie"});</script>');
+				$this->app->user()->setFlash('success','Opération réussie');
 				$this->app->httpresponse()->redirect('/admin/classes/'.$classe->id());
 				
 			// Cas de suppression d'élève
@@ -163,7 +163,7 @@ class ClasseController extends \Library\BackController
 					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete_eleve.php');
 					$this->page->updateVar('js', "<script>$('#modalDeleteEleve').modal('show');</script>");
 				} else {
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un élève pour le supprimer"});</script>');
+					$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins un élève pour le supprimer');
 				}
 			// Cas d'ajout de professeur
 			} else if ($request->postExists('ajout_professeur')) {
@@ -175,7 +175,7 @@ class ClasseController extends \Library\BackController
 					));
 					$this->managers->getManagerOf('Charger')->add($charger);
 				}
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Opération réussie"});</script>');
+				$this->app->user()->setFlash('success','Opération réussie');
 				$this->app->httpresponse()->redirect('/admin/classes/'.$classe->id());
 			// Cas de suppression de professeur
 			} else if ($request->postExists('supprimer_professeur')) {
@@ -196,7 +196,7 @@ class ClasseController extends \Library\BackController
 					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete_professeur.php');
 					$this->page->updateVar('js', "<script>$('#modalDeleteProfesseur').modal('show');</script>");
 				} else {
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le supprimer"});</script>');
+					$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le supprimer');
 				}
 			// Cas d'ajout de matière
 			} else if ($request->postExists('ajout_matiere')) {
@@ -208,7 +208,7 @@ class ClasseController extends \Library\BackController
 					));
 					$this->managers->getManagerOf('Assigner')->add($assigner);
 				}
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Opération réussie"});</script>');
+				$this->app->user()->setFlash('success','Opération réussie');
 				$this->app->httpresponse()->redirect('/admin/classes/'.$classe->id());
 			// Cas de suppression de matière
 			} else if ($request->postExists('supprimer_matiere')) {
@@ -229,7 +229,7 @@ class ClasseController extends \Library\BackController
 					$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete_matiere.php');
 					$this->page->updateVar('js', "<script>$('#modalDeleteMatiere').modal('show');</script>");
 				} else {
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins une matière pour la supprimer"});</script>');
+					$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins une matière pour la supprimer');
 				}
 			}
 		} else {
@@ -244,7 +244,7 @@ class ClasseController extends \Library\BackController
 				$etre = unserialize(base64_decode($request->postData('suppr_'.$i)));
 				$this->managers->getManagerOf('Etre')->delete($etre);
 			}
-			$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+			$this->app->user()->setFlash('success','<strong>Suppression réussie !</strong>');
 			$this->app->httpResponse()->redirect('/admin/classes/'.$request->postData('classe'));
 		} else {
 			$this->app->httpResponse()->redirect('/admin/classes');
@@ -258,7 +258,7 @@ class ClasseController extends \Library\BackController
 				$charger = unserialize(base64_decode($request->postData('suppr_'.$i)));
 				$this->managers->getManagerOf('Charger')->delete($charger);
 			}
-			$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+			$this->app->user()->setFlash('success','<strong>Suppression réussie !</strong>');
 			$this->app->httpResponse()->redirect('/admin/classes/'.$request->postData('classe'));
 		} else {
 			$this->app->httpResponse()->redirect('/admin/classes');
@@ -271,7 +271,7 @@ class ClasseController extends \Library\BackController
 			for ($i=0; $i < $request->postData('count'); $i++) {
 				$this->managers->getManagerOf('Assigner')->delete(unserialize(base64_decode($request->postData('suppr_'.$i))));
 			}
-			$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+			$this->app->user()->setFlash('success','<strong>Suppression réussie !</strong>');
 			$this->app->httpResponse()->redirect('/admin/classes/'.$request->postData('classe'));
 		} else {
 			$this->app->httpResponse()->redirect('/admin/classes');
@@ -283,7 +283,7 @@ class ClasseController extends \Library\BackController
 		for ($i=0; $i < $request->postData('count'); $i++) {
 			$this->managers->getManagerOf('Classe')->delete(unserialize(base64_decode($request->postData('suppr_'.$i))));
 		}
-		$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+		$this->app->user()->setFlash('success','<strong>Suppression réussie !</strong>');
 		$this->app->httpResponse()->redirect('/admin/classes');
 	}
 }

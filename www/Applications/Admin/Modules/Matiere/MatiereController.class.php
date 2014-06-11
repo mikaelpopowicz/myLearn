@@ -9,19 +9,18 @@ class MatiereController extends \Library\BackController
 		$this->page->addVar('class_cours', "active");
 		$this->page->addVar('class_mat', "active");
 		$this->page->addVar('listeMatiere', $this->managers->getManagerOf('Matiere')->getList());
-		$this->page->updateVar("js" ,"<script>$('#check_all').click(function () { var cases = $('#tabs').find('input[type=checkbox]'); $(cases).prop('checked', this.checked);});</script>");
 
 		// Cas de modification
 		if ($request->postExists('modifier')) {
 			if ($request->postExists('check')) {
 				$check = $request->postData('check');
 				if (count($check) > 1) {
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous ne pouvez modifier qu\'une matière à la fois"});</script>');
+					$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous ne pouvez modifier qu\'une matière à la fois');
 				} else {
 					$this->app->httpResponse()->redirect('/admin/matieres/modifier-'.$check[0]);
 				}
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,timeout: 10000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins une matière pour la modifier"});</script>');
+				$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins une matière pour la modifier');
 			}
 			
 		// Cas de suppression
@@ -36,7 +35,7 @@ class MatiereController extends \Library\BackController
 				$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete.php');
 				$this->page->updateVar('js', "<script>$('#modalDeleteMatiere').modal('show');</script>");
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins une matière pour la supprimer"});</script>');
+				$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins une matière pour la supprimer');
 			}
 		} else if ($request->postExists('volume')) {
 			$this->managers->getManagerOf('Matiere')->addVolume();
@@ -65,7 +64,7 @@ class MatiereController extends \Library\BackController
 			
 			if($matiere->isValid()) {
 				$this->managers->getManagerOf('Matiere')->save($matiere);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Création de la matière réussie"});</script>');
+				$this->app->user()->setFlash('success','Création de la matière réussie');
 				$this->app->httpresponse()->redirect('/admin/matieres');
 			} else {
 				$this->page->addVar('erreurs', $matiere['erreurs']);
@@ -99,7 +98,7 @@ class MatiereController extends \Library\BackController
 			
 			if($mat->isValid()) {
 				$this->managers->getManagerOf('Matiere')->save($mat);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification de la matière réussie"});</script>');
+				$this->app->user()->setFlash('success','Modification de la matière réussie');
 				$this->app->httpresponse()->redirect('/admin/matieres');
 			} else {
 				$this->page->addVar('erreurs', $mat['erreurs']);
@@ -119,41 +118,33 @@ class MatiereController extends \Library\BackController
 		$success = array();
 		for ($i=0; $i < $request->postData('count'); $i++) {
 			$suppr = unserialize(base64_decode($request->postData('suppr_'.$i)));
-			$profs = $this->managers->getManagerOf('Professeur')->countOf($suppr['id']);
-			$cours = $this->managers->getManagerOf('Cours')->countOf($suppr['id']);
-			if($profs < 1 && $cours < 1) {
+			$cours = $suppr->cours();
+			//echo '<pre>';print_r($cours);echo "</pre>";die();
+			if($cours < 1) {
 				$this->managers->getManagerOf('Matiere')->delete($suppr);
 				$success[] = $suppr['libelle'];
 			} else {
 				$erreurs[$suppr['libelle']] = array(
-					"profs" => $profs,
 					"cours" => $cours
 				);
 			}
 		}
 		if(empty($erreurs)) {
-			$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+			$this->app->user()->setFlash('success','<strong>Suppression réussie !</strong>');
 		} else {
 			$str = "<br/>".count($success)." a(ont) été supprimée(s). Voici la liste des erreurs :<ul>";
 			foreach ($erreurs as $key => $value) {
 				$str .= "<li>".$key." - ";
-				$tiret = "";
-				if($value['profs'] > 0) {
-					$str .= $value['profs']." professeur(s) dépendant(s)";
-				}
-				if($value['cours']) {
-					if ($value['profs'] > 0) {
-						$tiret = ", ";
-					}
-					$str .= $tiret.$value['cours']." cours dépendant(s)";
+				if($value['cours'] > 0) {
+					$str .= $value['cours']." cours dépendant(s)";
 				}
 				$str .= "</li>";
 			}
 			$str .= "</ul>";
 			if (count($erreurs) < $request->postData('count')) {
-				$this->app->user()->setFlash('<script>noty({type: "warning", layout: "topCenter", text: "<strong>Suppression partiellement réussie !</strong>'.$str.'"});</script>');
+				$this->app->user()->setFlash('warning','<strong>Suppression partiellement réussie !</strong>'.$str);
 			} else {
-				$this->app->user()->setFlash('<script>noty({type: "error", layout: "topCenter", text: "<strong>Suppression non réussie!</strong>'.$str.'"});</script>');
+				$this->app->user()->setFlash('error','<strong>Suppression non réussie!</strong>'.$str);
 			}
 		}
 

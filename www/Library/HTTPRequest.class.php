@@ -47,9 +47,24 @@ class HTTPRequest
 	{
 		return isset($_POST[$key]);
 	}
+	
+	public function fileData($key)
+	{
+		return isset($_FILES[$key]) ? $_FILES[$key] : null;
+	}
+   
+	public function fileExists($key)
+	{
+		return isset($_FILES[$key]);
+	}
    
 	public function requestURI()
 	{
 		return $_SERVER['REQUEST_URI'];
+	}
+	
+	public function requestIp()
+	{
+		return $_SERVER["REMOTE_ADDR"];
 	}
 }

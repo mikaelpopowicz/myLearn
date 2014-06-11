@@ -17,12 +17,12 @@ class ProfesseurController extends \Library\BackController
 			if ($request->postExists('check')) {
 				$check = $request->postData('check');
 				if (count($check) > 1) {
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous ne pouvez modifier qu\'un professeur à la fois"});</script>');
+					$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous ne pouvez modifier qu\'un professeur à la fois');
 				} else {
 					$this->app->httpResponse()->redirect('/admin/professeurs/modifier-'.$check[0]);
 				}
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,timeout: 10000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le modifier"});</script>');
+				$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le modifier');
 			}
 			
 		// Cas de suppression
@@ -37,7 +37,7 @@ class ProfesseurController extends \Library\BackController
 				$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete.php');
 				$this->page->updateVar('js', "<script>$('#modalDeleteProf').modal('show');</script>");
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le supprimer"});</script>');
+				$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins un professeur pour le supprimer');
 			}
 		}
 	}
@@ -54,47 +54,39 @@ class ProfesseurController extends \Library\BackController
 		}
 		
 		if($request->postExists('ajouter')) {
-			$mdp = $this->app->key()->getNewSalt(8);
-			$salt = $this->app->key()->getNewSalt(40);
-			
-			$username = strtolower(substr($request->postData('prenom'),0,1).$request->postData('nom'));
 			
 			$professeur = new \Library\Entities\Professeur(array(
-				"username" => $username,
 				"nom" => $request->postData('nom'),
 				"prenom" => $request->postData('prenom'),
 				"email" => $request->postData('email'),
-				"salt" => $salt,
-				"password" => sha1(md5(sha1(md5($salt)).sha1(md5($mdp)).sha1(md5($salt)))),
-				"token" => $this->app->key()->getNewSalt(40),
 				"matiere" => unserialize(base64_decode($request->postData('matiere')))
 			));
 			
 			if($professeur->isValid()) {
 				$record = $this->managers->getManagerOf('Professeur')->save($professeur);
-				$http = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
-				if($record == false)
+				if($record instanceof \Library\Entities\Professeur)
 				{
-					$message = '<h3>Bonjour, '.$professeur->nom().' '.$professeur->prenom().'</h3>
+					$http = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
+					$message = '<h3>Bonjour, '.$record->nom().' '.$record->prenom().'</h3>
 									<p class="lead">Nous vous souhaitons la bienvenue sur myLearn</p>
 									<p>Votre compte a été créé, vous pouvez maintenant activer votre compte en suivant le lien ci-dessous, pour pourrez vous connecter avec les identifiants suivants :
-									<ul><li><strong>Username :</strong> '.$professeur->username().'</li>
-									<li><strong>Mot de passe :</strong> '.$mdp.'</li></ul>
+									<ul><li><strong>Username :</strong> '.$record->username().'</li>
+									<li><strong>Mot de passe :</strong> '.$record->password().'</li></ul>
 									</p>
 									<p class="callout">
-										Pour activer votre compte  <a href="'.$http.'://'.$_SERVER['HTTP_HOST'].'/connexion/'.$professeur->token().'"> cliquez ici!</a>
+										Pour activer votre compte  <a href="'.$http.'://'.$_SERVER['HTTP_HOST'].'/connexion/'.$record->token().'"> cliquez ici!</a>
 									</p>';
 				
 					$encoded = $this->app->key()->encode($message);
 					$crypt = new \Library\Entities\Crypt(array(
-						"id" => $professeur->token(),
+						"id" => $record->token(),
 						"message" => $encoded['crypted'],
 						"cle" => $encoded['key']
 						));
 					$this->managers->getManagerOf('Crypt')->add($crypt);
 				
 					$sujet = 'Activation de votre compte';
-					$this->app->mail()->setMail($professeur->email());
+					$this->app->mail()->setMail($record->email());
 					$this->app->mail()->setMessage($sujet, $message);
 					$this->app->mail()->setSujet($sujet);
 				
@@ -102,18 +94,19 @@ class ProfesseurController extends \Library\BackController
 					$envoi = $this->app->mail()->send();
 					if($envoi == 1)
 					{
-						$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Enregistrement du professeur réussi"});</script>');
+						$this->app->user()->setFlash('success','Enregistrement du professeur réussi');
 					}
 					else
 					{
-						$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "error", layout: "topCenter", text: "'.$envoi.'"});</script>');
+						$this->app->user()->setFlash('error',$envoi);
 					}
 				
 					$this->app->httpresponse()->redirect('/admin/professeurs');
 				}
 				else
 				{
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "'.$record->type().'", layout: "topCenter", text: "'.$record->message().'"});</script>');
+					$this->app->user()->setFlash($record->type(),$record->message());
+					$this->page->addVar('erreurs', $professeur['erreurs']);
 					$this->page->addVar('professeur', $professeur);
 				}
 				
@@ -142,27 +135,34 @@ class ProfesseurController extends \Library\BackController
 			
 				$prof = new \Library\Entities\Professeur(array(
 					"id" => $professeur['id'],
-					"username" => strtolower($request->postData('username')),
+					"username" => $professeur['username'],
 					"nom" => $request->postData('nom'),
 					"prenom" => $request->postData('prenom'),
 					"email" => $request->postData('email'),
 					"password" => $professeur['password'],
-					"salt" => $professeur['salt'],
-					"token" => $professeur['token'],
-					"active" => $professeur['active'],
 					"matiere" => unserialize(base64_decode($request->postData('matiere')))
 				));
 			
 				if($prof->isValid()) {
-					$this->managers->getManagerOf('Professeur')->save($prof);
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification réussie"});</script>');
-					$this->app->httpresponse()->redirect('/admin/professeurs');
+					$record = $this->managers->getManagerOf('Professeur')->save($prof);
+					if($record instanceof \Library\Entities\Error)
+					{
+						$this->app->user()->setFlash($record->type(),$record->message());
+						if($record->code() == "OP_S")
+						{
+							$this->app->httpresponse()->redirect('/admin/professeurs');
+						}
+						else
+						{
+							$this->page->addVar('erreurs', $prof['erreurs']);
+							$this->page->addVar('professeur', $prof);
+						}
+					}
 				} else {
 					$this->page->addVar('erreurs', $prof['erreurs']);
 					$this->page->addVar('professeur', $prof);
 				}
 			}
-
 		} else {
 			$this->app->httpresponse()->redirect('/admin/professeurs');
 		}
@@ -174,7 +174,7 @@ class ProfesseurController extends \Library\BackController
 			$suppr = unserialize(base64_decode($request->postData('suppr_'.$i)));
 				$this->managers->getManagerOf('Professeur')->delete($suppr);
 			}
-		$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+		$this->app->user()->setFlash('success','<strong>Suppression réussie !</strong>');
 		$this->app->httpResponse()->redirect('/admin/professeurs');
 	}
 }

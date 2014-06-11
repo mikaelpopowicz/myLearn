@@ -45,7 +45,7 @@
 					<div class="form-group">
 						<label for="nom" class="col-sm-3 control-label">Mot de passe</label>
 						<div class="col-sm-4">
-							<input type="text" id="password" name="password" class="form-control" placeholder="******" value="<?php echo isset($smtp) ? $smtp['password'] : "";?>">
+							<input type="password" id="password" name="password" class="form-control" placeholder="******" value="<?php echo isset($smtp) ? $smtp['password'] : "";?>">
 							<?php
 							if(isset($erreur) && in_array('password', $erreur)) {
 								echo "<span class='help-block'></span>";
@@ -62,6 +62,29 @@
 								echo "<span class='help-block'></span>";
 							}
 							?>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="security" class="col-sm-3 control-label">Sécurité</label>
+						<div class="col-sm-4">
+							<div class="radio-inline">
+								<label>
+									<input type="radio" name="security" id="none" value="none" <?php echo isset($smtp['security']) && $smtp['security'] == "none" ? "checked" : "";?>>
+									Aucune
+								</label>
+							</div>
+							<div class="radio-inline">
+								<label>
+									<input type="radio" name="security" id="ssl" value="ssl" <?php echo isset($smtp['security']) && $smtp['security'] == "ssl" ? "checked" : "";?>>
+									SSL
+								</label>
+							</div>
+							<div class="radio-inline">
+								<label>
+									<input type="radio" name="security" id="tls" value="tls" <?php echo isset($smtp['security']) && $smtp['security'] == "tls" ? "checked" : "";?>>
+									TLS
+								</label>
+							</div>
 						</div>
 					</div>
 					<div class="form-group">

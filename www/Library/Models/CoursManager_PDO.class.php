@@ -146,6 +146,33 @@ class CoursManager_PDO extends CoursManager
 		return $result;
 	}
 	
+	public function getListJson($id,$mat)
+	{
+		$requete = $this->dao->prepare('CALL select_matiere_cours(:mat,null,:id,null)');
+		$requete->bindValue(':mat', $mat);
+		$requete->bindValue(':id', $id);
+		$requete->execute();
+		$nombre = $requete->fetch(\PDO::FETCH_ASSOC)['Cours'];
+		
+		if($nombre > 0)
+		{
+			for ($i=0; $i < $nombre; $i++) { 
+				$requete->nextRowset();
+				$result['classe'] = \Library\Models\ClasseManager_PDO::getObj($requete);
+				$requete->nextRowset();
+				$result['matiere'] = \Library\Models\MatiereManager_PDO::getObj($requete);
+				$requete->nextRowset();
+				$result[$i] = \Library\Models\CoursManager_PDO::getObj($requete);
+				$result[$i]->setClasse($result['classe']);
+				$result[$i]->setMatiere($result['matiere']);
+				unset($result['classe']);
+				unset($result['matiere']);
+			}
+			return $result;
+		}
+		return false;
+	}
+	
 	public function search($query, $id)
 	{
 		$requete = $this->dao->prepare('CALL search_engine(:query, :id)');
@@ -175,10 +202,10 @@ class CoursManager_PDO extends CoursManager
 	
 	public function getList()
 	{
-		$sql = 'SELECT c.id_cours as id, u.username AS auteur, c.id_m AS matiere, c.titre, c.description, c.contenu, c.dateAjout, c.dateModif
+		$sql = 'SELECT c.id_c as id, b.username AS auteur, c.id_m AS matiere, c.titre, c.description, c.contenu, c.dateAjout, c.dateModif, c.count_c
 			FROM cours c
-			INNER JOIN user u ON c.id_u = u.id_u
-			ORDER BY id_cours DESC';
+			INNER JOIN byte b ON c.id_u = b.id_u
+			ORDER BY id_c DESC';
      
 		$requete = $this->dao->query($sql);
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Cours');
@@ -196,31 +223,7 @@ class CoursManager_PDO extends CoursManager
 		return $listeCours;
 	}
 	
-	public function getListJson($id, $matiere)
-	{
-		$sql = 'SELECT m.libelle, c.id_cours, c.titre, c.description, c.dateAjout, u.nom, u.prenom
-			FROM matiere m 
-			INNER JOIN cours c ON c.id_m = m.id_m
-			INNER JOIN assigner a ON a.id_m = m.id_m
-			INNER jOIN etre et ON et.id_classe = a.id_classe
-			INNER JOIN eleve e ON e.id_u = et.id_u
-			INNER JOIN user u ON u.id_u = c.id_u
-			WHERE e.id_u = :id 
-			AND m.id_m = :matiere
-			GROUP BY c.id_cours
-			ORDER BY c.titre';
-			//id, titre, desc, contenu, date, auteur, matiere du cours 
-		$requete = $this->dao->prepare($sql);
-		$requete->bindValue(':id', $id );
-		$requete->bindValue(':matiere', $matiere );
-		$requete->execute();
-		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Matiere');
-     
-		$listeCours = $requete->fetchAll();
-		$requete->closeCursor();
-     
-		return $listeCours;
-	}
+	
 
 	public function getListByAuthor($auteur)
 	{
@@ -287,8 +290,8 @@ class CoursManager_PDO extends CoursManager
 		$result['cours']->setMatiere($result['matiere']);
 		unset($result['classe']);
 		unset($result['matiere']);
-		
-		return $result;
+
+		return $result['cours'];		
 	}
 
 	public function count()
@@ -323,8 +326,7 @@ class CoursManager_PDO extends CoursManager
 	
 	protected function add(Cours $cours)
 	{
-		$requete = $this->dao->prepare('INSERT INTO cours SET id_u = :auteur, id_classe = :classe, id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateAjout = sysdate(), dateModif = sysdate()');
-		
+		$requete = $this->dao->prepare('CALL ajouter_cours(:auteur, :classe, :matiere, :titre, :uri, :description, :contenu)');
 	    $requete->bindValue(':auteur', $cours->auteur()->id());
 		$requete->bindValue(':classe', $cours->classe()->id());
 		$requete->bindValue(':matiere', $cours->matiere()->id());
@@ -338,14 +340,16 @@ class CoursManager_PDO extends CoursManager
 	
 	protected function modify(Cours $cours)
 	{
-	    $requete = $this->dao->prepare('UPDATE cours SET id_classe = :classe, id_m = :matiere, titre = :titre, uri = :uri, description = :description, contenu = :contenu, dateModif = NOW() WHERE id_cours = :id');
+		//echo 'Cours :'.$cours->id().' - Classe :'.$cours->classe()->id().' - Matiere : '.$cours->matiere()->id().' - Titre : '.$cours->titre();
+	    $requete = $this->dao->prepare('CALL up_cours(:id, :classe, :matiere, :titre, :uri, :description, :contenu)');
+		$requete->bindValue(':id', $cours->id());
 		$requete->bindValue(':classe', $cours->classe()->id());
-	    $requete->bindValue(':matiere', $cours->matiere()->id());
-		$requete->bindValue(':titre', $cours->titre());
+		$requete->bindValue(':matiere', $cours->matiere()->id());
+	    $requete->bindValue(':titre', $cours->titre());
 		$requete->bindValue(':uri', $cours->uri());
 		$requete->bindValue(':description', $cours->description());
-		$requete->bindValue(':contenu', $cours->contenu());
-		$requete->bindValue(':id', $cours->id());
+	    $requete->bindValue(':contenu', $cours->contenu());
+		//echo '<pre>';print_r($requete);echo '</pre>';die();
 	    $requete->execute();
 	}
 	

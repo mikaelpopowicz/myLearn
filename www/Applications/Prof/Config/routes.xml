@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<routes>
+	<route url="/professeur(/?)" module="Cours" action="index" />
+	<route url="/professeur/cours/ecrire-un-cours" module="Cours" action="ecrire" />
+	<route url="/professeur/cours/modifier-([0-9]*)" module="Cours" action="modifier" vars="id" />
+	<route url="/professeur/cours/supprimer" module="Cours" action="supprimer" />
+	<route url="/professeur/cours/([0-9]{4}-[0-9]{4}\/.[^_/]+)/([^/]+)" module="Cours" action="show" vars="libelle,cours" />
+	<route url="/professeur/cours/([0-9]{4}-[0-9]{4}\/.[^_/]+)([_[0-9]*]?)" module="Cours" action="list_cours" vars="libelle,page" />
+	
+	<route url="/professeur/mes-cours" module="Param" action="cours" />
+	
+	<route url="/professeur/devoirs" module="Devoir" action="index" />
+	<route url="/professeur/devoirs/nouveau-devoir" module="Devoir" action="ajouter" vars="id" />
+	<route url="/professeur/devoirs/supprimer" module="Devoir" action="supprimer" />
+	<route url="/professeur/devoirs/supprimer-piece" module="Devoir" action="delPiece" />
+	<route url="/professeur/devoirs/modifier-([0-9]*)" module="Devoir" action="modifier" vars="id" />
+	<route url="/professeur/devoirs/([0-9]*)" module="Devoir" action="show" vars="id" />
+	<route url="/professeur/devoirs/([0-9]*)/piece-([0-9]*)" module="Devoir" action="download" vars="id,piece" />
+	<route url="/professeur/devoirs/([0-9]*)/production-([0-9]*)" module="Devoir" action="download" vars="id,production" />
+	
+	<route url="/professeur/parametres(/?)" module="Param" action="index" />
+	<route url="/professeur/parametres/modifier-user" module="Param" action="user" />
+	<route url="/professeur/parametres/modifier-password" module="Param" action="password" />
+</routes>

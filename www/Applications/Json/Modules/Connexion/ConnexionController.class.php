@@ -12,7 +12,7 @@ class ConnexionController extends \Library\BackController
 		$pass = $request->getData('pass');
 		if (!empty($login) && !empty($pass))
 		{
-			$user = $this->managers->getManagerOf('User')->connexion($login,MD5($pass));
+			$user = $this->managers->getManagerOf('User')->connexion($login,$pass,$request->requestIp());
 			
 			if(isset($user['user']) && ($user['user'] instanceof \Library\Entities\User))
 			{

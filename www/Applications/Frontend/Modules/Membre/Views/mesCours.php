@@ -27,9 +27,6 @@
 					<li class="<?php echo isset($class_mes_cours) ? $class_mes_cours : "";?>">
 						<a href="/mon-compte/mes-cours">Mes cours</a>
 					</li>
-					<li class="<?php echo isset($class_config) ? $class_config : "";?>">
-						<a href="/mon-compte/configuration">Configuration</a>
-					</li>
 				</ul>
 			</div>
 			<div class="span9">
@@ -53,7 +50,7 @@
 			<table class="table table-bordered table-hover table-striped datatable">
 				<thead>
 					<tr>
-						<th><input type="checkbox" name="checkAll" id="checkAll"></th>
+						<th><input type="checkbox" name="checkAll" id="check_all"></th>
 						<th width="300">Nom</th>
 						<th>Matière</th>
 						<th>Dernière modification</th>

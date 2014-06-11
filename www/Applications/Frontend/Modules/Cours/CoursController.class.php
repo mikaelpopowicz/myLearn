@@ -66,7 +66,7 @@ class CoursController extends \Library\BackController {
 					}
 					else
 					{
-						$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+						$this->app->user()->setFlash($erreur->type(),$erreur->message());
 						$this->app->httpResponse()->redirect("/cours/".str_replace('/','-',$classe->session()->session()).'/'.$classe->uri().'/'.$matiere->uri());
 					}
 				}
@@ -75,7 +75,7 @@ class CoursController extends \Library\BackController {
 			{
 				$erreur = $result['matiere'];
 			
-				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+				$this->app->user()->setFlash($erreur->type(),$erreur->message());
 				$this->app->httpResponse()->redirect("/cours/".str_replace('/','-',$classe->session()->session()).'/'.$classe->uri());
 			}
 		}
@@ -83,7 +83,7 @@ class CoursController extends \Library\BackController {
 		{
 			$erreur = $result['classe'];
 			
-			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+			$this->app->user()->setFlash($erreur->type(),$erreur->message());
 			$this->app->httpResponse()->redirect("/cours");
 		}
 	}
@@ -115,7 +115,7 @@ class CoursController extends \Library\BackController {
 		{
 			$erreur = $result['erreur'];
 			
-			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+			$this->app->user()->setFlash($erreur->type(),$erreur->message());
 			$this->app->httpResponse()->redirect("/cours");
 		}
 	}
@@ -156,7 +156,7 @@ class CoursController extends \Library\BackController {
 						if($comment->isValid())
 						{
 							$this->managers->getManagerOf('Comments')->save($comment);
-							$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "success", layout: "topCenter", text: "<strong>Commentaire enregistré</strong>"});</script>');
+							$this->app->user()->setFlash('success','<strong>Commentaire enregistré</strong>');
 							$this->app->httpResponse()->redirect('/cours/'.str_replace('/','-',$classe->session()->session()).'/'.$classe->uri()."/".$matiere->uri().'/'.$cours->uri());
 						}
 						else
@@ -170,7 +170,7 @@ class CoursController extends \Library\BackController {
 				{
 					$erreur = $result['cours'];
 
-					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+					$this->app->user()->setFlash($erreur->type(),$erreur->message());
 					$this->app->httpResponse()->redirect("/cours/".str_replace('/','-',$classe->session()->session()).'/'.$classe->uri().'/'.$matiere->uri());
 				}
 			}
@@ -178,7 +178,7 @@ class CoursController extends \Library\BackController {
 			{
 				$erreur = $result['matiere'];
 			
-				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+				$this->app->user()->setFlash($erreur->type(),$erreur->message());
 				$this->app->httpResponse()->redirect("/cours/".str_replace('/','-',$classe->session()->session()).'/'.$classe->uri());
 			}
 		}
@@ -186,7 +186,7 @@ class CoursController extends \Library\BackController {
 		{
 			$erreur = $result['classe'];
 			
-			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$erreur->type().'", layout: "top", text: "<strong>'.$erreur->message().'</strong>"});</script>');
+			$this->app->user()->setFlash($erreur->type(),$erreur->message());
 			$this->app->httpResponse()->redirect("/cours");
 		}
 	}
@@ -200,7 +200,7 @@ class CoursController extends \Library\BackController {
 	public function executeEcrire(\Library\HTTPRequest $request)
 	{
 		if($request->postExists('annuler')) {
-			$this->app->httpResponse()->redirect('/membre/mes-cours');
+			$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 		}
 		
 		if($request->postExists('ajouter')) {
@@ -217,7 +217,7 @@ class CoursController extends \Library\BackController {
 		
 			if($cours->isValid()) {
 				$this->managers->getManagerOf('Cours')->save($cours);
-				$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "success", layout: "topCenter", text: "<strong>Cours enregistré !</strong>"});</script>');
+				$this->app->user()->setFlash('success','<strong>Cours enregistré !</strong>');
 				$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 			} else {
 				$this->page->addVar('cours', $cours);
@@ -233,9 +233,9 @@ class CoursController extends \Library\BackController {
 	public function executeModifier(\Library\HTTPRequest $request)
 	{
 		$result = $this->managers->getManagerOf('Cours')->getUnique($request->getData('id'));
-		if(isset($result['cours']) && ($result['cours'] instanceof \Library\Entities\Cours))
+		if($result instanceof \Library\Entities\Cours)
 		{
-			$cours = $result['cours'];
+			$cours = $result;
 			
 			if($cours->auteur()->id() == $this->app->user()->getAttribute('id'))
 			{
@@ -258,7 +258,7 @@ class CoursController extends \Library\BackController {
 				
 					if($cours->isValid()) {
 						$this->managers->getManagerOf('Cours')->save($cours);
-						$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "success", layout: "topCenter", text: "<strong>Modifications enregistrées !</strong>"});</script>');
+						$this->app->user()->setFlash('success','<strong>Modifications enregistrées !</strong>');
 						$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 					} else {
 						$this->page->addVar('cours', $cours);
@@ -269,11 +269,11 @@ class CoursController extends \Library\BackController {
 				$this->page->addVar('title', 'MyLearn - Modifier - '.$cours->titre());
 				$this->page->addVar('cours', $cours);
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "Vous ne pouvez pas modifier ce cours car vous n\'en n\'êtes pas l\'auteur"});</script>');
+				$this->app->user()->setFlash('warning','Vous ne pouvez pas modifier ce cours car vous n\'en n\'êtes pas l\'auteur');
 				$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 			}		
 		} else {
-			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "'.$cours.'"});</script>');
+			$this->app->user()->setFlash('warning',$result);
 			$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 		}
 	}
@@ -283,7 +283,7 @@ class CoursController extends \Library\BackController {
 		for ($i=0; $i < $request->postData('count'); $i++) { 
 			$this->managers->getManagerOf('Cours')->delete(unserialize(base64_decode($request->postData('suppr_'.$i))));
 		}
-		$this->app->user()->setFlash('<script>noty({type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+		$this->app->user()->setFlash('success','<strong>Suppression réussie !</strong>');
 		$this->app->httpResponse()->redirect('/mon-compte/mes-cours');
 	}
 }

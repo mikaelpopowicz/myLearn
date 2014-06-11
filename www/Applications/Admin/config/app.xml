@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <definitions>
-	<define var="version" value="1.0" />
-	<define var="release" value="05/2014" />
-	<define var="db_host" value="PPS+ATKLr8lU" />
-	<define var="db_name" value="PeKxBT+Rrg==" />
-	<define var="db_user" value="IvSyFA==" />
-	<define var="db_user_pass" value="IvSyFA==" />
+	<define var="db_host" value="CKR5tuQAoMV2" />
+	<define var="db_name" value="CbJ2sukaoQ==" />
+	<define var="db_user" value="FqR1ow==" />
+	<define var="db_user_pass" value="FqR1ow==" />
 	<define var="conf_nom" value="Iris" />
-	<define var="conf_description" value="Description" />
+	<define var="conf_description" value="Description pour la page de connexion" />
+	<define var="conf_address" value="4 résidence du port " />
+	<define var="conf_ville" value="Mours" />
+	<define var="conf_cp" value="95260" />
+	<define var="conf_tel" value="0620767106" />
 	<define var="conf_email" value="adam.menebhi@gmail.com" />
-	<define var="conf_contact" value="j.oliveira@ecoleiris.fr" />
-	<define var="conf_date" value="29/05/2014" />
-	<define var="cryp_iv" value="LK/oWvCqXQA=" />
-	<define var="cryp_key" value="SUc4amtlSVRiRTh3bDdZRkJEbllCeHg1" />
-	<define var="smtp_host" value="I/apEHCErdtJM4cf3Co=" />
-	<define var="smtp_port" value="ZaPq" />
-	<define var="smtp_user" value="Mf+8DXCOpdRFPcEV8yBy9pM1zS5Hig==" />
-	<define var="smtp_pass" value="EdfkUT2O9Ys=" />
+	<define var="conf_contact" value="adam.menebhi@gmail.Com" />
+	<define var="conf_date" value="11/06/2014" />
+	<define var="cryp_iv" value="nPwVLXkODEQ=" />
+	<define var="cryp_key" value="RGZ2YzZsMXMzY1cxZUkzNTZaQThVVWRZ" />
+	<define var="smtp_host" value="F6Zup6YPotdrfGMKr0k=" />
+	<define var="smtp_port" value="UfMt" />
+	<define var="smtp_user" value="Ba97uqYFqthnciUAgEOSJltyoY113w==" />
+	<define var="smtp_pass" value="JYcj5usF+oc=" />
+	<define var="smtp_security" value="EKdp" />
 	<define var="cours_page" value="5" />
 	<define var="installed" value="true" />
 </definitions>

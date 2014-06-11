@@ -88,6 +88,12 @@
 								<li class="<?php echo isset($class_eleve) ? $class_eleve : "";?>"><a href="/admin/eleves">Elèves</a></li>
 							</ul>
 						</li>
+						<li class="dropdown <?php echo isset($class_log) ? $class_log : "";?>">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Journaux <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li class="<?php echo isset($class_conn) ? $class_conn : "";?>"><a href="/admin/logs-connexion">Logs de connexion</a></li>
+							</ul>
+						</li>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 						<li class="<?php echo isset($class_param) ? $class_param : "";?>"><a href="/admin/parametres">Paramètres</a></li>

@@ -12,6 +12,7 @@ class Mailer extends \Library\ApplicationComponent
 	private $phpmail;
 	private $host;
 	private $port;
+	private $security;
 	private $username;
 	private $password;
 	private $sender;
@@ -22,7 +23,8 @@ class Mailer extends \Library\ApplicationComponent
 		$this->setTeam($app->config()->get('conf_nom'));
 		$this->setContact($app->config()->get('conf_contact'));
 		$this->setHost($app->config()->get('smtp_host'));
-		$this->setPort($app->config()->get('smtp_host'));
+		$this->setPort($app->config()->get('smtp_port'));
+		$this->setSecurity($app->config()->get('smtp_security'));
 		$this->setUsername($app->config()->get('smtp_user'));
 		$this->setPassword($app->config()->get('smtp_pass'));
 		$this->setSender($app->config()->get('conf_email'));
@@ -60,6 +62,18 @@ class Mailer extends \Library\ApplicationComponent
 		$this->port = $port;
 	}
 	
+	public function setSecurity($security)
+	{
+		if($security == "none")
+		{
+			$this->security = "";
+		}
+		else
+		{
+			$this->security = $security;
+		}
+	}
+	
 	public function setUsername($username)
 	{
 		$this->username = $username;
@@ -84,20 +98,29 @@ class Mailer extends \Library\ApplicationComponent
 		$this->phpmail->Host		=	$this->host;
 		$this->phpmail->SMTPDebug	=	0;
 		$this->phpmail->SMTPAuth	=	true;
-		$this->phpmail->SMTPSecure	=	"tls";
+		$this->phpmail->SMTPSecure	=	$this->security;
 		$this->phpmail->Port		=	$this->port;
 		$this->phpmail->Username	=	$this->username;
 		$this->phpmail->Password	=	$this->password;
 		$this->phpmail->SetFrom($this->sender, "MyLearn");
-		$this->phpmail->AddAddress($this->mail);
+		if(is_array($this->mail))
+		{
+			foreach ($this->mail as $mail) {
+				$this->phpmail->AddAddress($mail);
+			}
+		}
+		else
+		{
+			$this->phpmail->AddAddress($this->mail);
+		}
 		try {
 			$this->phpmail->Send();
-			return true;
 		} catch (\phpmailerException $e) {
 			return $e->errorMessage(); //Pretty error messages from PHPMailer
 		} catch (Exception $e) {
 			return $e->getMessage(); //Boring error messages from anything else!
 		}
+		return true;
 	}
 	
 	
@@ -111,7 +134,7 @@ class Mailer extends \Library\ApplicationComponent
 		$this->message.= "Content-Transfer-Encoding: 8bit".$this->ligne;
 		*/
 		
-		$http = $_SERVER['HTTPS'] == "on" ? "https" : "http";
+		$http = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on" ? "https" : "http";
 		
 		$string = '
 			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

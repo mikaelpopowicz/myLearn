@@ -9,7 +9,11 @@
 	<route url="/cours/supprimer-un-cours" module="Cours" action="supprimer" />
 	<route url="/cours/modifier-([0-9]+)" module="Cours" action="modifier" vars="id" />
 	
-	<route url="/test(\/?)" module="Devoir" action="index" />
+	<route url="/devoirs(\/?)" module="Devoir" action="index" />
+	<route url="/devoirs/supprimer-document" module="Devoir" action="delDocument" />
+	<route url="/devoirs/consulter-([0-9]*)" module="Devoir" action="show" vars="id" />
+	<route url="/devoirs/consulter-([0-9]*)/piece-([0-9]*)" module="Devoir" action="download" vars="id,piece" />
+	<route url="/devoirs/consulter-([0-9]*)/production-([0-9]*)" module="Devoir" action="download" vars="id,production" />
 	
 	<route url="/contact" module="Contact" action="index" />
 	
@@ -27,8 +31,4 @@
 	<route url="/mon-compte/configuration" module="Membre" action="maConfiguration" />
 	
 	<route url="/search" module="Query" action="index" />
-	<route url="/coucou" module="Coucou" action="index" />
-	<route url="/coucou/test" module="Coucou" action="test" />
-	
-	<route url="/professor" module="Coucou" action="listeProf" /> 
 </routes>

@@ -12,14 +12,14 @@ class ConnexionController extends \Library\BackController
 		$this->page->addVar('mail', $this->app->config()->get('conf_contact'));
 		
 	 	if($this->app->user()->isAuthenticated()) {
-			$this->app->user()->setFlash('<script>noty({timeout: 3000, type: "warning", layout: "topCenter", text: "Vous êtes déjà connecté"});</script>');
+			$this->app->user()->setFlash('warning','Vous êtes déjà connecté');
 	 		$this->app->httpResponse()->redirect('/');
 	 	} else {
 	 		if($request->postExists('go')) {
 	 			$login = $request->postData('login');
 				$pass = $request->postData('password');
 				
-				$user = $this->managers->getManagerOf('User')->connexion($login,$pass);
+				$user = $this->managers->getManagerOf('User')->connexion($login,$pass,$request->requestIp());
 
 				if(isset($user['user']) && ($user['user'] instanceof \Library\Entities\User)) {
 					$this->app->user()->setAuthenticated(true);
@@ -53,7 +53,7 @@ class ConnexionController extends \Library\BackController
 	{
 		if($this->app->user()->isAuthenticated()) {
 			$this->app->user()->delUser();
-			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "information", layout: "topCenter", text: "Vous êtes déconnecté"});</script>');
+			$this->app->user()->setFlash('information','Vous êtes déconnecté');
 		}
 		$this->app->httpResponse()->redirect('/');
 	}
@@ -66,46 +66,10 @@ class ConnexionController extends \Library\BackController
 		$this->page->addVar('desc', $this->app->config()->get('conf_description'));
 		// Si le token est présent dans l'url
 		if($request->getExists('token')) {
-			$message = $this->managers->getManagerOf('User')->activation($request->getData('token'),$this->app->key()->getNewSalt(40));
-			$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$message->type().'", layout: "topCenter", text: "'.$message->message().'"});</script>');
+			$message = $this->managers->getManagerOf('User')->activation($request->getData('token'));
+			$this->app->user()->setFlash($message->type(),$message->message());
 			$this->app->httpResponse()->redirect('/');
-			
-			/* Ancienne méthode
-			
-			// Récupération du manager et de l'utilisateur qui a ce token
-			$manU = $this->managers->getManagerOf('User');
-			$test = $manU->getByToken($request->getData('token'));
-			
-			// Si un utilisateur à bien ce token
-			if($test != NULL) {
-				
-				// Si c'est un token d'activation
-				if($test->active() == 0) {
-					
-					// On change l'état ACTIVE de cet utilisateur et lui donne un nouveau token
-					$test->setActive(1);
-					$test->setToken($this->app->key()->getNewSalt(40));
-					$manU->save($test);
-					$this->app->user()->setFlash('<script>noty({type: "success", layout: "top", text: "<strong>Activation réussie !</strong> Vous pouvez maintenant vous connecter"});</script>');
-					$this->app->httpResponse()->redirect('/');
-					
-				// Sinon c'est token de restauration de mot de passe
-				} else {
-					$this->app->user()->setFlash('<script>noty({type: "warning", layout: "top", text: "Compte déjà activé"});</script>');
-					$this->app->httpResponse()->redirect('/');
-				}
-				
-			// Personne n'a ce token
-			} else {
-				$this->app->user()->setFlash('<script>noty({type: "error", layout: "top", text: "Mauvaise requête"});</script>');
-				$this->app->httpResponse()->redirect('/');
-			}
-			
-			*/
-			
-		// Le token n'est pas présent dans l'url
 		}
-		
 		// Si la demande d'envoi de lien d'activation a été faite
 		if($request->postExists('go')) {
 			
@@ -123,14 +87,12 @@ class ConnexionController extends \Library\BackController
 				$envoi = $this->app->mail()->send();
 				if($envoi != 1)
 				{
-					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "error", layout: "topCenter", text: "'.$envoi.'"});</script>');
+					$this->app->user()->setFlash('error',$envoi);
 				}
 				else
 				{
-					$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$message->type().'", layout: "topCenter", text: "'.$message->message().'"});</script>');
+					$this->app->user()->setFlash($message->type(),$message->message());
 				}
-				
-				
 				$this->app->httpResponse()->redirect('/');
 			}
 			else if($message->code() == "ACT_WM")
@@ -139,50 +101,9 @@ class ConnexionController extends \Library\BackController
 			}
 			else
 			{
-				$this->app->user()->setFlash('<script>noty({timeout: 4000, type: "'.$message->type().'", layout: "topCenter", text: "'.$message->message().'"});</script>');
+				$this->app->user()->setFlash($message->type(),$message->message());
 				$this->app->httpResponse()->redirect('/');
 			}
-			
-			
-			/* Ancienne méthode 
-			
-			// Récupération du manager et de l'utilisateur qui a ce token
-			$manU = $this->managers->getManagerOf('User');
-			$test = $manU->getByMail($request->postData('email'));
-			
-			// Si l'utilisateur existe
-			if($test != NULL) {
-				
-				// Vérification que l'utilisateur n'est pas activé
-				if($test->active() == 0) {
-					// Envoi du mail d'activation
-					$crypt = $this->managers->getManagerOf('Crypt')->getUnique($test['token']);
-					$message = $this->app->key()->decode($crypt->message(), $crypt->cle());
-					/*$message = '<h3>Bonjour, '.$test->username().'</h3>
-								<p class="lead">Nous vous souhaitons la bienvenue sur myLearn</p>
-								<p>Une fois votre compte activé vous pourrez participer activement au site, de la création de cours jusqu\'au simple commentaire des autres. Nous déterminerons dans quelle(s) matière(s) vous aurez le droit créer des cours. Une fois fait, vous accéderez à la création de cours directement depuis la barre de naviguation du site lorsque vous serrez connecté.</p>
-								<p class="callout">
-									Pour activer votre compte  <a href="http://ppe/connexion/'.$test->token().'"> cliquez ici!</a>
-								</p>';
-					
-					$sujet = 'Activation de votre compte';
-					$this->app->mail()->setMail($test->email());
-					$this->app->mail()->setMessage($sujet, $message);
-					$this->app->mail()->setSujet($sujet);
-					$this->app->mail()->send();
-					$this->app->user()->setFlash('<script>noty({type: "success", layout: "topCenter", text: "<strong>Mail envoyé</strong>"});</script>');
-					//echo "<pre>";print_r($this->app->mail()); echo "</pre>";
-					//echo '<pre>';print_r($this->app->config()->get('conf_email'));echo '</pre>';
-					$this->app->httpResponse()->redirect('/');
-				} else {
-					$this->app->user()->setFlash('<script>noty({type: "information", layout: "topCenter", text: "Votre compte est déjà activé"});</script>');
-					$this->app->httpResponse()->redirect('/');
-				}
-			} else {
-				$this->page->addVar('erreurs', array('danger', 'Aucun compte ne correspond à cet email'));
-			}
-			
-			*/
 		}
 	}
 	
@@ -214,9 +135,7 @@ class ConnexionController extends \Library\BackController
 					$this->app->mail()->setMessage($sujet, $message);
 					$this->app->mail()->setSujet($sujet);
 					$this->app->mail()->send();
-					$this->app->user()->setFlash('<script>noty({type: "information", layout: "topCenter", text: "<strong>Mail envoyé</strong>"});</script>');
-					//echo "<pre>";print_r($this->app->mail()); echo "</pre>";
-					//echo $this->app->mail()->headers();
+					$this->app->user()->setFlash('information','<strong>Mail envoyé</strong>');
 					$this->app->httpResponse()->redirect('/');
 				} else {
 					$this->page->addVar('erreurs', array('warning', 'Vous devez d\'abord <a href="/connexion/activer">activez</a> votre compte !'));
@@ -260,7 +179,7 @@ class ConnexionController extends \Library\BackController
 								$test->setPassword(sha1(md5(sha1(md5($test['salt'])).sha1(md5($pass1)).sha1(md5($test['salt'])))));
 								$test->setToken($this->app->key()->getNewSalt(40));
 								$manU->save($test);
-								$this->app->user()->setFlash('<script>noty({type: "success", layout: "top", text: "<strong>Réinitialisation réussie !</strong> Vous pouvez maintenant vous connecter"});</script>');
+								$this->app->user()->setFlash('success','<strong>Réinitialisation réussie !</strong> Vous pouvez maintenant vous connecter');
 								$this->app->httpResponse()->redirect('/connexion');
 							} else {
 								$this->page->addVar('erreurs', array('danger', 'Veuillez saisir deux mots de passe identiques'));

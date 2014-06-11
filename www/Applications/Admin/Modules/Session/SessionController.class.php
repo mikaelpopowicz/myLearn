@@ -16,12 +16,12 @@ class SessionController extends \Library\BackController
 			if ($request->postExists('check')) {
 				$check = $request->postData('check');
 				if (count($check) > 1) {
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous ne pouvez modifier qu\'une session à la fois"});</script>');
+					$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous ne pouvez modifier qu\'une session à la fois');
 				} else {
 					$this->app->httpResponse()->redirect('/admin/sessions/modifier-'.$check[0]);
 				}
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,timeout: 10000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins une session pour la modifier"});</script>');
+				$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins une session pour la modifier');
 			}
 			
 		// Cas de suppression
@@ -36,7 +36,7 @@ class SessionController extends \Library\BackController
 				$this->page->updateVar('includes',  __DIR__.'/Views/modal_delete.php');
 				$this->page->updateVar('js', "<script>$('#modalDeleteSession').modal('show');</script>");
 			} else {
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "warning", layout: "top", text: "<strong>Attention !</strong> Vous devez sélectionner au moins une session pour la supprimer"});</script>');
+				$this->app->user()->setFlash('warning','<strong>Attention !</strong> Vous devez sélectionner au moins une session pour la supprimer');
 			}
 		}
 	}
@@ -59,7 +59,7 @@ class SessionController extends \Library\BackController
 			
 			if($session->isValid()) {
 				$this->managers->getManagerOf('Session')->save($session);
-				$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Création de la session réussie"});</script>');
+				$this->app->user()->setFlash('success','Création de la session réussie');
 				$this->app->httpresponse()->redirect('/admin/sessions');
 			} else {
 				$this->page->addVar('erreurs', $session['erreurs']);
@@ -90,7 +90,7 @@ class SessionController extends \Library\BackController
 				
 				if($sess->isValid()) {
 					$this->managers->getManagerOf('Session')->save($sess);
-					$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "Modification de la section réussie"});</script>');
+					$this->app->user()->setFlash('success','Modification de la section réussie');
 					$this->app->httpresponse()->redirect('/admin/sessions');
 				} else {
 					$this->page->addVar('erreurs', $sess['erreurs']);
@@ -121,7 +121,7 @@ class SessionController extends \Library\BackController
 		for ($i=0; $i < $request->postData('count'); $i++) {
 			$this->managers->getManagerOf('Session')->delete(unserialize(base64_decode($request->postData('suppr_'.$i))));
 		}
-		$this->app->user()->setFlash('<script>noty({timeout: 4000,type: "success", layout: "topCenter", text: "<strong>Suppression réussie !</strong>"});</script>');
+		$this->app->user()->setFlash('success','<strong>Suppression réussie !</strong>');
 		$this->app->httpResponse()->redirect('/admin/sessions');
 	}
 }

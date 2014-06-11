@@ -60,9 +60,9 @@ class User extends ApplicationComponent
 		$_SESSION['auth'] = $authenticated;
 	}
    
-	public function setFlash($value)
+	public function setFlash($type, $message, $timeout = 3500)
 	{
-		$_SESSION['flash'] = $value;
+		$_SESSION['flash'] = '<script>noty({timeout: '.$timeout.', type: "'.$type.'", layout: "topCenter", text: "'.$message.'"});</script>';
 	}
 	
 	public function setQuery($query) {

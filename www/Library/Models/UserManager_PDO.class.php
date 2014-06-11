@@ -5,6 +5,24 @@ use \Library\Entities\User;
  
 class UserManager_PDO extends UserManager
 {
+	public static function getObj($requete, $mode = 'Alone')
+	{
+		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\User');
+		if($mode == 'Alone')
+		{
+			$result = $requete->fetch();
+			$result->setDateUser(new \DateTime($result->dateUser()));
+		}
+		else if($mode == 'Groups')
+		{
+			$result = $requete->fetchAll();
+			foreach ($res as $user) {
+				$user->setDateUser(new \DateTime($user->dateUser()));
+			}
+		}
+		return $result;
+	}
+	
 	public function getList()
 	{
 		$requete = $this->dao->prepare('SELECT id_u AS id, username, nom, prenom, email, active, dateUser
@@ -19,11 +37,12 @@ class UserManager_PDO extends UserManager
 		return $listeByte;
 	}
 	
-	public function connexion($login, $pass)
+	public function connexion($login, $pass, $ip)
 	{
-		$requete = $this->dao->prepare('CALL connexion(:login, :pass)');
+		$requete = $this->dao->prepare('CALL connexion(:login, :pass, :ip)');
 		$requete->bindValue(':login', $login);
 		$requete->bindValue(':pass', $pass);
+		$requete->bindValue(':ip', $ip);
 		$requete->execute();
 		$erreur = $requete->fetch();
 		$requete->nextRowset();
@@ -66,11 +85,10 @@ class UserManager_PDO extends UserManager
 		return $result;
 	}
 	
-	public function activation($oldTk,$newTk)
+	public function activation($oldTk)
 	{
-		$requete = $this->dao->prepare('CALL activation(:old, :new)');
+		$requete = $this->dao->prepare('CALL activation(:old)');
 		$requete->bindValue(':old', $oldTk);
-		$requete->bindValue(':new', $newTk);
 		$requete->execute();
 		$requete->setFetchMode(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, '\Library\Entities\Error');
 		$result = $requete->fetch();
